@@ -1,4 +1,4 @@
-package chess;
+package chess; //does this mean that it is pulling in all the other files in the chess folder?
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
