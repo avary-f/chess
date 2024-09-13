@@ -54,7 +54,6 @@ public class ChessBoard {
             addPiece(new ChessPosition(7, j), new ChessPiece(BLACK, PAWN));
         }
     }
-
     public void setOthers(){
         // Set Rooks
         addPiece(new ChessPosition(1, 1), new ChessPiece(WHITE, ROOK));
@@ -116,17 +115,17 @@ public class ChessBoard {
                 match = false; //reset match for each spot
                 for(ChessPosition pos: board.keySet()){ //get access to each position
                     if(pos.getRow() == i && pos.getColumn() == j) { //see if it matched with current position
-                        layout += "|" + board.get(pos).toString2() + "| "; //if it matches, add it (toString2 is for the singular letter)
+                        layout += "|" + board.get(pos).toString2() ; //if it matches, add it (toString2 is for the singular letter)
                         match = true; //found match for that spot
                         break;
                     }
                 }
                 if(!match) {
-                    layout += "| | "; //if it didn't find a match for that spot, add an empty char
+                    layout += "| "; //if it didn't find a match for that spot, add an empty char
                 }
             }
             match = false;
-            layout += "\n";
+            layout += "|\n";
         }
 
         return layout;

@@ -64,7 +64,7 @@ public class ChessPiece {
                     //System.out.println(pos + " exists"); //testing
                     ChessPiece spot = board.getPiece(pos); //return the temp chessPiece, null if no piece
                     if(spot == null || spot.pieceColor != pieceColor){ // if the space is empty OR its the other team's piece
-                        moves.add(new ChessMove(myPosition, pos, type));
+                        moves.add(new ChessMove(myPosition, pos, null)); //no promotion piece, so it's null
                     }
                 }
             }
@@ -83,6 +83,7 @@ public class ChessPiece {
                 if(spot == null){
                     if(j == 0){
                         moves.add(new ChessMove(myPosition, pos, type)); // if its directly in front AND the space is empty
+                        //need to change the "type" to whatever the promotion piece is
                     }
                 }
                 else { //only check if the spot is not null to see if it can kill another piece

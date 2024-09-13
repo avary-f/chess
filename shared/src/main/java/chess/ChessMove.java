@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Objects;
+import static chess.ChessPiece.PieceType.*;
 
 /**
  * Represents moving a chess piece on a chessboard
@@ -16,7 +17,7 @@ public class ChessMove {
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
-        this.promotionPiece = promotionPiece;
+        this.promotionPiece = null;
     }
 
     /**
