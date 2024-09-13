@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -59,9 +60,32 @@ public class ChessPiece {
                 int col = myPosition.getColumn() + j;
                 ChessPosition pos = new ChessPosition(row, col); //position it is trying to go
                 if(spaceExists(pos)) { //if the space is on the board
-                    ChessPiece spot = board.getPiece(pos); //create a temp chessPiece, null if no piece
+                    ChessPiece spot = board.getPiece(pos); //return the temp chessPiece, null if no piece
                     if(spot == null || spot.pieceColor != pieceColor){ // if the space is empty OR its the other team's piece
                         moves.add(new ChessMove(myPosition, pos, type));
+                    }
+                }
+            }
+        }
+        return moves;
+    }
+
+    public Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition){
+        Collection<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow() + 1; //checking the row above the pawn
+        for(int j = -1; j <= 1; j++) {
+            int col = myPosition.getColumn() + j;
+            ChessPosition pos = new ChessPosition(row, col); //position it is trying to go
+            if (spaceExists(pos)) { //if the space is on the board
+                ChessPiece spot = board.getPiece(pos); //return the temp chessPiece, null if no piece
+                if(spot == null){
+                    if(j == 0){
+                        moves.add(new ChessMove(myPosition, pos, type)); // if its directly in front AND the space is empty
+                    }
+                }
+                else { //only check if the spot is not null to see if it can kill another piece
+                    if(j != 0 && spot.pieceColor != pieceColor){ //if it's a diagonal AND the other team's piece
+                        moves.add(new ChessMove(myPosition, pos, type)); //need to check if its able to be converted to a new piece?
                     }
                 }
             }
@@ -78,24 +102,35 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) { //collection allows for various return types
 
-        switch(type) {
-            case KING:
-                return kingMoves(board, myPosition);
-//            case QUEEEN:
-//                break;
-//            case BISHOP:
-//
-//                break;
-//            case KNIGHT:
-//
-//                break;
-//            case ROOK:
-//
-//                break;
-//            case PAWN:
-//
-//                break;
-        }
-        throw new RuntimeException("Not implemented");
+        return switch (type) {
+            case KING -> kingMoves(board, myPosition);
+            case PAWN -> pawnMoves(board, myPosition);
+//            case BISHOP -> bishopMoves(board, myPosition);
+//            case KNIGHT -> knightMoves(board, myPosition);
+//            case ROOK -> rookMoves(board, myPosition);
+//            case QUEEN -> queenMoves(board, myPosition);
+            default -> throw new RuntimeException("Not implemented");
+        };
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "pieceColor=" + pieceColor +
+                ", type=" + type +
+                '}';
     }
 }
