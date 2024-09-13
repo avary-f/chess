@@ -133,4 +133,15 @@ public class ChessPiece {
                 ", type=" + type +
                 '}';
     }
+
+    public String toString2() {
+        return switch (type) {
+            case KING -> "K";
+            case QUEEN -> "Q";
+            case KNIGHT -> "N";
+            case ROOK -> "R";
+            case PAWN -> "P";
+            case BISHOP -> "B";
+        };
+    }
 }
