@@ -3,6 +3,8 @@ package chess; //does this mean that it is pulling in all the other files in the
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
 import static chess.ChessPiece.PieceType.*;
 import static chess.ChessGame.TeamColor.*;
 
@@ -18,7 +20,11 @@ public class ChessBoard {
     private Map<ChessPosition, ChessPiece> board = new HashMap<>();
 
     public ChessBoard() {
-        resetBoard();
+        resetBoard(); //set the board upon construction
+    }
+
+    public ChessBoard(ChessPosition pos, ChessPiece piece){
+        addPiece(pos, piece);
     }
 
     /**
@@ -69,12 +75,12 @@ public class ChessBoard {
         addPiece(new ChessPosition(8, 6), new ChessPiece(BLACK, BISHOP));
 
         //Set Kings
-        addPiece(new ChessPosition(1, 4), new ChessPiece(WHITE, KING));
-        addPiece(new ChessPosition(8, 4), new ChessPiece(BLACK, KING));
+        addPiece(new ChessPosition(1, 5), new ChessPiece(WHITE, KING));
+        addPiece(new ChessPosition(8, 5), new ChessPiece(BLACK, KING));
 
         //Set Queens
-        addPiece(new ChessPosition(1, 5), new ChessPiece(WHITE, QUEEN));
-        addPiece(new ChessPosition(8, 5), new ChessPiece(BLACK, QUEEN));
+        addPiece(new ChessPosition(1, 4), new ChessPiece(WHITE, QUEEN));
+        addPiece(new ChessPosition(8, 4), new ChessPiece(BLACK, QUEEN));
     }
 
 
@@ -89,19 +95,34 @@ public class ChessBoard {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard that = (ChessBoard) o;
+        return Objects.equals(board, that.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(board);
+    }
+
+    @Override
     public String toString() {
         String layout = "";
-        boolean match = false;
+        boolean match;
         for(int i = 1; i < 9; i++){ //loop through each row
             for(int j = 1; j < 9; j++){ //loop through each column
+                match = false; //reset match for each spot
                 for(ChessPosition pos: board.keySet()){ //get access to each position
                     if(pos.getRow() == i && pos.getColumn() == j) { //see if it matched with current position
                         layout += "|" + board.get(pos).toString2() + "| "; //if it matches, add it (toString2 is for the singular letter)
-                        match = true;
+                        match = true; //found match for that spot
+                        break;
                     }
                 }
                 if(!match) {
-                    layout += "| | "; //if it didn't find a match for that column, add a space
+                    layout += "| | "; //if it didn't find a match for that spot, add an empty char
                 }
             }
             match = false;

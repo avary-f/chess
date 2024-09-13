@@ -3,6 +3,7 @@ package chess;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Objects;
+import static chess.ChessGame.TeamColor.*;
 
 /**
  * Represents a single chess piece
@@ -46,7 +47,7 @@ public class ChessPiece {
     }
 
     public boolean spaceExists(ChessPosition position){
-        return position.getRow() <= 8 && position.getColumn() <= 8; //return false if it is an edge
+        return position.getRow() <= 8 && position.getColumn() <= 8 && position.getRow() > 0 && position.getColumn() > 0; //return false if it is an edge
     }
 
     public Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition){
@@ -60,6 +61,7 @@ public class ChessPiece {
                 int col = myPosition.getColumn() + j;
                 ChessPosition pos = new ChessPosition(row, col); //position it is trying to go
                 if(spaceExists(pos)) { //if the space is on the board
+                    //System.out.println(pos + " exists"); //testing
                     ChessPiece spot = board.getPiece(pos); //return the temp chessPiece, null if no piece
                     if(spot == null || spot.pieceColor != pieceColor){ // if the space is empty OR its the other team's piece
                         moves.add(new ChessMove(myPosition, pos, type));
@@ -136,12 +138,12 @@ public class ChessPiece {
 
     public String toString2() {
         return switch (type) {
-            case KING -> "K";
-            case QUEEN -> "Q";
-            case KNIGHT -> "N";
-            case ROOK -> "R";
-            case PAWN -> "P";
-            case BISHOP -> "B";
+            case KING -> (pieceColor == WHITE) ? "K" : "k"; //different syntax to return the result based on if its true of false
+            case QUEEN -> (pieceColor == WHITE) ? "Q" : "q";
+            case KNIGHT -> (pieceColor == WHITE) ? "N" : "n";
+            case ROOK -> (pieceColor == WHITE) ? "R" : "r";
+            case PAWN -> (pieceColor == WHITE) ? "P" : "p";
+            case BISHOP -> (pieceColor == WHITE) ? "B" : "b";
         };
     }
 }

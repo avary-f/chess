@@ -10,7 +10,6 @@ import java.util.Objects;
  */
 public class ChessMove {
     private ChessPosition startPosition;
-
     private ChessPosition endPosition;
     private ChessPiece.PieceType promotionPiece;
 
@@ -40,20 +39,8 @@ public class ChessMove {
      *
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
-    public ChessPiece.PieceType getPromotionPiece() { //seems like you will only call this if the piece that is being moved is a pawn
-        return ChessPiece.PieceType.KING;
-//        if(pawnPromotion() == true){
-//            return chessPiece.PieceType; // how will it decide which piece type to get? How will it know what you want to promote it to?
-//        }
-//        else{
-//            return null;
-//        }
-    }
+    public ChessPiece.PieceType getPromotionPiece() { return promotionPiece; }
 
-//    public boolean pawnPromotion(){ //is the pawn capable of being promoted
-//        if pawn can be promoted{return true;} //how do you know if a pawn can be promoted? - check if its on the end of the board
-//        else {return false;}
-//    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -69,6 +56,7 @@ public class ChessMove {
 
     @Override
     public String toString() {
+//        return " " + endPosition;
         return "ChessMove{" +
                 "startPosition=" + startPosition +
                 ", endPosition=" + endPosition +
