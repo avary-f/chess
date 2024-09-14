@@ -88,13 +88,23 @@ public class ChessPiece {
                 ChessPiece spot = board.getPiece(pos); //return the temp chessPiece, null if no piece
                 if(spot == null){
                     if(j == 0){
-                        moves.add(new ChessMove(myPosition, pos, type)); // if its directly in front AND the space is empty
-                        //need to change the "type" to whatever the promotion piece is
+                        if((row == 8 && getTeamColor() == WHITE) || (row == 1 && getTeamColor() == BLACK)){
+                            moves.add(new ChessMove(myPosition, pos, type)); // TO DO: Tell them what the promotion piece should be
+                        }
+                        else {
+                            moves.add(new ChessMove(myPosition, pos, null)); // if its directly in front AND the space is empty
+                        }
                     }
                 }
                 else { //only check if the spot is not null to see if it can kill another piece
                     if(j != 0 && spot.pieceColor != pieceColor){ //if it's a diagonal AND the other team's piece
-                        moves.add(new ChessMove(myPosition, pos, type)); // TO DO: need to check if its able to be converted to a new piece?
+                        if((row == 8 && getTeamColor() == WHITE) || (row == 1 && getTeamColor() == BLACK)){
+                            moves.add(new ChessMove(myPosition, pos, type)); // TO DO: tell them what the promotion piece should be?
+                        }
+                        else {
+                            moves.add(new ChessMove(myPosition, pos, null)); // if its directly in front AND the space is empty
+                        }
+                        //moves.add(new ChessMove(myPosition, pos, null)); // TO DO: need to check if its able to be converted to a new piece?
                     }
                 }
             }
@@ -105,7 +115,7 @@ public class ChessPiece {
         else if(myPosition.getRow() == 7 && getTeamColor() == BLACK && board.getPiece(new ChessPosition(5, myPosition.getColumn())) == null && board.getPiece(new ChessPosition(6, myPosition.getColumn())) == null){
             moves.add(new ChessMove(myPosition, new ChessPosition(5, myPosition.getColumn()), null));
         }
-        System.out.println(board);
+        //System.out.println(board);
         return moves;
     }
 
