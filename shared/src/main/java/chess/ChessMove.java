@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Objects;
-import static chess.ChessPiece.PieceType.*;
 
 /**
  * Represents moving a chess piece on a chessboard
@@ -9,28 +8,26 @@ import static chess.ChessPiece.PieceType.*;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessMove {
-    private ChessPosition startPosition;
-    private ChessPosition endPosition;
-    private ChessPiece.PieceType promotionPiece;
-
+public record ChessMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece) {
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
-        this.promotionPiece = null;
+        this.promotionPiece = promotionPiece;
     }
 
     /**
      * @return ChessPosition of starting location
      */
-    public ChessPosition getStartPosition() {
+    @Override
+    public ChessPosition startPosition() {
         return startPosition;
     }
 
     /**
      * @return ChessPosition of ending location
      */
-    public ChessPosition getEndPosition() {
+    @Override
+    public ChessPosition endPosition() {
         return endPosition;
     }
 
@@ -40,12 +37,16 @@ public class ChessMove {
      *
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
-    public ChessPiece.PieceType getPromotionPiece() { return promotionPiece; }
+    @Override
+    public ChessPiece.PieceType promotionPiece() {
+        return promotionPiece;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+//        if (o == null || getClass() != o.getClass()) return false; //I don't think the null statement should be here
+        if (getClass() != o.getClass()) return false;
         ChessMove chessMove = (ChessMove) o;
         return Objects.equals(startPosition, chessMove.startPosition) && Objects.equals(endPosition, chessMove.endPosition) && promotionPiece == chessMove.promotionPiece;
     }
@@ -57,11 +58,11 @@ public class ChessMove {
 
     @Override
     public String toString() {
-//        return " " + endPosition;
-        return "ChessMove{" +
-                "startPosition=" + startPosition +
-                ", endPosition=" + endPosition +
-                ", promotionPiece=" + promotionPiece +
-                '}';
+        return " " + endPosition;
+//        return "ChessMove{" +
+//                "startPosition=" + startPosition +
+//                ", endPosition=" + endPosition +
+//                ", promotionPiece=" + promotionPiece +
+//                '}';
     }
 }

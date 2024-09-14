@@ -70,11 +70,17 @@ public class ChessPiece {
             }
         }
         return moves;
-    }
+    } //I have an issue when it's actually running the test cases!
 
     public Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> moves = new ArrayList<>();
-        int row = myPosition.getRow() + 1; //checking the row above the pawn
+        int row;
+        if(getTeamColor() == WHITE){
+            row = myPosition.getRow() + 1; //checking the row above the white pawn
+        }
+        else{
+            row = myPosition.getRow() - 1; //checking the row above the black pawn
+        }
         for(int j = -1; j <= 1; j++) {
             int col = myPosition.getColumn() + j;
             ChessPosition pos = new ChessPosition(row, col); //position it is trying to go
@@ -88,10 +94,16 @@ public class ChessPiece {
                 }
                 else { //only check if the spot is not null to see if it can kill another piece
                     if(j != 0 && spot.pieceColor != pieceColor){ //if it's a diagonal AND the other team's piece
-                        moves.add(new ChessMove(myPosition, pos, type)); //need to check if its able to be converted to a new piece?
+                        moves.add(new ChessMove(myPosition, pos, type)); // TO DO: need to check if its able to be converted to a new piece?
                     }
                 }
             }
+        }
+        if(myPosition.getRow() == 2 && getTeamColor() == WHITE && board.getPiece(new ChessPosition(4, myPosition.getColumn())) == null && board.getPiece(new ChessPosition(3, myPosition.getColumn())) == null){
+            moves.add(new ChessMove(myPosition, new ChessPosition(4, myPosition.getColumn()), null));
+        }
+        else if(myPosition.getRow() == 7 && getTeamColor() == BLACK && board.getPiece(new ChessPosition(5, myPosition.getColumn())) == null && board.getPiece(new ChessPosition(6, myPosition.getColumn())) == null){
+            moves.add(new ChessMove(myPosition, new ChessPosition(5, myPosition.getColumn()), null));
         }
         return moves;
     }
@@ -131,13 +143,6 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return "ChessPiece{" +
-                "pieceColor=" + pieceColor +
-                ", type=" + type +
-                '}';
-    }
-
-    public String toString2() {
         return switch (type) {
             case KING -> (pieceColor == WHITE) ? "K" : "k"; //different syntax to return the result based on if its true of false
             case QUEEN -> (pieceColor == WHITE) ? "Q" : "q";

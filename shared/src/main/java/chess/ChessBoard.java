@@ -46,7 +46,7 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
         return board.get(position);
-    }
+    } //returns null if nothing is there
 
     public void setPawns(){
         for(int j = 1; j < 9; j++) { //fill up all columns
@@ -110,12 +110,14 @@ public class ChessBoard {
     public String toString() {
         String layout = "";
         boolean match;
-        for(int i = 1; i < 9; i++){ //loop through each row
+        for(int i = 8; i > 0; i--){ //loop through each row
             for(int j = 1; j < 9; j++){ //loop through each column
                 match = false; //reset match for each spot
                 for(ChessPosition pos: board.keySet()){ //get access to each position
                     if(pos.getRow() == i && pos.getColumn() == j) { //see if it matched with current position
-                        layout += "|" + board.get(pos).toString2() ; //if it matches, add it (toString2 is for the singular letter)
+//                        System.out.println(i);
+//                        System.out.println(j);
+                        layout += "|" + board.get(pos).toString() ; //if it matches, add it (toString2 is for the singular letter)
                         match = true; //found match for that spot
                         break;
                     }
