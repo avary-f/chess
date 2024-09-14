@@ -19,11 +19,9 @@ public class ChessBoard {
 
     private Map<ChessPosition, ChessPiece> board = new HashMap<>();
 
-    public ChessBoard() {
-        resetBoard(); //set the board upon construction
-    }
+    public ChessBoard() {}
 
-    public ChessBoard(ChessPosition pos, ChessPiece piece){
+    public ChessBoard(ChessPosition pos, ChessPiece piece){ //constructor that takes one piece and constructs an empty board
         addPiece(pos, piece);
     }
 

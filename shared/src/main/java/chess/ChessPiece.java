@@ -105,6 +105,7 @@ public class ChessPiece {
         else if(myPosition.getRow() == 7 && getTeamColor() == BLACK && board.getPiece(new ChessPosition(5, myPosition.getColumn())) == null && board.getPiece(new ChessPosition(6, myPosition.getColumn())) == null){
             moves.add(new ChessMove(myPosition, new ChessPosition(5, myPosition.getColumn()), null));
         }
+        System.out.println(board);
         return moves;
     }
 
