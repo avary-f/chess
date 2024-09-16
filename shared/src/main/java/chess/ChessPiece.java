@@ -136,46 +136,83 @@ public class ChessPiece {
         ChessPiece spot = board.getPiece(pos);
         while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //left upper diagonal
             moves.add(new ChessMove(myPosition, pos, null));
-            pos = new ChessPosition(pos.getRow() + 1, pos.getColumn() - 1);
-            spot = board.getPiece(pos);
             if(spot != null){
                 break;
             }
+            pos = new ChessPosition(pos.getRow() + 1, pos.getColumn() - 1);
+            spot = board.getPiece(pos);
 
         }
         pos = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
         spot = board.getPiece(pos);
         while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ // right upper diagonal
             moves.add(new ChessMove(myPosition, pos, null));
-            pos = new ChessPosition(pos.getRow() + 1, pos.getColumn() + 1);
-            spot = board.getPiece(pos);
             if(spot != null){
                 break;
             }
+            pos = new ChessPosition(pos.getRow() + 1, pos.getColumn() + 1);
+            spot = board.getPiece(pos);
 
         }
         pos = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
         spot = board.getPiece(pos);
         while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //left lower diagonal
             moves.add(new ChessMove(myPosition, pos, null));
-            pos = new ChessPosition(pos.getRow() - 1, pos.getColumn() - 1);
-            spot = board.getPiece(pos);
             if(spot != null){
                 break;
-            }
+            }pos = new ChessPosition(pos.getRow() - 1, pos.getColumn() - 1);
+            spot = board.getPiece(pos);
 
         }
         pos = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
         spot = board.getPiece(pos);
         while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //right lower diagonal
             moves.add(new ChessMove(myPosition, pos, null));
-            pos = new ChessPosition(pos.getRow() - 1, pos.getColumn() + 1);
-            spot = board.getPiece(pos);
             if(spot != null){
                 break;
             }
+            pos = new ChessPosition(pos.getRow() - 1, pos.getColumn() + 1);
+            spot = board.getPiece(pos);
 
         }
+        return moves;
+    }
+
+    public Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition){
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPosition pos;
+        ChessPiece spot;
+        for(int i = -2; i < 3; i++) { //looking at two rows down (-2) and 2 rows up (+2)
+            if (i == 0) {
+                continue;
+            }
+            if (i == -1 || i == 1) { //if the rows are -1 or +1
+                for (int j = -2; j < 3; j = j + 4) { //looking at col left (-2) and col right (+2)
+                    pos = new ChessPosition(myPosition.getRow() + i, myPosition.getColumn() + j);
+                    spot = board.getPiece(pos);
+                    if (spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)) {
+                        moves.add(new ChessMove(myPosition, pos, null));
+                    }
+                }
+            } else { //if the rows are -2 or +2
+                for (int j = -1; j < 2; j++) { //looking at col left (-1) and col right (+1)
+                    if (j == 0) {
+                        continue;
+                    }
+                    pos = new ChessPosition(myPosition.getRow() + i, myPosition.getColumn() + j);
+                    spot = board.getPiece(pos);
+                    if (spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)) {
+                        moves.add(new ChessMove(myPosition, pos, null));
+                    }
+                }
+            }
+        }
+        return moves;
+    }
+
+    public Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition){
+        Collection<ChessMove> moves = new ArrayList<>();
+        for()
         return moves;
     }
 
@@ -192,8 +229,8 @@ public class ChessPiece {
             case KING -> kingMoves(board, myPosition);
             case PAWN -> pawnMoves(board, myPosition);
             case BISHOP -> bishopMoves(board, myPosition);
-//            case KNIGHT -> knightMoves(board, myPosition);
-//            case ROOK -> rookMoves(board, myPosition);
+            case KNIGHT -> knightMoves(board, myPosition);
+            case ROOK -> rookMoves(board, myPosition);
 //            case QUEEN -> queenMoves(board, myPosition);
             default -> throw new RuntimeException("Not implemented");
         };
