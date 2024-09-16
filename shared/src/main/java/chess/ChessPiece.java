@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Objects;
 import static chess.ChessGame.TeamColor.*;
+import static chess.ChessPiece.PieceType.*;
+
 
 /**
  * Represents a single chess piece
@@ -73,6 +75,8 @@ public class ChessPiece {
     } //I have an issue when it's actually running the test cases!
 
     public Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition){
+        ArrayList<ChessPiece.PieceType> promotionPieces = new ArrayList<>();
+        promotionPieces.add(QUEEN); promotionPieces.add(BISHOP); promotionPieces.add(ROOK); promotionPieces.add(KNIGHT);
         Collection<ChessMove> moves = new ArrayList<>();
         int row;
         if(getTeamColor() == WHITE){
@@ -89,7 +93,9 @@ public class ChessPiece {
                 if(spot == null){
                     if(j == 0){
                         if((row == 8 && getTeamColor() == WHITE) || (row == 1 && getTeamColor() == BLACK)){
-                            moves.add(new ChessMove(myPosition, pos, type)); // TO DO: Tell them what the promotion piece should be
+                            for(ChessPiece.PieceType piece : promotionPieces){ //gets all the possible promotion pieces
+                                moves.add(new ChessMove(myPosition, pos, piece));
+                            }
                         }
                         else {
                             moves.add(new ChessMove(myPosition, pos, null)); // if its directly in front AND the space is empty
@@ -99,7 +105,9 @@ public class ChessPiece {
                 else { //only check if the spot is not null to see if it can kill another piece
                     if(j != 0 && spot.pieceColor != pieceColor){ //if it's a diagonal AND the other team's piece
                         if((row == 8 && getTeamColor() == WHITE) || (row == 1 && getTeamColor() == BLACK)){
-                            moves.add(new ChessMove(myPosition, pos, type)); // TO DO: tell them what the promotion piece should be?
+                            for(ChessPiece.PieceType piece : promotionPieces){
+                                moves.add(new ChessMove(myPosition, pos, piece)); //gets all the possible promotion pieces
+                            }
                         }
                         else {
                             moves.add(new ChessMove(myPosition, pos, null)); // if its directly in front AND the space is empty
@@ -109,13 +117,65 @@ public class ChessPiece {
                 }
             }
         }
-        if(myPosition.getRow() == 2 && getTeamColor() == WHITE && board.getPiece(new ChessPosition(4, myPosition.getColumn())) == null && board.getPiece(new ChessPosition(3, myPosition.getColumn())) == null){
+        if(myPosition.getRow() == 2 && getTeamColor() == WHITE && board.getPiece(new ChessPosition(4, myPosition.getColumn())) == null
+                && board.getPiece(new ChessPosition(3, myPosition.getColumn())) == null){
             moves.add(new ChessMove(myPosition, new ChessPosition(4, myPosition.getColumn()), null));
         }
-        else if(myPosition.getRow() == 7 && getTeamColor() == BLACK && board.getPiece(new ChessPosition(5, myPosition.getColumn())) == null && board.getPiece(new ChessPosition(6, myPosition.getColumn())) == null){
+        else if(myPosition.getRow() == 7 && getTeamColor() == BLACK && board.getPiece(new ChessPosition(5, myPosition.getColumn())) == null
+                && board.getPiece(new ChessPosition(6, myPosition.getColumn())) == null){
             moves.add(new ChessMove(myPosition, new ChessPosition(5, myPosition.getColumn()), null));
         }
         //System.out.println(board);
+        return moves;
+    }
+
+    public Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition){
+        Collection<ChessMove> moves = new ArrayList<>();
+
+        ChessPosition pos = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1);
+        ChessPiece spot = board.getPiece(pos);
+        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //left upper diagonal
+            moves.add(new ChessMove(myPosition, pos, null));
+            pos = new ChessPosition(pos.getRow() + 1, pos.getColumn() - 1);
+            spot = board.getPiece(pos);
+            if(spot != null){
+                break;
+            }
+
+        }
+        pos = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
+        spot = board.getPiece(pos);
+        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ // right upper diagonal
+            moves.add(new ChessMove(myPosition, pos, null));
+            pos = new ChessPosition(pos.getRow() + 1, pos.getColumn() + 1);
+            spot = board.getPiece(pos);
+            if(spot != null){
+                break;
+            }
+
+        }
+        pos = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
+        spot = board.getPiece(pos);
+        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //left lower diagonal
+            moves.add(new ChessMove(myPosition, pos, null));
+            pos = new ChessPosition(pos.getRow() - 1, pos.getColumn() - 1);
+            spot = board.getPiece(pos);
+            if(spot != null){
+                break;
+            }
+
+        }
+        pos = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
+        spot = board.getPiece(pos);
+        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //right lower diagonal
+            moves.add(new ChessMove(myPosition, pos, null));
+            pos = new ChessPosition(pos.getRow() - 1, pos.getColumn() + 1);
+            spot = board.getPiece(pos);
+            if(spot != null){
+                break;
+            }
+
+        }
         return moves;
     }
 
@@ -131,7 +191,7 @@ public class ChessPiece {
         return switch (type) {
             case KING -> kingMoves(board, myPosition);
             case PAWN -> pawnMoves(board, myPosition);
-//            case BISHOP -> bishopMoves(board, myPosition);
+            case BISHOP -> bishopMoves(board, myPosition);
 //            case KNIGHT -> knightMoves(board, myPosition);
 //            case ROOK -> rookMoves(board, myPosition);
 //            case QUEEN -> queenMoves(board, myPosition);
