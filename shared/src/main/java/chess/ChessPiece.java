@@ -259,7 +259,98 @@ public class ChessPiece {
 
     public Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        //Rook moves ability
+        ChessPosition pos = new ChessPosition(row, col + 1);
+        ChessPiece spot = board.getPiece(pos);
+        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //going right
+            moves.add(new ChessMove(myPosition, pos, null));
+            if(spot != null){
+                break;
+            }
+            pos = new ChessPosition(row, pos.getColumn() + 1);
+            spot = board.getPiece(pos);
+        }
+        pos = new ChessPosition(row,  col - 1);
+        spot = board.getPiece(pos);
+        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //going left
+            moves.add(new ChessMove(myPosition, pos, null));
+            if(spot != null){
+                break;
+            }
+            pos = new ChessPosition(row, pos.getColumn() - 1);
+            spot = board.getPiece(pos);
+        }
+        pos = new ChessPosition(row + 1, col);
+        spot = board.getPiece(pos);
+        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //going up
+            moves.add(new ChessMove(myPosition, pos, null));
+            if(spot != null){
+                break;
+            }
+            pos = new ChessPosition(pos.getRow() + 1, col);
+            spot = board.getPiece(pos);
+        }
+        pos = new ChessPosition(row - 1, col);
+        spot = board.getPiece(pos);
+        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)) { //going down
+            moves.add(new ChessMove(myPosition, pos, null));
+            if(spot != null){
+                break;
+            }
+            pos = new ChessPosition(pos.getRow() - 1, col);
+            spot = board.getPiece(pos);
+        }
+
+        //Bishop Moves ability
+        pos = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1);
+        spot = board.getPiece(pos);
+        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //left upper diagonal
+            moves.add(new ChessMove(myPosition, pos, null));
+            if(spot != null){
+                break;
+            }
+            pos = new ChessPosition(pos.getRow() + 1, pos.getColumn() - 1);
+            spot = board.getPiece(pos);
+
+        }
+        pos = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
+        spot = board.getPiece(pos);
+        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ // right upper diagonal
+            moves.add(new ChessMove(myPosition, pos, null));
+            if(spot != null){
+                break;
+            }
+            pos = new ChessPosition(pos.getRow() + 1, pos.getColumn() + 1);
+            spot = board.getPiece(pos);
+
+        }
+        pos = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
+        spot = board.getPiece(pos);
+        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //left lower diagonal
+            moves.add(new ChessMove(myPosition, pos, null));
+            if(spot != null){
+                break;
+            }pos = new ChessPosition(pos.getRow() - 1, pos.getColumn() - 1);
+            spot = board.getPiece(pos);
+
+        }
+        pos = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
+        spot = board.getPiece(pos);
+        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //right lower diagonal
+            moves.add(new ChessMove(myPosition, pos, null));
+            if(spot != null){
+                break;
+            }
+            pos = new ChessPosition(pos.getRow() - 1, pos.getColumn() + 1);
+            spot = board.getPiece(pos);
+
+        }
+
         return moves;
+
     }
 
     /**
