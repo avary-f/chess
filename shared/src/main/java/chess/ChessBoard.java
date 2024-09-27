@@ -30,16 +30,16 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        int row = position.getRow();
-        int col = position.getColumn();
-        board[row - 1][col - 1] = piece;
+        int r = position.getRow() - 1;
+        int c = position.getColumn() - 1;
+        board[r][c] = piece;
     }
 
     public ChessPiece removePiece(ChessPosition position){
-        int r = position.getRow();
-        int c = position.getColumn();
-        ChessPiece piece = board[r - 1][c - 1];
-        board[r - 1][c - 1] = null;
+        int r = position.getRow() - 1;
+        int c = position.getColumn() - 1;
+        ChessPiece piece = board[r][c];
+        board[r][c] = null;
         return piece;
     }
 
@@ -106,9 +106,9 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        for(int i = 0; i < 8; i++){
-            for(int j = 0; j < 8; j++){
-                board[i][j] = null;
+        for(int r = 1; r < board.length; r++){
+            for(int c = 1; c < board[r].length; c++){
+                removePiece(new ChessPosition(r, c));
             }
         }
         setPawns();
