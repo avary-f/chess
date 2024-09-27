@@ -91,6 +91,7 @@ public class ChessPiece {
             case ROOK -> (pieceColor == WHITE) ? "R" : "r";
             case PAWN -> (pieceColor == WHITE) ? "P" : "p";
             case BISHOP -> (pieceColor == WHITE) ? "B" : "b";
+            case null -> " ";
         };
     }
 }

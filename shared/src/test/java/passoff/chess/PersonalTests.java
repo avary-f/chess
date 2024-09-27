@@ -13,7 +13,7 @@ import static passoff.chess.PersonalTestUtilities.validateMoves;
 public class PersonalTests {
 
     @Test
-    public void kingMoveUntilEdge() {
+    public void test() {
 //        validateMoves("""
 //                        | | | | | | | | |
 //                        | | | | | | | | |
@@ -27,9 +27,11 @@ public class PersonalTests {
 //                new ChessPosition(3, 6),
 //                new int[][]{{4, 6}, {4, 7}, {3, 7}, {2, 7}, {2, 6}, {2, 5}, {3, 5}, {4, 5}}
 //        );
-        ChessPiece pawn = new ChessPiece(BLACK, PAWN);
-        ChessPosition pos = new ChessPosition(2, 3);
+        ChessPiece pawn = new ChessPiece(WHITE, PAWN);
+        ChessPosition pos = new ChessPosition(2, 5);
         ChessBoard testBoard = new ChessBoard(pos, pawn);
+
+        System.out.println(testBoard);
         //testBoard.addPiece(new ChessPosition(5, 8), new ChessPiece(BLACK, QUEEN));
         //System.out.println(testBoard); //print board
         System.out.println(pawn.pieceMoves(testBoard, pos));

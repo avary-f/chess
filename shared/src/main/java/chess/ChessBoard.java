@@ -1,9 +1,7 @@
 package chess; //does this mean that it is pulling in all the other files in the chess folder?
 //doesn't have anything to do with subclasses
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static chess.ChessPiece.PieceType.*;
 import static chess.ChessGame.TeamColor.*;
@@ -17,7 +15,7 @@ import static chess.ChessGame.TeamColor.*;
  */
 public class ChessBoard {
 
-    private Map<ChessPosition, ChessPiece> board = new HashMap<>();
+    private final ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {}
 
@@ -32,7 +30,17 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board.put(position, piece);
+        int row = position.getRow();
+        int col = position.getColumn();
+        board[row - 1][col - 1] = piece;
+    }
+
+    public ChessPiece removePiece(ChessPosition position){
+        int r = position.getRow();
+        int c = position.getColumn();
+        ChessPiece piece = board[r - 1][c - 1];
+        board[r - 1][c - 1] = null;
+        return piece;
     }
 
     /**
@@ -43,7 +51,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board.get(position);
+        return board[position.getRow() - 1][position.getColumn() - 1];
     } //returns null if nothing is there
 
     public void setPawns(){
@@ -80,13 +88,29 @@ public class ChessBoard {
         addPiece(new ChessPosition(8, 4), new ChessPiece(BLACK, QUEEN));
     }
 
+    // gets the king of specified color and if it doesn't exits, return null
+    public ChessPosition getKing(ChessGame.TeamColor color){
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
+                ChessPosition pos = new ChessPosition(i, j);
+                if (getPiece(pos).getPieceType() == KING && getPiece(pos).getTeamColor() == color) {
+                    return pos;
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        board.clear();
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
+                board[i][j] = null;
+            }
+        }
         setPawns();
         setOthers();
     }
@@ -96,7 +120,7 @@ public class ChessBoard {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that = (ChessBoard) o;
-        return Objects.equals(board, that.board);
+        return Arrays.deepEquals(board, that.board);
     }
 
     @Override
@@ -107,27 +131,22 @@ public class ChessBoard {
     @Override
     public String toString() {
         String layout = "";
-        boolean match;
-        for(int i = 8; i > 0; i--){ //loop through each row
-            for(int j = 1; j < 9; j++){ //loop through each column
-                match = false; //reset match for each spot
-                for(ChessPosition pos: board.keySet()){ //get access to each position
-                    if(pos.getRow() == i && pos.getColumn() == j) { //see if it matched with current position
-//                        System.out.println(i);
-//                        System.out.println(j);
-                        layout += "|" + board.get(pos).toString() ; //if it matches, add it (toString2 is for the singular letter)
-                        match = true; //found match for that spot
-                        break;
-                    }
-                }
-                if(!match) {
-                    layout += "| "; //if it didn't find a match for that spot, add an empty char
+
+        for (int i = 8; i > 0; i--) {  // Loop through each row from 8 to 1 (to print from top to bottom)
+            for (int j = 1; j < 9; j++) {  // Loop through each column from 1 to 8
+                ChessPosition pos = new ChessPosition(i, j);  // Create the position
+                ChessPiece piece = getPiece(pos);  // Get the piece at this position
+
+                if (piece != null) {
+                    layout += "|" + piece.toString();  // If there's a piece, add its string representation
+                } else {
+                    layout += "| ";  // If no piece, add an empty space
                 }
             }
-            match = false;
-            layout += "|\n";
+            layout += "|\n";  // Add the end of the row
         }
 
         return layout;
     }
+
 }
