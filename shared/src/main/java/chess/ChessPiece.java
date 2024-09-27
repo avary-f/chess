@@ -1,11 +1,7 @@
 package chess;
 
 import java.util.Collection;
-import java.util.ArrayList;
 import java.util.Objects;
-import static chess.ChessGame.TeamColor.*;
-import static chess.ChessPiece.PieceType.*;
-
 
 /**
  * Represents a single chess piece
@@ -14,12 +10,13 @@ import static chess.ChessPiece.PieceType.*;
  * signature of the existing methods.
  */
 public class ChessPiece {
+
     private final ChessGame.TeamColor pieceColor;
-    private final ChessPiece.PieceType type;
+    private final PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
-        this.type = type; //does this need to check if the piece is actually found in PieceType?
+        this.type = type;
     }
 
     /**
@@ -55,18 +52,24 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) { //collection allows for various return types
-        Moves moveList;
-        switch (type) {
-            case KING -> moveList = new KingMoves();
-            case PAWN -> moveList = new PawnMoves();
-            case BISHOP -> moveList = new BishopMoves();
-            case KNIGHT -> moveList = new KnightMoves();
-            case ROOK -> moveList = new RookMoves();
-            case QUEEN -> moveList = new QueenMoves();
-            default -> throw new RuntimeException("Not implemented");
-        };
-        return moveList.moves(board, myPosition, pieceColor);
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        Moves moveObj;
+        switch (type){
+            case KING -> moveObj = new KingMoves();
+            case QUEEN -> moveObj = new QueenMoves();
+            case PAWN -> moveObj = new PawnMoves();
+            case BISHOP -> moveObj = new BishopMoves();
+            case ROOK -> moveObj = new RookMoves();
+            case KNIGHT -> moveObj = new KnightMoves();
+            default -> throw new RuntimeException("Invalid Piece");
+        }
+        return moveObj.moves(board, myPosition);
+
+    }
+
+    @Override
+    public String toString() {
+        return " " + type;
     }
 
     @Override
@@ -80,18 +83,5 @@ public class ChessPiece {
     @Override
     public int hashCode() {
         return Objects.hash(pieceColor, type);
-    }
-
-    @Override
-    public String toString() {
-        return switch (type) {
-            case KING -> (pieceColor == WHITE) ? "K" : "k"; //different syntax to return the result based on if its true of false
-            case QUEEN -> (pieceColor == WHITE) ? "Q" : "q";
-            case KNIGHT -> (pieceColor == WHITE) ? "N" : "n";
-            case ROOK -> (pieceColor == WHITE) ? "R" : "r";
-            case PAWN -> (pieceColor == WHITE) ? "P" : "p";
-            case BISHOP -> (pieceColor == WHITE) ? "B" : "b";
-            case null -> " ";
-        };
     }
 }

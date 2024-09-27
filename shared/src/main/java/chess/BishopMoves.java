@@ -4,52 +4,55 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class BishopMoves extends Moves{
-    public Collection<ChessMove> moves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor pieceColor){
-        Collection<ChessMove> moves = new ArrayList<>();
-
-        ChessPosition pos = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1);
-        ChessPiece spot = board.getPiece(pos);
-        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //left upper diagonal
-            moves.add(new ChessMove(myPosition, pos, null));
-            if(spot != null){
+    @Override
+    public Collection<ChessMove> moves(ChessBoard board, ChessPosition pos) {
+        int row = pos.getRow();
+        int col = pos.getColumn();
+        for (int i = 1; i < 9; i++) {
+            ChessPosition spot = new ChessPosition(row + i, col + i);
+            if (attackable(board, pos, spot)) {
+                add(new ChessMove(pos, spot, null));
+                if(board.getPiece(spot) != null){
+                    break;
+                }
+            } else {
                 break;
             }
-            pos = new ChessPosition(pos.getRow() + 1, pos.getColumn() - 1);
-            spot = board.getPiece(pos);
-
         }
-        pos = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
-        spot = board.getPiece(pos);
-        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ // right upper diagonal
-            moves.add(new ChessMove(myPosition, pos, null));
-            if(spot != null){
+        for (int i = 1; i < 9; i++) {
+            ChessPosition spot = new ChessPosition(row - i, col + i);
+            if (attackable(board, pos, spot)) {
+                add(new ChessMove(pos, spot, null));
+                if(board.getPiece(spot) != null){
+                    break;
+                }
+            } else {
                 break;
             }
-            pos = new ChessPosition(pos.getRow() + 1, pos.getColumn() + 1);
-            spot = board.getPiece(pos);
-
         }
-        pos = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
-        spot = board.getPiece(pos);
-        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //left lower diagonal
-            moves.add(new ChessMove(myPosition, pos, null));
-            if(spot != null){
-                break;
-            }pos = new ChessPosition(pos.getRow() - 1, pos.getColumn() - 1);
-            spot = board.getPiece(pos);
-
-        }
-        pos = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
-        spot = board.getPiece(pos);
-        while(spaceExists(pos) && (spot == null || spot.getTeamColor() != pieceColor)){ //right lower diagonal
-            moves.add(new ChessMove(myPosition, pos, null));
-            if(spot != null){
+        for (int i = 1; i < 9; i++) {
+            ChessPosition spot = new ChessPosition(row + i, col - i);
+            if (attackable(board, pos, spot)) {
+                add(new ChessMove(pos, spot, null));
+                if(board.getPiece(spot) != null){
+                    break;
+                }
+            } else {
                 break;
             }
-            pos = new ChessPosition(pos.getRow() - 1, pos.getColumn() + 1);
-            spot = board.getPiece(pos);
-
         }
-        return moves;
+        for (int i = 1; i < 9; i++) {
+            ChessPosition spot = new ChessPosition(row - i, col - i);
+            if (attackable(board, pos, spot)) {
+                add(new ChessMove(pos, spot, null));
+                if(board.getPiece(spot) != null){
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        return getMoves();
     }
 }

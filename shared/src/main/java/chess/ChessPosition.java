@@ -35,6 +35,11 @@ public class ChessPosition {
     }
 
     @Override
+    public String toString() {
+        return row + "," + col;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -45,14 +50,5 @@ public class ChessPosition {
     @Override
     public int hashCode() {
         return Objects.hash(row, col);
-    }
-
-    @Override
-    public String toString() {
-        return row + ", " + col;
-//        return "ChessPosition{" +
-//                "row=" + row +
-//                ", col=" + col +
-//                '}';
     }
 }

@@ -9,11 +9,6 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public record ChessMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece) {
-    public ChessMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece) {
-        this.startPosition = startPosition;
-        this.endPosition = endPosition;
-        this.promotionPiece = promotionPiece;
-    }
 
     /**
      * @return ChessPosition of starting location
@@ -43,25 +38,20 @@ public record ChessMove(ChessPosition startPosition, ChessPosition endPosition, 
     }
 
     @Override
+    public String toString() {
+        return " " + endPosition;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false; //I don't think the null statement should be here
+        if (o == null || getClass() != o.getClass()) return false;
         ChessMove chessMove = (ChessMove) o;
-        return Objects.equals(startPosition, chessMove.startPosition) && Objects.equals(endPosition, chessMove.endPosition) && promotionPiece == chessMove.promotionPiece;
+        return Objects.equals(endPosition, chessMove.endPosition) && Objects.equals(startPosition, chessMove.startPosition) && promotionPiece == chessMove.promotionPiece;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(startPosition, endPosition, promotionPiece);
-    }
-
-    @Override
-    public String toString() {
-        return " " + endPosition;
-//        return "ChessMove{" +
-//                "startPosition=" + startPosition +
-//                ", endPosition=" + endPosition +
-//                ", promotionPiece=" + promotionPiece +
-//                '}';
     }
 }
