@@ -50,8 +50,8 @@ public class ChessGame{
 
     public Collection<ChessPosition> getOpponentPieces(ChessPiece piece){
         Collection<ChessPosition> opponents= new ArrayList<>();
-        for(int r = 0; r < 8; r++){
-            for(int c = 0; c < 8; c++){ //iterate through the board
+        for(int r = 1; r < 9; r++){
+            for(int c = 1; c < 9; c++){ //iterate through the board
                 ChessPosition pos = new ChessPosition(r, c);
                 ChessPiece oppPiece = board.getPiece(pos); //possible opponent piece
                 if(oppPiece.getTeamColor() != piece.getTeamColor()){ //check if it's opponent
@@ -66,7 +66,7 @@ public class ChessGame{
         for(ChessPosition oppPos: opponents){
             Collection<ChessMove> oppMoves = validMoves(oppPos);
             for(ChessMove oppMove: oppMoves){
-                if(oppMove.endPosition() == kingMove.endPosition()){
+                if(oppMove.getEndPosition() == kingMove.getEndPosition()){
                     return true;
                 }
             }
@@ -108,13 +108,13 @@ public class ChessGame{
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        Collection<ChessMove> moves = validMoves(move.startPosition());
+        Collection<ChessMove> moves = validMoves(move.getStartPosition());
         if(!moves.contains(move)){
             throw new InvalidMoveException("Invalid Move");
         }
         else {
-            ChessPiece piece = board.removePiece(move.startPosition());
-            board.addPiece(move.endPosition(), piece);
+            ChessPiece piece = board.removePiece(move.getStartPosition());
+            board.addPiece(move.getEndPosition(), piece);
             setTeamTurn(piece.getTeamColor()); //Make it the other team's turn after the piece is moved
         }
     }
@@ -132,7 +132,7 @@ public class ChessGame{
         for(ChessPosition oppPos: opponents){
             Collection<ChessMove> oppMoves = validMoves(oppPos); //check what the opponent can do
             for(ChessMove oppMove: oppMoves){
-                if(oppMove.endPosition() == kingPos){ //if the opponent can kill the king
+                if(oppMove.getEndPosition() == kingPos){ //if the opponent can kill the king
                     return true;
                 }
             }
