@@ -1,6 +1,8 @@
 package chess;
+import java.util.ArrayList;
 import java.util.Collection;
 import static chess.ChessGame.TeamColor.*;
+import static chess.ChessPiece.PieceType.*;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -11,8 +13,6 @@ import static chess.ChessGame.TeamColor.*;
 public class ChessGame{
     private ChessGame.TeamColor turnColor;
     private ChessBoard board = new ChessBoard();
-    private boolean inCheck;
-    private boolean checkmate;
 
     public ChessGame() {}
 
@@ -42,6 +42,33 @@ public class ChessGame{
         turnColor = (turnColor == WHITE) ? BLACK : WHITE; //turnColor will be = to whatever (team == white)? if T -> Black
     }
 
+    public void futureMoves(ChessPosition newStartPosition){
+        Collection<ChessMove> futureMoves= board.getPiece(newStartPosition).pieceMoves(getBoard(), newStartPosition);
+    }
+
+    public Collection<ChessPiece> getOpponentPieces(ChessPiece piece){
+        Collection<ChessPiece> opponents= new ArrayList<>();
+        for(int r = 0; r < 8; r++){
+            for(int c = 0; c < 8; c++){ //iterate through the board
+                ChessPiece oppPiece = board.getPiece(new ChessPosition(r, c)); //possible opponent piece
+                if(oppPiece.getTeamColor() != piece.getTeamColor()){ //check if it's opponent
+                    opponents.add(oppPiece); //if it is, add it to the list
+                }
+            }
+        }
+        return opponents;
+    }
+
+    public Collection<ChessMove> dropInvalidMoves(Collection<ChessMove> allMoves, ChessPiece piece){
+        Collection<ChessPiece> opponents = getOpponentPieces(piece);
+        for(ChessPiece opp: opponents){
+
+        }
+        for(ChessMove move: allMoves){
+            if()
+        }
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -50,17 +77,13 @@ public class ChessGame{
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> validMoves= board.getPiece(startPosition).pieceMoves(getBoard(), startPosition);
-        inCheck = false;
-        for(ChessMove m: validMoves){
-            if(m.endPosition().equals(board.getKing(getOtherTeamTurn()))){
-                inCheck = true; //it would probably be good to check on it going to check mate in conjunction with being in check
-                break;
-            }
+        ChessPiece piece = board.getPiece(startPosition);
+        Collection<ChessMove> allMoves = piece.pieceMoves(getBoard(), startPosition);
+        if(piece.getPieceType() == KING){
+           allMoves = dropInvalidMoves(allMoves, piece);
         }
-        return validMoves;
+        return allMoves;
     }
-    //I don't think you can allow a king to move somewhere within check, so drop those moves
 
     /**
      * Makes a move in a chess game
@@ -77,18 +100,6 @@ public class ChessGame{
             ChessPiece piece = board.removePiece(move.startPosition());
             board.addPiece(move.endPosition(), piece);
             setTeamTurn(piece.getTeamColor()); //Make it the other team's turn after the piece is moved
-
-            //Check if King is in Check
-            Collection<ChessMove> futureMoves = validMoves(move.endPosition());
-            for (ChessMove m : futureMoves) {
-                if (m.endPosition() == board.getKing(getTeamTurn())) { //check if the king can get killed in next move
-                    inCheck = true;
-                    break;
-                }
-                else{
-                    inCheck = false;
-                }
-            }
         }
     }
 
@@ -98,7 +109,18 @@ public class ChessGame{
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
-    public boolean isInCheck(TeamColor teamColor) {return inCheck;}
+    public boolean isInCheck(TeamColor teamColor) {
+
+        for(ChessMove move: futureMoves){
+            if(move.endPosition().equals(board.getKing(getOtherTeamTurn()))){
+                return true; //it would probably be good to check on it going to check mate in conjunction with being in check
+                break;
+            }
+            else{
+                return false;
+            }
+        }
+    }
 
     /**
      * Determines if the given team is in checkmate
@@ -106,7 +128,7 @@ public class ChessGame{
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
      */
-    public boolean isInCheckmate(TeamColor teamColor) {return checkmate;}
+    public boolean isInCheckmate(TeamColor teamColor) {}
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
