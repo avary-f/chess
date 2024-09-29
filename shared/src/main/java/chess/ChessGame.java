@@ -44,9 +44,9 @@ public class ChessGame{
         turnColor = (turnColor == WHITE) ? BLACK : WHITE; //turnColor will be = to whatever (team == white)? if T -> Black
     }
 
-    public void futureMoves(ChessPosition newStartPosition){
-        Collection<ChessMove> futureMoves= board.getPiece(newStartPosition).pieceMoves(getBoard(), newStartPosition);
-    }
+//    public void futureMoves(ChessPosition newStartPosition){
+//        Collection<ChessMove> futureMoves= board.getPiece(newStartPosition).pieceMoves(getBoard(), newStartPosition);
+//    }
 
     public Collection<ChessPosition> getOpponentPieces(ChessPiece piece){
         Collection<ChessPosition> opponents= new ArrayList<>();
@@ -126,12 +126,13 @@ public class ChessGame{
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPiece king = board.getPiece(board.getKing(teamColor)); //get the king that we are checking
+        ChessPosition kingPos = board.getKing(teamColor);
+        ChessPiece king = board.getPiece(kingPos); //get the king that we are checking
         Collection<ChessPosition> opponents = getOpponentPieces(king); //get each opponent position
         for(ChessPosition oppPos: opponents){
             Collection<ChessMove> oppMoves = validMoves(oppPos); //check what the opponent can do
             for(ChessMove oppMove: oppMoves){
-                if(oppMove.endPosition() == kingMove.endPosition()){
+                if(oppMove.endPosition() == kingPos){ //if the opponent can kill the king
                     return true;
                 }
             }
@@ -145,7 +146,12 @@ public class ChessGame{
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
      */
-    public boolean isInCheckmate(TeamColor teamColor) {}
+    public boolean isInCheckmate(TeamColor teamColor) {
+        ChessPosition kingPos = board.getKing(teamColor); //get king position we are checking
+        ChessPiece king = board.getPiece(kingPos); //get the king object
+        Collection<ChessMove> kingMoves = king.pieceMoves(board, kingPos);
+        return isInCheck(teamColor) && kingMoves.isEmpty(); //check if the king is in check & if he can't do anything
+    }
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
@@ -155,7 +161,10 @@ public class ChessGame{
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return validMoves(board.getKing(teamColor)).isEmpty();
+        ChessPosition kingPos = board.getKing(teamColor); //get king position we are checking
+        ChessPiece king = board.getPiece(kingPos); //get the king object
+        Collection<ChessMove> kingMoves = king.pieceMoves(board, kingPos);
+        return !isInCheck(teamColor) && kingMoves.isEmpty(); //check if the king is NOT in check & if he can't do anything
     }
 
     /**
