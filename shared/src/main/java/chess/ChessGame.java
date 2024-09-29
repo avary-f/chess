@@ -1,6 +1,8 @@
 package chess;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
 import static chess.ChessGame.TeamColor.*;
 import static chess.ChessPiece.PieceType.*;
 
@@ -11,7 +13,7 @@ import static chess.ChessPiece.PieceType.*;
  * signature of the existing methods.
  */
 public class ChessGame{
-    private ChessGame.TeamColor turnColor;
+    private TeamColor turnColor;
     private ChessBoard board = new ChessBoard();
 
     public ChessGame() {}
@@ -46,27 +48,41 @@ public class ChessGame{
         Collection<ChessMove> futureMoves= board.getPiece(newStartPosition).pieceMoves(getBoard(), newStartPosition);
     }
 
-    public Collection<ChessPiece> getOpponentPieces(ChessPiece piece){
-        Collection<ChessPiece> opponents= new ArrayList<>();
+    public Collection<ChessPosition> getOpponentPieces(ChessPiece piece){
+        Collection<ChessPosition> opponents= new ArrayList<>();
         for(int r = 0; r < 8; r++){
             for(int c = 0; c < 8; c++){ //iterate through the board
-                ChessPiece oppPiece = board.getPiece(new ChessPosition(r, c)); //possible opponent piece
+                ChessPosition pos = new ChessPosition(r, c);
+                ChessPiece oppPiece = board.getPiece(pos); //possible opponent piece
                 if(oppPiece.getTeamColor() != piece.getTeamColor()){ //check if it's opponent
-                    opponents.add(oppPiece); //if it is, add it to the list
+                    opponents.add(pos); //if it is, add it to the list
                 }
             }
         }
         return opponents;
     }
 
-    public Collection<ChessMove> dropInvalidMoves(Collection<ChessMove> allMoves, ChessPiece piece){
-        Collection<ChessPiece> opponents = getOpponentPieces(piece);
-        for(ChessPiece opp: opponents){
+    public boolean couldBeInCheckmate(ChessMove kingMove, Collection<ChessPosition> opponents){
+        for(ChessPosition oppPos: opponents){
+            Collection<ChessMove> oppMoves = validMoves(oppPos);
+            for(ChessMove oppMove: oppMoves){
+                if(oppMove.endPosition() == kingMove.endPosition()){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
+    public Collection<ChessMove> dropInvalidMoves(Collection<ChessMove> kingMoves, ChessPiece king){
+        Collection<ChessPosition> opponents = getOpponentPieces(king); //get each opponent position
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        for(ChessMove kingMove: kingMoves){
+            if(!couldBeInCheckmate(kingMove, opponents)){
+                validMoves.add(kingMove);
+            }
         }
-        for(ChessMove move: allMoves){
-            if()
-        }
+        return validMoves;
     }
 
     /**
@@ -110,16 +126,17 @@ public class ChessGame{
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-
-        for(ChessMove move: futureMoves){
-            if(move.endPosition().equals(board.getKing(getOtherTeamTurn()))){
-                return true; //it would probably be good to check on it going to check mate in conjunction with being in check
-                break;
-            }
-            else{
-                return false;
+        ChessPiece king = board.getPiece(board.getKing(teamColor)); //get the king that we are checking
+        Collection<ChessPosition> opponents = getOpponentPieces(king); //get each opponent position
+        for(ChessPosition oppPos: opponents){
+            Collection<ChessMove> oppMoves = validMoves(oppPos); //check what the opponent can do
+            for(ChessMove oppMove: oppMoves){
+                if(oppMove.endPosition() == kingMove.endPosition()){
+                    return true;
+                }
             }
         }
+        return false;
     }
 
     /**
