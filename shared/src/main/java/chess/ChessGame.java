@@ -1,7 +1,6 @@
 package chess;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static chess.ChessGame.TeamColor.*;
 import static chess.ChessPiece.PieceType.*;
@@ -41,12 +40,8 @@ public class ChessGame{
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        turnColor = (turnColor == WHITE) ? BLACK : WHITE; //turnColor will be = to whatever (team == white)? if T -> Black
+        turnColor = team; //turnColor will be = to whatever (team == white)? if T -> Black
     }
-
-//    public void futureMoves(ChessPosition newStartPosition){
-//        Collection<ChessMove> futureMoves= board.getPiece(newStartPosition).pieceMoves(getBoard(), newStartPosition);
-//    }
 
     public Collection<ChessPosition> getOpponentPieces(ChessPiece piece){
         Collection<ChessPosition> opponents= new ArrayList<>();
@@ -54,7 +49,9 @@ public class ChessGame{
             for(int c = 1; c < 9; c++){ //iterate through the board
                 ChessPosition pos = new ChessPosition(r, c);
                 ChessPiece oppPiece = board.getPiece(pos); //possible opponent piece
-                if(oppPiece.getTeamColor() != piece.getTeamColor()){ //check if it's opponent
+                if(oppPiece != null && oppPiece.getTeamColor() != piece.getTeamColor()){ //check if it's opponent
+                    System.out.print("Adding an opponent: "); //testing
+                    System.out.print(oppPiece); //testing
                     opponents.add(pos); //if it is, add it to the list
                 }
             }
@@ -63,10 +60,10 @@ public class ChessGame{
     }
 
     public boolean couldBeInCheckmate(ChessMove kingMove, Collection<ChessPosition> opponents){
-        for(ChessPosition oppPos: opponents){
-            Collection<ChessMove> oppMoves = validMoves(oppPos);
-            for(ChessMove oppMove: oppMoves){
-                if(oppMove.getEndPosition() == kingMove.getEndPosition()){
+        for(ChessPosition oppPos: opponents){ //for each opponent
+            Collection<ChessMove> oppMoves = validMoves(oppPos); //get their valid moves
+            for(ChessMove oppMove: oppMoves){ //for each of those moves
+                if(oppMove.getEndPosition() == kingMove.getEndPosition()){ //could they kill the king if he moves there?
                     return true;
                 }
             }
@@ -79,7 +76,13 @@ public class ChessGame{
         Collection<ChessMove> validMoves = new ArrayList<>();
         for(ChessMove kingMove: kingMoves){
             if(!couldBeInCheckmate(kingMove, opponents)){
+                System.out.print("Adding a valid king move: "); //testing
+                System.out.println(kingMove); //testing
                 validMoves.add(kingMove);
+            }
+            else{
+                System.out.print("King can't move here: ");
+                System.out.println(kingMove);
             }
         }
         return validMoves;
@@ -94,11 +97,15 @@ public class ChessGame{
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
+        if(piece == null) { //return null if no piece at startPosition
+            return null;
+        }
         Collection<ChessMove> allMoves = piece.pieceMoves(getBoard(), startPosition);
-        if(piece.getPieceType() == KING){
-           allMoves = dropInvalidMoves(allMoves, piece);
+        if (piece.getPieceType() == KING) {
+            allMoves = dropInvalidMoves(allMoves, piece);
         }
         return allMoves;
+
     }
 
     /**
@@ -109,13 +116,15 @@ public class ChessGame{
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
-        if(!moves.contains(move)){
+        if(moves == null || !moves.contains(move)){
             throw new InvalidMoveException("Invalid Move");
         }
         else {
+            System.out.print("making a move: "); //testing
+            System.out.println(move); //testing
             ChessPiece piece = board.removePiece(move.getStartPosition());
             board.addPiece(move.getEndPosition(), piece);
-            setTeamTurn(piece.getTeamColor()); //Make it the other team's turn after the piece is moved
+            //setTeamTurn(getOtherTeamTurn()); //Make it the other team's turn after the piece is moved, not sure if I need this yet
         }
     }
 
@@ -126,8 +135,10 @@ public class ChessGame{
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPosition kingPos = board.getKing(teamColor);
-        ChessPiece king = board.getPiece(kingPos); //get the king that we are checking
+        ChessPosition kingPos = board.getKing(teamColor); //get king's pos
+        System.out.print("King pos: "); //testing
+        System.out.println(kingPos); //testing
+        ChessPiece king = board.getPiece(kingPos); //get the king piece
         Collection<ChessPosition> opponents = getOpponentPieces(king); //get each opponent position
         for(ChessPosition oppPos: opponents){
             Collection<ChessMove> oppMoves = validMoves(oppPos); //check what the opponent can do
