@@ -3,6 +3,8 @@ package chess;
 import java.util.Collection;
 import java.util.Objects;
 
+import static chess.ChessGame.TeamColor.WHITE;
+
 /**
  * Represents a single chess piece
  * <p>
@@ -69,7 +71,14 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return " " + type;
+        return switch (type) {
+            case KING -> (pieceColor == WHITE) ? "K" : "k"; //different syntax to return the result based on if its true of false
+            case QUEEN -> (pieceColor == WHITE) ? "Q" : "q";
+            case KNIGHT -> (pieceColor == WHITE) ? "N" : "n";
+            case ROOK -> (pieceColor == WHITE) ? "R" : "r";
+            case PAWN -> (pieceColor == WHITE) ? "P" : "p";
+            case BISHOP -> (pieceColor == WHITE) ? "B" : "b";
+        };
     }
 
     @Override

@@ -38,6 +38,9 @@ public class ChessBoard {
     public ChessPiece removePiece(ChessPosition position){
         int r = position.getRow() - 1;
         int c = position.getColumn() - 1;
+        if(r < 0 || r > 8 || c < 0 || c > 8){
+            return null;
+        }
         ChessPiece piece = board[r][c];
         board[r][c] = null;
         return piece;
@@ -90,14 +93,16 @@ public class ChessBoard {
 
     // gets the king of specified color and if it doesn't exits, return null
     public ChessPosition getKing(ChessGame.TeamColor color){
-        for(int i = 0; i < 8; i++){
-            for(int j = 0; j < 8; j++){
+        for(int i = 1; i < 9; i++){
+            for(int j = 1; j < 9; j++){
                 ChessPosition pos = new ChessPosition(i, j);
-                if (getPiece(pos).getPieceType() == KING && getPiece(pos).getTeamColor() == color) {
+                ChessPiece piece = getPiece(pos);
+                if (piece != null && piece.getPieceType() == KING && piece.getTeamColor() == color) {
                     return pos;
                 }
             }
         }
+        System.out.println("Can't find the king");
         return null;
     }
 
