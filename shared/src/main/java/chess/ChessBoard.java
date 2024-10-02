@@ -29,10 +29,8 @@ public class ChessBoard {
             for(int j = 1; j < 9; j++){
                 ChessPosition pos = new ChessPosition(i, j);
                 ChessPiece piece = getPiece(pos);
-                if(piece != null){
-                    tempBoard.addPiece(pos, piece);
-                }
-
+                tempBoard.removePiece(pos);
+                tempBoard.addPiece(pos, piece);
             }
         }
         return tempBoard;

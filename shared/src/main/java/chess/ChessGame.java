@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static chess.ChessGame.TeamColor.*;
-import static chess.ChessPiece.PieceType.*;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -15,7 +14,6 @@ import static chess.ChessPiece.PieceType.*;
 public class ChessGame{
     private TeamColor turnColor = WHITE;
     private ChessBoard board = new ChessBoard();
-    private ChessBoard tempBoard = new ChessBoard();
 
     public ChessGame() {}
 
@@ -51,8 +49,6 @@ public class ChessGame{
                 ChessPosition pos = new ChessPosition(r, c);
                 ChessPiece myTeamPiece = board.getPiece(pos); //possible opponent piece
                 if(myTeamPiece != null && myTeamPiece.getTeamColor().equals(getOtherTeamColor(color))){ //check if it's opponent
-//                    System.out.print("Adding an teams piece: "); //testing
-//                    System.out.print(myTeamPiece); //testing
                     opponents.add(pos); //if it is, add it to the list
                 }
             }
@@ -85,21 +81,22 @@ public class ChessGame{
         if(!spaceExists(move.getEndPosition()) || !spaceExists(move.getStartPosition())){ //if start or end poses don't exist, its a bad move
             return false;
         }
-        tempBoard = board.clone(); //deep copy the chess board
-//        System.out.println(tempBoard);
-        ChessPiece piece = tempBoard.removePiece(move.getStartPosition()); //make temp move
-        //System.out.println(piece);
-        tempBoard.addPiece(move.getEndPosition(), piece);
-//        System.out.println(tempBoard);
-        return !isInCheck(piece.getTeamColor());  //return false if move puts its own king in check
+        ChessPiece piece = board.removePiece(move.getStartPosition()); //make temp move
+        board.addPiece(move.getEndPosition(), piece);
+        boolean inCheck = isInCheck(piece.getTeamColor());  //return false if move puts its own king in check
+        undoMove(move);
+        return !inCheck;
+    }
+
+    public void undoMove(ChessMove move){
+        ChessPiece piece = board.removePiece(move.getEndPosition());
+        board.addPiece(move.getStartPosition(), piece);
     }
 
     public Collection<ChessMove> dropInvalidMoves(Collection<ChessMove> pieceMoves){
         Collection<ChessMove> validMoves = new ArrayList<>(); //only add valid moves
         for(ChessMove move: pieceMoves){   //go through each move the piece can make
             if(goodMove(move)){  //if that move won't result in the king being in check
-                //System.out.print("Adding a valid king move: "); //testing
-                //System.out.println(move); //testing
                 validMoves.add(move);
             }
         }
@@ -119,10 +116,7 @@ public class ChessGame{
             return null;
         }
         Collection<ChessMove> allMoves = piece.pieceMoves(getBoard(), startPosition);
-        //System.out.println(allMoves);
         allMoves = dropInvalidMoves(allMoves); //drop invalid moves for every type of piece.
-        //System.out.println(allMoves); //NOTHING IS BEING DROPPED IN INVALIDMOVES
-        //you can never end your turn with your king in check!
         return allMoves;
 
     }
@@ -141,8 +135,6 @@ public class ChessGame{
             throw new InvalidMoveException("Invalid Move");
         }
         else {
-//            System.out.print("making a move: "); //testing
-//            System.out.println(move); //testing
             ChessPiece piece = board.removePiece(move.getStartPosition());
             if(move.promotionPiece() == null){
                 board.addPiece(move.getEndPosition(), piece);
@@ -156,8 +148,9 @@ public class ChessGame{
 
     public boolean canAttack(ChessPosition oppPos, ChessPosition kingPos){
         ChessPiece oppPiece = board.getPiece(oppPos);
-        Collection<ChessMove> oppMoves = oppPiece.pieceMoves(tempBoard, oppPos); //check what the opponent can do, this board needs to be changed to temp board
-        //System.out.println(tempBoard);
+//        System.out.println(oppPiece);
+//        System.out.println(board);
+        Collection<ChessMove> oppMoves = oppPiece.pieceMoves(board, oppPos); //check what the opponent can do, this board needs to be changed to temp board
         for(ChessMove oppMove: oppMoves){
             //System.out.println(oppMove);
             //System.out.println(kingPos);
@@ -169,6 +162,29 @@ public class ChessGame{
         return false;
     }
 
+//    public boolean checkChecker(TeamColor teamColor, ChessBoard thisBoard) {
+//        //System.out.println(thisBoard);
+//        ChessPosition kingPos = thisBoard.getKing(teamColor); //get king's pos
+//        if(kingPos == null){
+//            return false; //if there is no king, he can't be in check
+//        }
+//        //System.out.println(kingPos);
+////        System.out.print("King pos: "); //testing
+////        System.out.println(kingPos); //testing
+//        //System.out.println(board); //testing
+//        ChessPiece king = thisBoard.getPiece(kingPos); //get the king piece
+//
+//        Collection<ChessPosition> opponents = getOpponentPieces(king); //get each opponent position
+////        System.out.println(opponents);
+//        for(ChessPosition oppPos: opponents){
+//            System.out.println(oppPos);
+//            if(canAttack(oppPos, kingPos)){
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+
     /**
      * Determines if the given team is in check
      *
@@ -176,25 +192,22 @@ public class ChessGame{
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPosition kingPos = tempBoard.getKing(teamColor); //get king's pos
+        ChessPosition kingPos = board.getKing(teamColor); //get king's pos
         if(kingPos == null){
             return false; //if there is no king, he can't be in check
         }
-        //System.out.println(kingPos);
-//        System.out.print("King pos: "); //testing
-//        System.out.println(kingPos); //testing
-        //System.out.println(board); //testing
-        ChessPiece king = tempBoard.getPiece(kingPos); //get the king piece
+        ChessPiece king = board.getPiece(kingPos); //get the king piece
 
         Collection<ChessPosition> opponents = getOpponentPieces(king); //get each opponent position
-//        System.out.println(opponents);
         for(ChessPosition oppPos: opponents){
+            System.out.println(oppPos);
             if(canAttack(oppPos, kingPos)){
                 return true;
             }
         }
         return false;
     }
+
 
     public Collection<ChessMove> getTotalTeamMoves(TeamColor teamColor){
         ChessPosition kingPos = board.getKing(teamColor); //get king position we are checking
