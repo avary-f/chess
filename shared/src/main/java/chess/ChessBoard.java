@@ -23,6 +23,21 @@ public class ChessBoard {
         addPiece(pos, piece);
     }
 
+    public ChessBoard clone(){
+        ChessBoard tempBoard = new ChessBoard();
+        for(int i = 1; i < 9; i++){
+            for(int j = 1; j < 9; j++){
+                ChessPosition pos = new ChessPosition(i, j);
+                ChessPiece piece = getPiece(pos);
+                if(piece != null){
+                    tempBoard.addPiece(pos, piece);
+                }
+
+            }
+        }
+        return tempBoard;
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
