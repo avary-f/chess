@@ -35,6 +35,16 @@ public class ChessBoard {
         }
         return tempBoard;
     }
+    public boolean isEmpty(){
+        for(int r = 1; r < 9; r++){
+            for(int c = 1; c < 9; c++){
+                if(getPiece(new ChessPosition(r, c)) != null){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     /**
      * Adds a chess piece to the chessboard

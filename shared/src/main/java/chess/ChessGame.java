@@ -15,7 +15,9 @@ public class ChessGame{
     private TeamColor turnColor = WHITE;
     private ChessBoard board = new ChessBoard();
 
-    public ChessGame() {}
+    public ChessGame() {
+        board.resetBoard();
+    }
 
     /**
      * Enum identifying the 2 possible teams in a chess game
@@ -81,16 +83,23 @@ public class ChessGame{
         if(!spaceExists(move.getEndPosition()) || !spaceExists(move.getStartPosition())){ //if start or end poses don't exist, its a bad move
             return false;
         }
-        ChessPiece piece = board.removePiece(move.getStartPosition()); //make temp move
-        board.addPiece(move.getEndPosition(), piece);
+        ChessPiece removedPiece = board.removePiece(move.getEndPosition()); //make temp move
+        ChessPiece piece = board.removePiece(move.getStartPosition());
+        if(move.promotionPiece() != null){
+            board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.promotionPiece()));
+        }
+        else{
+            board.addPiece(move.getEndPosition(), piece);
+        }
         boolean inCheck = isInCheck(piece.getTeamColor());  //return false if move puts its own king in check
-        undoMove(move);
+        undoMove(move, removedPiece);
         return !inCheck;
     }
 
-    public void undoMove(ChessMove move){
+    public void undoMove(ChessMove move, ChessPiece removedPiece){
         ChessPiece piece = board.removePiece(move.getEndPosition());
         board.addPiece(move.getStartPosition(), piece);
+        board.addPiece(move.getEndPosition(), removedPiece);
     }
 
     public Collection<ChessMove> dropInvalidMoves(Collection<ChessMove> pieceMoves){
@@ -131,7 +140,7 @@ public class ChessGame{
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
-        if(moves == null || moves.isEmpty() || !moves.contains(move)){
+        if(moves == null || moves.isEmpty() || !moves.contains(move) || board.getPiece(move.getStartPosition()).getTeamColor() != getTeamTurn()){
             throw new InvalidMoveException("Invalid Move");
         }
         else {
@@ -162,29 +171,6 @@ public class ChessGame{
         return false;
     }
 
-//    public boolean checkChecker(TeamColor teamColor, ChessBoard thisBoard) {
-//        //System.out.println(thisBoard);
-//        ChessPosition kingPos = thisBoard.getKing(teamColor); //get king's pos
-//        if(kingPos == null){
-//            return false; //if there is no king, he can't be in check
-//        }
-//        //System.out.println(kingPos);
-////        System.out.print("King pos: "); //testing
-////        System.out.println(kingPos); //testing
-//        //System.out.println(board); //testing
-//        ChessPiece king = thisBoard.getPiece(kingPos); //get the king piece
-//
-//        Collection<ChessPosition> opponents = getOpponentPieces(king); //get each opponent position
-////        System.out.println(opponents);
-//        for(ChessPosition oppPos: opponents){
-//            System.out.println(oppPos);
-//            if(canAttack(oppPos, kingPos)){
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
     /**
      * Determines if the given team is in check
      *
@@ -200,7 +186,7 @@ public class ChessGame{
 
         Collection<ChessPosition> opponents = getOpponentPieces(king); //get each opponent position
         for(ChessPosition oppPos: opponents){
-            System.out.println(oppPos);
+            //System.out.println(oppPos);
             if(canAttack(oppPos, kingPos)){
                 return true;
             }
@@ -233,7 +219,12 @@ public class ChessGame{
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return isInCheck(teamColor) && getTotalTeamMoves(teamColor).isEmpty(); //check if the king is in check & if no other pieces can do anything
+        if(board.isEmpty()){
+            return false;
+        }
+        boolean t = isInCheck(teamColor);
+        boolean f = getTotalTeamMoves(teamColor).isEmpty(); //check if the king is in check & if no other pieces can do anything
+        return t && f;
     }
 
     /**
@@ -244,6 +235,9 @@ public class ChessGame{
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        if(board.isEmpty()){
+            return false;
+        }
         return !isInCheck(teamColor) && getTotalTeamMoves(teamColor).isEmpty(); //check if the king is NOT in check & if no pieces can do anything
     }
 
