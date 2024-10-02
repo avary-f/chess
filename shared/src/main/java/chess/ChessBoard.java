@@ -117,7 +117,7 @@ public class ChessBoard {
                 }
             }
         }
-        System.out.println("Can't find the king");
+        //System.out.println("Can't find the king");
         return null;
     }
 

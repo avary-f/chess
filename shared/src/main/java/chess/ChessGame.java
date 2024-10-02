@@ -144,7 +144,12 @@ public class ChessGame{
 //            System.out.print("making a move: "); //testing
 //            System.out.println(move); //testing
             ChessPiece piece = board.removePiece(move.getStartPosition());
-            board.addPiece(move.getEndPosition(), piece);
+            if(move.promotionPiece() == null){
+                board.addPiece(move.getEndPosition(), piece);
+            }
+            else{
+                board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.promotionPiece()));
+            }
             setTeamTurn(getOtherTeamColor(turnColor)); //Make it the other team's turn after the piece is moved, not sure if I need this yet
         }
     }
@@ -172,14 +177,15 @@ public class ChessGame{
      */
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingPos = tempBoard.getKing(teamColor); //get king's pos
+        if(kingPos == null){
+            return false; //if there is no king, he can't be in check
+        }
         //System.out.println(kingPos);
 //        System.out.print("King pos: "); //testing
 //        System.out.println(kingPos); //testing
         //System.out.println(board); //testing
         ChessPiece king = tempBoard.getPiece(kingPos); //get the king piece
-        if(king == null){
-            return false; //if there is no king, he can't be in check
-        }
+
         Collection<ChessPosition> opponents = getOpponentPieces(king); //get each opponent position
 //        System.out.println(opponents);
         for(ChessPosition oppPos: opponents){
@@ -192,10 +198,10 @@ public class ChessGame{
 
     public Collection<ChessMove> getTotalTeamMoves(TeamColor teamColor){
         ChessPosition kingPos = board.getKing(teamColor); //get king position we are checking
-        ChessPiece king = board.getPiece(kingPos);
-        if(king == null){
+        if(kingPos == null){
             return Collections.emptyList(); //if the king pos is null, then return an empty list of moves
         }
+        ChessPiece king = board.getPiece(kingPos);
         Collection<ChessMove> allMoves = new ArrayList<>();
         Collection<ChessPosition> myTeam = getMyTeamPieces(king); //all the pieces on your team
         for(ChessPosition myGuy: myTeam){
