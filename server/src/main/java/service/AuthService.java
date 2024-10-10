@@ -1,9 +1,15 @@
 package service;
 
+import dataaccess.AuthDAO;
+
 public class AuthService {
-    public void delete(AuthData data){}
-    public void clear(){}
-    public AuthData read(AuthData data){}
-    public AuthData update(AuthData data){}
-    public AuthData create(){}
+    private final AuthDAO dataAccess;
+
+    public AuthService(AuthDAO dataAccess){
+        this.dataAccess = dataAccess;
+    }
+    public AuthData createAuth(){} //should this take in a user?
+//    public void delete(AuthData data){}
+//    public void clearAllAuths(){}
+//    public AuthData verifyAuth(AuthData data){}
 }
