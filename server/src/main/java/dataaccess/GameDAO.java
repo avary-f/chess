@@ -1,8 +1,9 @@
 package dataaccess;
+import model.GameData;
 
 public interface GameDAO {
-    public void deleteGame(GameData game);
-    public GameData update(GameData game);
-    public GameData create(GameData game); //this will only have the name in it
-    public GameData get(GameData game); //like a read operation
+    void deleteGame(GameData game);
+    void update(GameData game);
+    void create(GameData game); //this will only have the name in it
+    GameData get(GameData game); //like a read operation
 }

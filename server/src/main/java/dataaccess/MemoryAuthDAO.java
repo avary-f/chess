@@ -1,23 +1,28 @@
 package dataaccess;
 
-import java.util.ArrayList;
+import model.AuthData;
+import model.UserData;
+
+import java.util.HashMap;
 
 public class MemoryAuthDAO implements AuthDAO{
-    private ArrayList<AuthData> list = new ArrayList<AuthData>(); //memory of authData objects
-    //How are the auth data tokens connected to the users?
-
+    private final HashMap<String, AuthData> list = new HashMap<>(); //memory of authData objects
+    //authTokens are connected to the user by the username
 
     @Override
     public void delete(AuthData data) {
+        list.remove(data.username());
     }
 
     @Override
     public AuthData get(AuthData data) {
-        return null;
+        return list.get(data.username());
     }
 
     @Override
-    public AuthData create() {
-        return null;
+    public AuthData create(UserData data) {
+        AuthData auth = new AuthData("testing", data.username());
+        list.put(data.username(), auth);
+        return auth;
     }
 }

@@ -1,8 +1,9 @@
 package dataaccess;
+import model.UserData;
 
 public interface UserDAO {
-    public UserData get(UserData user);
-    public UserData create(UserData user);
-    public void delete(UserData user);
+    UserData get(UserData user) throws DataAccessException;
+    void create(UserData user) throws DataAccessException;
+    void delete(UserData user) throws DataAccessException;
 
 }

@@ -8,8 +8,8 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
     public AuthData register(UserData user) {}
-//    public AuthData login(UserData user) {}
-//    public void logout(AuthData auth) {}
+//    public model.AuthData login(model.UserData user) {}
+//    public void logout(model.AuthData auth) {}
 //    public void clearAllUsers(){}
 }
 

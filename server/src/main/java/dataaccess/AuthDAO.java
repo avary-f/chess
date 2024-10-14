@@ -1,7 +1,9 @@
 package dataaccess;
+import model.AuthData;
+import model.UserData;
 
 public interface AuthDAO {
-    public void delete(AuthData data);
-    public AuthData get(AuthData data);
-    public AuthData create(); //does this need to be associated with a user?
+    void delete(AuthData data);
+    AuthData get(AuthData data);
+    AuthData create(UserData data); //does this need to be associated with a user?
 }

@@ -9,7 +9,7 @@ public class AuthService {
         this.dataAccess = dataAccess;
     }
     public AuthData createAuth(){} //should this take in a user?
-//    public void delete(AuthData data){}
+//    public void delete(model.AuthData data){}
 //    public void clearAllAuths(){}
-//    public AuthData verifyAuth(AuthData data){}
+//    public model.AuthData verifyAuth(model.AuthData data){}
 }

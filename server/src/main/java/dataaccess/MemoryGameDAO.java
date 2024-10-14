@@ -1,23 +1,29 @@
 package dataaccess;
+import model.GameData;
 
-public class MemoryGameDAO implements GameDAO{
+import java.util.HashMap;
+
+public class MemoryGameDAO implements GameDAO {
+    private final HashMap<Integer, GameData> games = new HashMap<>();
+
     @Override
     public void deleteGame(GameData game) {
-
+        games.remove(game.gameID());
     }
 
     @Override
-    public GameData update(GameData game) {
-        return null;
+    public void update(GameData game) {
+        games.remove(game.gameID());
+        games.put(game.gameID(), game);
     }
 
     @Override
-    public GameData create(GameData game) {
-        return null;
+    public void create(GameData game) {
+        games.put(game.gameID(), game); //might need to add more game data here?
     }
 
     @Override
     public GameData get(GameData game) {
-        return null;
+        return games.get(game.gameID());
     }
 }
