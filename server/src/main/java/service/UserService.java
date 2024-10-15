@@ -1,15 +1,20 @@
 package service;
+import dataaccess.AuthDAO;
 import dataaccess.UserDAO;
+import model.*;
 
 public class UserService {
-    private final UserDAO dataAccess;
+    private final UserDAO dataAccessUser;
+    private final AuthDAO dataAccessAuth;
 
     public UserService(UserDAO dataAccess){
-        this.dataAccess = dataAccess;
+        this.dataAccessUser = dataAccessUser;
     }
     public AuthData register(UserData user) {}
-//    public model.AuthData login(model.UserData user) {}
-//    public void logout(model.AuthData auth) {}
+//    public AuthData login(UserData user) {
+//      validateAuthToken();
+//    }
+//    public void logout(AuthData auth) {}
 //    public void clearAllUsers(){}
 }
 

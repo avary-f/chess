@@ -4,10 +4,10 @@ import model.AuthData;
 import model.UserData;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO{
     private final HashMap<String, AuthData> list = new HashMap<>(); //memory of authData objects
-    //authTokens are connected to the user by the username
 
     @Override
     public void delete(AuthData data) {
@@ -21,7 +21,7 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public AuthData create(UserData data) {
-        AuthData auth = new AuthData("testing", data.username());
+        AuthData auth = new AuthData(UUID.randomUUID().toString(), data.username());
         list.put(data.username(), auth);
         return auth;
     }
