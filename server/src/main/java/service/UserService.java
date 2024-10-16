@@ -43,6 +43,10 @@ public class UserService {
         }
         dataAccessAuth.delete(auth);
     }
+    public void clearAllUsers(){ //might need to include the clear games and clear auth
+        dataAccessAuth.clearAll();
+        dataAccessUser.clearAll();
+    }
     public boolean isAuthTokenValid(AuthData auth){
         return auth != null;
     }
@@ -52,6 +56,5 @@ public class UserService {
     private boolean isPasswordsEqual(UserData user1, UserData user2){
         return user1.password().equals(user2.password());
     }
-//    public void clearAllUsers(){}
 }
 

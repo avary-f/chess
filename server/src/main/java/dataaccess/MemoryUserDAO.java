@@ -19,4 +19,11 @@ public class MemoryUserDAO implements UserDAO {
     public void delete(UserData user) {
         users.remove(user.username());
     }
+
+    @Override
+    public void clearAll(){
+        for(UserData user: users.values()){
+            delete(user);
+        }
+    }
 }
