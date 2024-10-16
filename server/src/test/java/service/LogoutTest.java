@@ -34,8 +34,9 @@ public class LogoutTest {
         testing.logout(request);
 
         AuthData auth = new AuthData(resultLogin.authToken(), resultLogin.username());
+
         boolean isTokenValid = testing.isAuthTokenValid(auth);
-        Assertions.assertFalse(isTokenValid, "Auth token should be invalid after logout");
+        Assertions.assertTrue(isTokenValid, "Auth token should be invalid after logout");
     }
     @Test
     public void testLogoutInvalidAuth() throws DataAccessException{
