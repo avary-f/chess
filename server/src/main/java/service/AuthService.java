@@ -9,9 +9,9 @@ public class AuthService {
     public AuthService(AuthDAO dataAccess){ //where should I be passing in what type of data access class?
         this.dataAccess = dataAccess;
     }
-    public AuthData createAuth(){
-
-    } //should this take in a user?
+//    public AuthData createAuth(){
+//
+//    } //should this take in a user?
 //    public void delete(model.AuthData data){}
 //    public void clearAllAuths(){}
 //    public model.AuthData verifyAuth(model.AuthData data){}

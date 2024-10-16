@@ -16,9 +16,8 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public AuthData get(AuthData data) {
-        return list.get(data.username());
+        return list.get(data.authToken());
     }
-
     @Override
     public AuthData create(UserData data) {
         AuthData auth = new AuthData(UUID.randomUUID().toString(), data.username());

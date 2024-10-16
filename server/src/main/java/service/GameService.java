@@ -10,7 +10,7 @@ public class GameService {
         this.dataAccess = dataAccess;
     }
 
-    public CreateResult createGame(CreateRequest game){}
+//    public CreateResult createGame(CreateRequest game){}
 //    public void clearAllGames(){
 //        for all the games in db
 //                delete(game);
