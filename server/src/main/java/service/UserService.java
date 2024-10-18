@@ -33,7 +33,7 @@ public class UserService {
         dataAccessAuth.checkAuthTokenValid(auth);
         dataAccessAuth.delete(auth);
     }
-    public void clearAllUsers(){ //might need to include the clear games and clear auth
+    public void clearAllUserAuthData(){ //might need to include the clear games and clear auth
         dataAccessAuth.clearAll();
         dataAccessUser.clearAll();
     }
