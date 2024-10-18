@@ -13,9 +13,23 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public void update(GameData game) {
+    public GameData updatePlayer(String username, String color, GameData game) throws DataAccessException {
+        GameData newGame;
+        if(color.equals("WHITE")){ //player wants to be white
+            if(games.get(game.gameID()).whiteUsername() != null){
+                throw new DataAccessException("already taken");
+            }
+            newGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
+        }
+        else{ //black
+            if(games.get(game.gameID()).blackUsername() != null){
+                throw new DataAccessException("already taken");
+            }
+            newGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
+        }
         games.remove(game.gameID());
-        games.put(game.gameID(), game);
+        games.put(newGame.gameID(), newGame);
+        return newGame;
     }
 
     @Override

@@ -8,4 +8,5 @@ public interface AuthDAO {
     AuthData create(UserData data);
     void clearAll();
     void checkAuthTokenValid(AuthData data) throws DataAccessException;
+    String getUsername(AuthData data);
 }

@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import request.*;
 import result.CreateResult;
+import result.JoinResult;
 import result.ListResult;
 import result.LoginResult;
 import org.junit.jupiter.api.*;
@@ -23,6 +24,7 @@ public class GameServiceTesting {
     private LoginResult resultLogin;
     private CreateResult resultCreate;
     private AuthData data;
+    private JoinResult resultJoin;
 
     public void createGames(String authToken, int count) throws DataAccessException {
         for(int i = 0; i < count; i++){
@@ -32,17 +34,22 @@ public class GameServiceTesting {
         }
     }
 
+    public void registerAndLogin(int numUsers) throws DataAccessException {
+        for(int i = 0; i < numUsers; i++){
+            //Register User
+            RegisterRequest registerRequest = new RegisterRequest("user" + i, "testing", "@gmail.com");
+            serviceUser.register(registerRequest);
+            //Login User
+            LoginRequest request = new LoginRequest("user" + i, "testing");
+            resultLogin = serviceUser.login(request);
+        }
+    }
     @BeforeEach
     public void setUp() throws DataAccessException {
         serviceGame = new GameService(userDao, authDao, gameDao);
         serviceUser = new UserService(userDao, authDao);
 
-        //Register User
-        RegisterRequest registerRequest = new RegisterRequest("avaryef", "testing", "@gmail.com");
-        serviceUser.register(registerRequest);
-        //Login User
-        LoginRequest request = new LoginRequest("avaryef", "testing");
-        resultLogin = serviceUser.login(request);
+        registerAndLogin(1);
     }
 
     // Testing CreateGame
@@ -66,7 +73,7 @@ public class GameServiceTesting {
     public void testCreateInvalidAuth() throws DataAccessException {
         //1st Game Creation, Success
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
-            createGames("invalidAuth", 1);;
+            createGames("invalidAuth", 1);
         });
         Assertions.assertEquals("unauthorized", exception.getMessage());
     }
@@ -83,72 +90,67 @@ public class GameServiceTesting {
         int numGames = 5; //number of games you want to list
         createGames(resultLogin.authToken(), numGames);
         AuthData invalidData = new AuthData("invalidAuth", resultLogin.username());
-        ListResult resultList = serviceGame.listGames(new ListRequest(invalidData));
-        Assertions.assertEquals(resultList.gameList().size(), numGames);
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            serviceGame.listGames(new ListRequest(invalidData));
+        });
     }
-//
-//    @Test
-//    public void testLoginInvalidPassword(){
-//        LoginRequest request = new LoginRequest("avaryef", "wrongPassword");
-//        try {
-//            service.login(request); // This should fail because of an invalid password
-//            Assertions.fail("Expected DataAccessException to be thrown due to invalid password");
-//        } catch (DataAccessException error) {
-//            Assertions.assertEquals("unauthorized", error.getMessage());
-//        }
-//    }
-//
-//    @Test
-//    public void testLoginInvalidUsername(){
-//        LoginRequest request = new LoginRequest("wrongUsername", "testing");
-//        try {
-//            service.login(request); // This should fail because of an invalid username
-//            Assertions.fail("Expected DataAccessException to be thrown due to invalid username");
-//        } catch (DataAccessException error) {
-//            Assertions.assertEquals("unauthorized", error.getMessage());
-//        }
-//    }
-//
-//    // Testing Logout
-//    @Test
-//    public void testLogoutSuccess() throws DataAccessException {
-//        LoginRequest requestLogin = new LoginRequest("avaryef", "testing");
-//        LoginResult result = service.login(requestLogin);
-//        LogoutRequest requestLogout = new LogoutRequest(result.authToken());
-//        Assertions.assertDoesNotThrow(() -> service.logout(requestLogout));
-//    }
-//
-//    @Test
-//    public void testLogoutInvalidAuth(){
-//        LogoutRequest request = new LogoutRequest("invalidAuthtokenTest");
-//        try {
-//            service.logout(request); // This should fail due to an invalid auth token
-//            Assertions.fail("Expected DataAccessException to be thrown due to invalid auth token");
-//        } catch (DataAccessException error) {
-//            Assertions.assertEquals("unauthorized", error.getMessage());
-//        }
-//    }
-//
-//    // Testing Register
-//    @Test
-//    public void testRegisterSuccess() throws DataAccessException {
-//        RegisterRequest request = new RegisterRequest("newUser", "password", "newUser@gmail.com");
-//        RegisterResult result = service.register(request);
-//
-//        Assertions.assertNotNull(result);
-//        Assertions.assertEquals("newUser", result.username());
-//        Assertions.assertNotNull(result.authToken());
-//    }
-//
-//    @Test
-//    public void testRegisterDuplicateUser(){
-//        RegisterRequest request = new RegisterRequest("avaryef", "testing", "@gmail.com");
-//        try {
-//            service.register(request);
-//            Assertions.fail("Expected DataAccessException to be thrown due to duplicate user");
-//        } catch (DataAccessException error) {
-//            Assertions.assertEquals("already taken", error.getMessage());
-//        }
-//    }
+
+    @Test
+    public void testJoinGameSuccessWhite() throws DataAccessException {
+        createGames(resultLogin.authToken(), 1);
+        int gameID = resultCreate.gameID();
+        JoinRequest requestJoin = new JoinRequest(data, "WHITE", gameID);
+        resultJoin = serviceGame.joinGame(requestJoin);
+        Assertions.assertEquals(resultJoin.gameID(), requestJoin.gameID());
+        Assertions.assertEquals(resultJoin.whiteUser(), requestJoin.auth()); // need to check what the username of the request was
+    }
+    @Test
+    public void testJoinGameSuccessBlack() throws DataAccessException {
+        createGames(resultLogin.authToken(), 1);
+        int gameID = resultCreate.gameID();
+        JoinRequest requestJoin = new JoinRequest(data, "BLACK", gameID);
+        resultJoin = serviceGame.joinGame(requestJoin);
+        Assertions.assertEquals(resultJoin.gameID(), requestJoin.gameID());
+        Assertions.assertEquals(resultJoin.blackUser(), requestJoin.playerColor());
+    }
+
+    @Test
+    public void testJoinInvalidAuth() throws DataAccessException {
+        createGames(resultLogin.authToken(), 1);
+        int gameID = resultCreate.gameID();
+        AuthData invalidData = new AuthData("invalidAuth", resultLogin.username());
+        JoinRequest requestJoin = new JoinRequest(invalidData, "BLACK", gameID);
+        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
+            serviceGame.joinGame(requestJoin);
+        });
+        Assertions.assertEquals("unauthorized", exception.getMessage());
+    }
+
+    @Test
+    public void testJoinWhiteTaken() throws DataAccessException {
+        createGames(resultLogin.authToken(), 1);
+        int gameID = resultCreate.gameID();
+        JoinRequest requestJoin = new JoinRequest(data, "WHITE", gameID);
+        serviceGame.joinGame(requestJoin);
+        registerAndLogin(1);
+        JoinRequest requestJoin2 = new JoinRequest(data, "WHITE", gameID);
+        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
+            serviceGame.joinGame(requestJoin2);
+        });
+        Assertions.assertEquals("already taken", exception.getMessage());
+    }
+    @Test
+    public void testJoinBlackTaken() throws DataAccessException {
+        createGames(resultLogin.authToken(), 1);
+        int gameID = resultCreate.gameID();
+        JoinRequest requestJoin = new JoinRequest(data, "BLACK", gameID);
+        serviceGame.joinGame(requestJoin);
+        registerAndLogin(1);
+        JoinRequest requestJoin2 = new JoinRequest(data, "BLACK", gameID);
+        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
+            serviceGame.joinGame(requestJoin2);
+        });
+        Assertions.assertEquals("already taken", exception.getMessage());
+    }
 }
 
