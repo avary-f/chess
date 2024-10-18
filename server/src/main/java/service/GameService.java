@@ -23,18 +23,16 @@ public class GameService {
         this.dataAccessUser = dataAccessUser;
         this.dataAccessAuth = dataAccessAuth;
     }
-//    public ListResult listGames(ListRequest req) throws DataAccessException{
-//        AuthData auth = dataAccessAuth.get(req.auth());
-//        dataAccessAuth.checkAuthTokenValid(auth);
-//        return new ListResult(dataAccessGame.getAll());
-//    }
+    public ListResult listGames(ListRequest req) throws DataAccessException{
+        AuthData auth = dataAccessAuth.get(req.auth());
+        dataAccessAuth.checkAuthTokenValid(auth);
+        return new ListResult(dataAccessGame.getAll());
+    }
     public CreateResult createGame(CreateRequest req) throws DataAccessException {
         AuthData auth = dataAccessAuth.get(req.auth());
         dataAccessAuth.checkAuthTokenValid(auth);
         GameData game = new GameData(UUID.randomUUID().hashCode(), null, null,  req.gameName(), null);
-        if(dataAccessGame.get(game) != null){
-            throw new DataAccessException("game already exists");
-        }
+        dataAccessGame.getName(game); //will throw an error if it is already taken
         dataAccessGame.create(game);
         return new CreateResult(game.gameID());
 

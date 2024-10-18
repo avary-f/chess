@@ -24,8 +24,17 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public GameData get(GameData game) {
+    public GameData getID(GameData game) {
         return games.get(game.gameID());
+    }
+
+    @Override
+    public void getName(GameData game) throws DataAccessException {
+        for(GameData cur: games.values()){
+            if(cur.gameName().equals(game.gameName())){
+                throw new DataAccessException("game already exists");
+            }
+        }
     }
 
     @Override

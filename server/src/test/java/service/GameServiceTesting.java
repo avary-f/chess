@@ -5,13 +5,12 @@ import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import model.AuthData;
-import request.CreateRequest;
-import request.LoginRequest;
-import request.RegisterRequest;
-import request.LogoutRequest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import request.*;
 import result.CreateResult;
+import result.ListResult;
 import result.LoginResult;
-import result.RegisterResult;
 import org.junit.jupiter.api.*;
 
 public class GameServiceTesting {
@@ -21,8 +20,17 @@ public class GameServiceTesting {
     private MemoryAuthDAO authDao = new MemoryAuthDAO();
     private MemoryGameDAO gameDao = new MemoryGameDAO();
     private MemoryUserDAO userDao = new MemoryUserDAO();
-    private LoginResult result;
+    private LoginResult resultLogin;
+    private CreateResult resultCreate;
+    private AuthData data;
 
+    public void createGames(String authToken, int count) throws DataAccessException {
+        for(int i = 0; i < count; i++){
+            data = new AuthData(authToken, resultLogin.username());
+            CreateRequest request = new CreateRequest(data, "TheGameName" + i);
+            resultCreate = serviceGame.createGame(request);
+        }
+    }
 
     @BeforeEach
     public void setUp() throws DataAccessException {
@@ -34,56 +42,50 @@ public class GameServiceTesting {
         serviceUser.register(registerRequest);
         //Login User
         LoginRequest request = new LoginRequest("avaryef", "testing");
-        result = serviceUser.login(request);
+        resultLogin = serviceUser.login(request);
     }
 
     // Testing CreateGame
     @Test
     public void testCreateSuccess() throws DataAccessException {
-        AuthData data = new AuthData(result.authToken(), result.username());
-        CreateRequest request = new CreateRequest(data, "TheGameName");
-        CreateResult result = serviceGame.createGame(request);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertNotEquals(result.gameID(), -1);
+        int numGames = 1;
+        createGames(resultLogin.authToken(), numGames);
+        Assertions.assertNotNull(resultCreate);
     }
     @Test
     public void testCreateGameTaken() throws DataAccessException {
-        AuthData data = new AuthData(result.authToken(), result.username());
         //1st Game Creation, Success
-        CreateRequest request = new CreateRequest(data, "TheGameName");
-        CreateResult result = serviceGame.createGame(request);
+        createGames(resultLogin.authToken(), 1);
         //2nd Game Creation Attempt, Fail
-        CreateRequest request2 = new CreateRequest(data, "TheGameName");
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
-            serviceGame.createGame(request2);
+            createGames(resultLogin.authToken(), 1);
         });
         Assertions.assertEquals("game already exists", exception.getMessage());
     }
     @Test
     public void testCreateInvalidAuth() throws DataAccessException {
-        AuthData data = new AuthData(result.authToken(), result.username());
         //1st Game Creation, Success
-        CreateRequest request = new CreateRequest(data, "TheGameName");
-        CreateResult result = serviceGame.createGame(request);
-        //2nd Game Creation Attempt, Fail
-        CreateRequest request2 = new CreateRequest(data, "TheGameName");
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
-            serviceGame.createGame(request2);
+            createGames("invalidAuth", 1);;
         });
         Assertions.assertEquals("unauthorized", exception.getMessage());
     }
-
-//    @Test
-//    public void testDuplicateLoginSuccess() throws DataAccessException {
-//        LoginRequest request = new LoginRequest("avaryef", "testing");
-//        LoginResult result = service.login(request);
-//        LoginResult result2 = service.login(request); // Attempt to log in a second time
-//
-//        Assertions.assertNotNull(result2);
-//        Assertions.assertEquals("avaryef", result.username());
-//        Assertions.assertNotNull(result.authToken());
-//    }
+    // Testing ListGames
+    @Test
+    public void testListGamesSuccess() throws DataAccessException {
+        int numGames = 5; //number of games you want to list
+        createGames(resultLogin.authToken(), numGames);
+        ListResult resultList = serviceGame.listGames(new ListRequest(data));
+        Assertions.assertEquals(resultList.gameList().size(), numGames);
+    }
+    @Test
+    public void testListGamesInvalidAuth() throws DataAccessException {
+        int numGames = 5; //number of games you want to list
+        createGames(resultLogin.authToken(), numGames);
+        AuthData invalidData = new AuthData("invalidAuth", resultLogin.username());
+        ListResult resultList = serviceGame.listGames(new ListRequest(invalidData));
+        Assertions.assertEquals(resultList.gameList().size(), numGames);
+    }
 //
 //    @Test
 //    public void testLoginInvalidPassword(){

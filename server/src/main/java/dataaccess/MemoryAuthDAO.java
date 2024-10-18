@@ -23,7 +23,7 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public void checkAuthTokenValid(AuthData auth) throws DataAccessException{
-        if(list.get(auth.authToken()) == null){
+        if(auth == null || list.get(auth.authToken()) == null){
             throw new DataAccessException("unauthorized");
         }
     }
