@@ -42,7 +42,7 @@ public class GameService {
     }
 
     public JoinResult joinGame(JoinRequest req) throws DataAccessException {
-        if(!req.playerColor().equals("WHITE") && req.playerColor().equals("BLACK")){
+        if(!req.playerColor().equals("WHITE") && !req.playerColor().equals("BLACK")){
             throw new DataAccessException("Bad request");
         }
         AuthData auth = dataAccessAuth.get(req.auth());

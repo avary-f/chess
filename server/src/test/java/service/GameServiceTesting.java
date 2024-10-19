@@ -7,6 +7,7 @@ import dataaccess.MemoryUserDAO;
 import model.AuthData;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import java.util.Random;
 import request.*;
 import result.CreateResult;
 import result.JoinResult;
@@ -25,6 +26,7 @@ public class GameServiceTesting {
     private CreateResult resultCreate;
     private AuthData data;
     private JoinResult resultJoin;
+    private Random random = new Random();
 
     public void createGames(String authToken, int count) throws DataAccessException {
         for(int i = 0; i < count; i++){
@@ -36,11 +38,12 @@ public class GameServiceTesting {
 
     public void registerAndLogin(int numUsers) throws DataAccessException {
         for(int i = 0; i < numUsers; i++){
+            String username = "user" + random.nextInt(100);
             //Register User
-            RegisterRequest registerRequest = new RegisterRequest("user" + i, "testing", "@gmail.com");
+            RegisterRequest registerRequest = new RegisterRequest(username, "testing", "@gmail.com");
             serviceUser.register(registerRequest);
             //Login User
-            LoginRequest request = new LoginRequest("user" + i, "testing");
+            LoginRequest request = new LoginRequest(username, "testing");
             resultLogin = serviceUser.login(request);
         }
     }
@@ -102,7 +105,7 @@ public class GameServiceTesting {
         JoinRequest requestJoin = new JoinRequest(data, "WHITE", gameID);
         resultJoin = serviceGame.joinGame(requestJoin);
         Assertions.assertEquals(resultJoin.gameID(), requestJoin.gameID());
-        Assertions.assertEquals(resultJoin.whiteUser(), requestJoin.auth()); // need to check what the username of the request was
+        Assertions.assertEquals(resultJoin.whiteUser(), data.username()); // need to check what the username of the request was
     }
     @Test
     public void testJoinGameSuccessBlack() throws DataAccessException {
@@ -111,7 +114,7 @@ public class GameServiceTesting {
         JoinRequest requestJoin = new JoinRequest(data, "BLACK", gameID);
         resultJoin = serviceGame.joinGame(requestJoin);
         Assertions.assertEquals(resultJoin.gameID(), requestJoin.gameID());
-        Assertions.assertEquals(resultJoin.blackUser(), requestJoin.playerColor());
+        Assertions.assertEquals(resultJoin.blackUser(), data.username());
     }
 
     @Test
