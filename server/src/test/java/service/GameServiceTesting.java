@@ -1,12 +1,10 @@
 package service;
 
-import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import model.AuthData;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+
 import java.util.Random;
 import request.*;
 import result.CreateResult;

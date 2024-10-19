@@ -4,9 +4,7 @@ import model.UserData;
 
 public interface AuthDAO {
     void delete(AuthData data);
-    AuthData get(AuthData data);
-    AuthData create(UserData data);
     void clearAll();
-    void checkAuthTokenValid(AuthData data) throws DataAccessException;
-    String getUsername(AuthData data);
+    AuthData get(AuthData data);
+    AuthData create(UserData data); //does this need to be associated with a user?
 }

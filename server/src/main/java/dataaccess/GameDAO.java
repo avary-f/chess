@@ -6,9 +6,9 @@ import java.util.ArrayList;
 public interface GameDAO {
     void deleteGame(GameData game);
     void clearAll();
-    GameData updatePlayer(String username, String color, GameData game) throws DataAccessException;
-    void create(GameData game); //this will only have the name in it
-    GameData getID(GameData game); //like a read operation
-    void getName(GameData game) throws DataAccessException;
+    GameData updatePlayer(GameData game, GameData newGame);
+    void create(GameData game);
+    GameData getID(GameData game);
+    void getName(GameData game);
     ArrayList<GameData> getAll();
 }

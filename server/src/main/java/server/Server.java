@@ -21,19 +21,15 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         //register, login, logout, createGame, joinGame, listGames, clear
-        Spark.delete("/db", this::clear); //what are these paths?
+        //Spark.delete("/db", this::clear); //what are these paths?
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
         Spark.get("/get", this::listGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
-        Spark.exception(ResponseException.class, this::exceptionHandler);
-        //how do I add the clear path? Do I do that here?
-        //Why do I need a clear path?
-        //Do I just run the server and start testing things?
-        //What type of errors should I be throwing? do I need to use their class?
-
+        Spark.exception(ResponseException.class, this::exceptionHandler); //make response exception a super class to all other exceptions.
+        //put the responseException class in....a package?
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
@@ -47,10 +43,13 @@ public class Server {
     }
 
     //Handlers
-    private Object clear(Request req, Response res) {
-    }
+//    private Object clear(Request req, Response res) {
+//        var clear = new Gson().fromJson(req.body(), ClearRequest.class);
+//        clear = serviceUser.clearAllUserAuthData(clear);
+//        return new Gson().toJson(clear);
+//    } //not sure how to do this one
 
-    private Object register(Request req, Response res) {
+    private Object register(Request req, Response res) throws ResponseException{
         var user = new Gson().fromJson(req.body(), RegisterRequest.class);
         user = serviceUser.register(user);
         return new Gson().toJson(user);

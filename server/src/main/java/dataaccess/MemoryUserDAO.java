@@ -13,34 +13,12 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public void create(UserData user) throws DataAccessException {
-        if(users.get(user.username()) != null){
-            throw new DataAccessException("already taken");
-        }
+    public void create(UserData user){
         users.put(user.username(), user);
-    }
-
-    @Override
-    public void delete(UserData user) {
-        users.remove(user.username());
     }
 
     @Override
     public void clearAll(){
         users.clear();
-    }
-
-    @Override
-    public void checkValidUser(UserData user) throws DataAccessException{
-        if(user == null){
-            throw new DataAccessException("unauthorized");
-        }
-    }
-
-    @Override
-    public void checkPasswordsEqual(UserData user1, UserData user2) throws DataAccessException {
-        if(!(user1.password().equals(user2.password()))){
-            throw new DataAccessException("unauthorized");
-        }
     }
 }

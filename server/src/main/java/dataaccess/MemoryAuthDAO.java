@@ -20,22 +20,8 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void checkAuthTokenValid(AuthData auth) throws DataAccessException{
-        if(auth == null || list.get(auth.authToken()) == null){
-            throw new DataAccessException("unauthorized");
-        }
-    }
-
-    @Override
     public AuthData get(AuthData data) {
         return list.get(data.authToken());
-    }
-
-    @Override
-    public String getUsername(AuthData auth) {
-        AuthData data = list.get(auth.authToken());
-        return data.username();
-
     }
 
     @Override
