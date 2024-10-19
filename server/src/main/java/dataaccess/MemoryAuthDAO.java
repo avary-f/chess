@@ -16,9 +16,7 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public void clearAll(){
-        for(AuthData auth: list.values()){
-            delete(auth);
-        }
+        list.clear();
     }
 
     @Override

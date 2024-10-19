@@ -13,6 +13,11 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
+    public void clearAll() {
+        games.clear();
+    }
+
+    @Override
     public GameData updatePlayer(String username, String color, GameData game) throws DataAccessException {
         GameData newGame;
         if(color.equals("WHITE")){ //player wants to be white

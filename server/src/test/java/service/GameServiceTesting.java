@@ -38,7 +38,7 @@ public class GameServiceTesting {
 
     public void registerAndLogin(int numUsers) throws DataAccessException {
         for(int i = 0; i < numUsers; i++){
-            String username = "user" + random.nextInt(100);
+            String username = "user" + random.nextDouble(100);
             //Register User
             RegisterRequest registerRequest = new RegisterRequest(username, "testing", "@gmail.com");
             serviceUser.register(registerRequest);
@@ -154,6 +154,14 @@ public class GameServiceTesting {
             serviceGame.joinGame(requestJoin2);
         });
         Assertions.assertEquals("already taken", exception.getMessage());
+    }
+
+    @Test
+    public void clearDB() throws DataAccessException {
+        registerAndLogin(20);
+        createGames(resultLogin.authToken(), 10);
+        serviceGame.clearAllGames();
+        serviceUser.clearAllUserAuthData();
     }
 }
 

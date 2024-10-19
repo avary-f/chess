@@ -55,7 +55,8 @@ public class GameService {
         return new JoinResult(newGame.gameID(), newGame.whiteUsername(), newGame.blackUsername());
     }
 
-//    public void clearAllGames(){
-//    }
+    public void clearAllGames(){
+        dataAccessGame.clearAll();
+    }
 
 }
