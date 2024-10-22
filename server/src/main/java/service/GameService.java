@@ -38,7 +38,7 @@ public class GameService {
     public CreateResult createGame(CreateRequest req) throws Exception {
         AuthData auth = dataAccessAuth.get(req.auth());
         serviceAuth.checkAuthTokenValid(auth);
-        GameData game = new GameData(UUID.randomUUID().hashCode(), null, null,  req.gameName(), null);
+        GameData game = new GameData(Math.abs(UUID.randomUUID().hashCode()), null, null,  req.gameName(), null);
         if(dataAccessGame.getName(game)){
             throw new AlreadyTakenException();
         } //will throw an error if it is already taken
@@ -48,7 +48,8 @@ public class GameService {
     }
 
     public JoinResult joinGame(JoinRequest req) throws Exception {
-        if(!req.playerColor().equals("WHITE") && !req.playerColor().equals("BLACK")){
+        String passedInColor = req.playerColor();
+        if(passedInColor == null || (!passedInColor.equals("WHITE") && !req.playerColor().equals("BLACK"))){
             throw new BadRequestException();
         }
         AuthData auth = dataAccessAuth.get(req.auth());

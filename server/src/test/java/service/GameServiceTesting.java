@@ -62,6 +62,8 @@ public class GameServiceTesting {
         int numGames = 1;
         createGames(resultLogin.authToken(), numGames);
         Assertions.assertNotNull(resultCreate);
+        Assertions.assertNotEquals(resultCreate.gameID(), -1);
+
     }
     @Test
     public void testCreateGameTaken()  throws Exception {
@@ -71,7 +73,7 @@ public class GameServiceTesting {
         AlreadyTakenException exception = Assertions.assertThrows(AlreadyTakenException.class, () -> {
             createGames(resultLogin.authToken(), 1);
         });
-        Assertions.assertEquals("game already exists", exception.getMessage());
+        Assertions.assertEquals("Error: already taken", exception.getMessage());
     }
     @Test
     public void testCreateInvalidAuth()  throws Exception {
@@ -79,7 +81,7 @@ public class GameServiceTesting {
         UnauthorizedException exception = Assertions.assertThrows(UnauthorizedException.class, () -> {
             createGames("invalidAuth", 1);
         });
-        Assertions.assertEquals("unauthorized", exception.getMessage());
+        Assertions.assertEquals("Error: unauthorized", exception.getMessage());
     }
     // Testing ListGames
     @Test
@@ -87,7 +89,7 @@ public class GameServiceTesting {
         int numGames = 5; //number of games you want to list
         createGames(resultLogin.authToken(), numGames);
         ListResult resultList = serviceGame.listGames(new ListRequest(data.authToken()));
-        Assertions.assertEquals(resultList.gameList().size(), numGames);
+        Assertions.assertEquals(resultList.games().size(), numGames);
     }
     @Test
     public void testListGamesInvalidAuth()  throws Exception {
@@ -127,7 +129,7 @@ public class GameServiceTesting {
         UnauthorizedException exception = Assertions.assertThrows(UnauthorizedException.class, () -> {
             serviceGame.joinGame(requestJoin);
         });
-        Assertions.assertEquals("unauthorized", exception.getMessage());
+        Assertions.assertEquals("Error: unauthorized", exception.getMessage());
     }
 
     @Test
@@ -141,7 +143,7 @@ public class GameServiceTesting {
         AlreadyTakenException exception = Assertions.assertThrows(AlreadyTakenException.class, () -> {
             serviceGame.joinGame(requestJoin2);
         });
-        Assertions.assertEquals("already taken", exception.getMessage());
+        Assertions.assertEquals("Error: already taken", exception.getMessage());
     }
     @Test
     public void testJoinBlackTaken()  throws Exception {
@@ -154,7 +156,7 @@ public class GameServiceTesting {
         AlreadyTakenException exception = Assertions.assertThrows(AlreadyTakenException.class, () -> {
             serviceGame.joinGame(requestJoin2);
         });
-        Assertions.assertEquals("already taken", exception.getMessage());
+        Assertions.assertEquals("Error: already taken", exception.getMessage());
     }
 
     @Test

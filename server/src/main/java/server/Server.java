@@ -1,6 +1,9 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
+import dataaccess.MemoryUserDAO;
 import request.*;
 import result.*;
 import service.GameService;
@@ -10,13 +13,12 @@ import spark.*;
 import java.util.Map;
 
 public class Server {
-    private final UserService serviceUser;
-    private final GameService serviceGame;
+    private MemoryUserDAO userDAO = new MemoryUserDAO();
+    private MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    private MemoryGameDAO gameDAO = new MemoryGameDAO();
+    private final UserService serviceUser = new UserService(userDAO, authDAO);
+    private final GameService serviceGame = new GameService(userDAO, authDAO, gameDAO);
 
-    public Server(UserService serviceUser, GameService serviceGame) {
-        this.serviceUser = serviceUser;
-        this.serviceGame = serviceGame;
-    }
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
@@ -24,11 +26,11 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         //register, login, logout, createGame, joinGame, listGames, clear
-        //Spark.delete("/db", this::clear); //what are these paths?
+        Spark.delete("/db", this::clear); //what are these paths?
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
-        Spark.get("/get", this::listGames);
+        Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
         Spark.exception(UnauthorizedException.class, this::exceptionHandlerUnauthorized); //make response exception a super class to all other exceptions.
@@ -47,16 +49,19 @@ public class Server {
     }
 
     //Handlers
-//    private Object clear(Request req, Response res) {
-//        var clear = new Gson().fromJson(req.body(), ClearRequest.class);
-//        clear = serviceUser.clearAllUserAuthData(clear);
-//        return new Gson().toJson(clear);
-//    } //not sure how to do this one
+    private Object clear(Request req, Response res) {
+        serviceUser.clearAllUserAuthData();
+        serviceGame.clearAllGames();
+        return "";
+    }
 
 
     private Object register(Request req, Response res) throws Exception {
         //need to check the request to make sure it is real --> also listGames and joinGame?
         RegisterRequest request = new Gson().fromJson(req.body(), RegisterRequest.class);
+        if(request.username() == null || request.password() == null || request.email() == null){
+            throw new BadRequestException();
+        }
         RegisterResult result = serviceUser.register(request);
         return new Gson().toJson(result);
     }
@@ -88,11 +93,17 @@ public class Server {
 
     private Object joinGame(Request req, Response res) throws Exception {
         Map<String, Object> bodyParams = new Gson().fromJson(req.body(), Map.class);
-        String playerColor = (String) bodyParams.get("playerColor");
-        int gameID = (int) bodyParams.get("gameID");
-        JoinRequest request = new JoinRequest(req.headers("authorization"), playerColor, gameID);
-        serviceGame.joinGame(request);
-        return "";
+        if(bodyParams.size() == 2){
+            String playerColor = (String) bodyParams.get("playerColor");
+            double gameIDdouble = (double) bodyParams.get("gameID");
+            int gameID = (int) gameIDdouble;
+            JoinRequest request = new JoinRequest(req.headers("authorization"), playerColor, gameID);
+            serviceGame.joinGame(request);
+            return "";
+        }
+        else{
+            throw new BadRequestException();
+        }
     }
 
     private void exceptionHandlerBadRequest(BadRequestException e, Request req, Response res) {
