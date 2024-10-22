@@ -34,30 +34,28 @@ public class PawnMoves extends Moves{
         return getMoves();
     }
     private void getMovesHelper(int i, int promotionRow, ChessPosition spot, ChessPosition pos, ChessBoard board) {
+        if (!attackable(board, pos, spot)) {
+            return;
+        }
+        if (i == 0 && board.getPiece(spot) == null) {
+            addMoves(pos, spot, promotionRow);
+        } else if (i != 0 && board.getPiece(spot) != null && board.getPiece(spot).getTeamColor() != board.getPiece(pos).getTeamColor()) {
+            addMoves(pos, spot, promotionRow);
+        }
+    }
+
+    private void addMoves(ChessPosition pos, ChessPosition spot, int promotionRow){
         ArrayList<ChessPiece.PieceType> types = new ArrayList<>();
         types.add(ROOK);
         types.add(QUEEN);
         types.add(KNIGHT);
         types.add(BISHOP);
-        if (!attackable(board, pos, spot)) {
-            return;
-        }
-        if (i == 0 && board.getPiece(spot) == null) {
-            if (spot.getRow() == promotionRow) {
-                for (ChessPiece.PieceType type : types) {
-                    add(new ChessMove(pos, spot, type));
-                }
-            } else {
-                add(new ChessMove(pos, spot, null));
+        if (spot.getRow() == promotionRow) {
+            for (ChessPiece.PieceType type : types) {
+                add(new ChessMove(pos, spot, type));
             }
-        } else if (i != 0 && board.getPiece(spot) != null && board.getPiece(spot).getTeamColor() != board.getPiece(pos).getTeamColor()) {
-            if (spot.getRow() == promotionRow) {
-                for (ChessPiece.PieceType type : types) {
-                    add(new ChessMove(pos, spot, type));
-                }
-            } else {
-                add(new ChessMove(pos, spot, null));
-            }
+        } else {
+            add(new ChessMove(pos, spot, null));
         }
     }
 }
