@@ -15,7 +15,7 @@ import org.junit.jupiter.api.*;
 import server.AlreadyTakenException;
 import server.UnauthorizedException;
 
-public class GameServiceTesting {
+public class GameServiceTests {
 
     private GameService serviceGame;
     private UserService serviceUser;

@@ -8,10 +8,8 @@ import request.LogoutRequest;
 import result.LoginResult;
 import result.RegisterResult;
 import org.junit.jupiter.api.*;
-import server.AlreadyTakenException;
-import server.UnauthorizedException;
 
-public class UserServiceTesting {
+public class UserServiceTests {
 
     private UserService service;
 
