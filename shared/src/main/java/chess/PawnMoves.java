@@ -51,7 +51,7 @@ public class PawnMoves extends Moves{
                 add(new ChessMove(pos, spot, null));
             }
         } else if (i != 0 && board.getPiece(spot) != null && board.getPiece(spot).getTeamColor() != board.getPiece(pos).getTeamColor()) {
-            if (spot.getRow() == 8) {
+            if (spot.getRow() == promotionRow) {
                 for (ChessPiece.PieceType type : types) {
                     add(new ChessMove(pos, spot, type));
                 }
