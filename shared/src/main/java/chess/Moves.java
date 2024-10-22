@@ -26,9 +26,5 @@ public abstract class Moves {
         return moves;
     }
 
-    public void combine(Moves other){
-        moves.addAll(other.getMoves());
-    }
-
     public abstract Collection<ChessMove> moves(ChessBoard board, ChessPosition pos);
 }

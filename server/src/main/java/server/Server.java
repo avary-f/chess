@@ -33,7 +33,7 @@ public class Server {
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
-        Spark.exception(UnauthorizedException.class, this::exceptionHandlerUnauthorized); //make response exception a super class to all other exceptions.
+        Spark.exception(UnauthorizedException.class, this::exceptionHandlerUnauthorized);
         Spark.exception(AlreadyTakenException.class, this::exceptionHandlerAlreadyTaken);
         Spark.exception(BadRequestException.class, this::exceptionHandlerBadRequest);
 

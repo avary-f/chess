@@ -23,18 +23,6 @@ public class ChessBoard {
         addPiece(pos, piece);
     }
 
-    public ChessBoard clone(){
-        ChessBoard tempBoard = new ChessBoard();
-        for(int i = 1; i < 9; i++){
-            for(int j = 1; j < 9; j++){
-                ChessPosition pos = new ChessPosition(i, j);
-                ChessPiece piece = getPiece(pos);
-                tempBoard.removePiece(pos);
-                tempBoard.addPiece(pos, piece);
-            }
-        }
-        return tempBoard;
-    }
     public boolean isEmpty(){
         for(int r = 1; r < 9; r++){
             for(int c = 1; c < 9; c++){
@@ -145,8 +133,8 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         ChessBoard that = (ChessBoard) o;
         return Arrays.deepEquals(board, that.board);
     }

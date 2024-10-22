@@ -157,14 +157,9 @@ public class ChessGame{
 
     public boolean canAttack(ChessPosition oppPos, ChessPosition kingPos){
         ChessPiece oppPiece = board.getPiece(oppPos);
-//        System.out.println(oppPiece);
-//        System.out.println(board);
-        Collection<ChessMove> oppMoves = oppPiece.pieceMoves(board, oppPos); //check what the opponent can do, this board needs to be changed to temp board
+        Collection<ChessMove> oppMoves = oppPiece.pieceMoves(board, oppPos);
         for(ChessMove oppMove: oppMoves){
-            //System.out.println(oppMove);
-            //System.out.println(kingPos);
             if(oppMove.getEndPosition().equals(kingPos)){ //if the opponent can kill the king
-                //System.out.println("can attack");
                 return true;
             }
         }
