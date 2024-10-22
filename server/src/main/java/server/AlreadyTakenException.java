@@ -2,6 +2,6 @@ package server;
 
 public class AlreadyTakenException extends Exception {
     public AlreadyTakenException() {
-        super("already taken");
+        super("Error: already taken");
     }
 }

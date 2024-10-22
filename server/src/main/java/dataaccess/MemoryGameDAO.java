@@ -18,13 +18,6 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public GameData updatePlayer(GameData game, GameData newGame) {
-        games.remove(game.gameID());
-        games.put(newGame.gameID(), newGame);
-        return newGame;
-    }
-
-    @Override
     public void create(GameData game) {
         games.put(game.gameID(), game); //might need to add more game data here?
     }
@@ -35,12 +28,13 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public void getName(GameData game) throws DataAccessException {
+    public boolean getName(GameData game){
         for(GameData cur: games.values()){
             if(cur.gameName().equals(game.gameName())){
-                throw new DataAccessException("game already exists");
+                return true;
             }
         }
+        return false;
     }
 
     @Override

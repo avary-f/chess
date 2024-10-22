@@ -3,6 +3,7 @@ package service;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import model.AuthData;
+import server.UnauthorizedException;
 
 public class AuthService {
     private final AuthDAO dataAccessAuth;
@@ -10,9 +11,9 @@ public class AuthService {
     public AuthService(AuthDAO dataAccessAuth){
         this.dataAccessAuth = dataAccessAuth;
     }
-    public void checkAuthTokenValid(AuthData auth) throws DataAccessException {
+    public void checkAuthTokenValid(AuthData auth) throws Exception {
         if(auth == null || dataAccessAuth.get(auth) == null){
-            throw new DataAccessException("unauthorized");
+            throw new UnauthorizedException();
         }
     }
     public String getUsername(AuthData auth) {

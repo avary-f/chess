@@ -43,7 +43,7 @@ public class UserService {
         dataAccessUser.clearAll();
     }
     private void checkUserNotTaken(UserData user) throws AlreadyTakenException {
-        if(dataAccessUser.get(user).username() != null){
+        if(dataAccessUser.get(user) != null && dataAccessUser.get(user).username() != null){
             throw new AlreadyTakenException();
         }
     }

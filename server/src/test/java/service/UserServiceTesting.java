@@ -8,13 +8,15 @@ import request.LogoutRequest;
 import result.LoginResult;
 import result.RegisterResult;
 import org.junit.jupiter.api.*;
+import server.AlreadyTakenException;
+import server.UnauthorizedException;
 
 public class UserServiceTesting {
 
     private UserService service;
 
     @BeforeEach
-    public void setUp() throws DataAccessException {
+    public void setUp() throws Exception {
         service = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
 
         RegisterRequest registerRequest = new RegisterRequest("avaryef", "testing", "@gmail.com");
@@ -23,7 +25,7 @@ public class UserServiceTesting {
 
     // Testing Login
     @Test
-    public void testLoginSuccess() throws DataAccessException {
+    public void testLoginSuccess() throws Exception {
         LoginRequest request = new LoginRequest("avaryef", "testing");
         LoginResult result = service.login(request);
 
@@ -33,7 +35,7 @@ public class UserServiceTesting {
     }
 
     @Test
-    public void testDuplicateLoginSuccess() throws DataAccessException {
+    public void testDuplicateLoginSuccess() throws Exception {
         LoginRequest request = new LoginRequest("avaryef", "testing");
         LoginResult result = service.login(request);
         LoginResult result2 = service.login(request); // Attempt to log in a second time
@@ -49,8 +51,8 @@ public class UserServiceTesting {
         try {
             service.login(request); // This should fail because of an invalid password
             Assertions.fail("Expected DataAccessException to be thrown due to invalid password");
-        } catch (DataAccessException error) {
-            Assertions.assertEquals("unauthorized", error.getMessage());
+        } catch (Exception error) {
+            Assertions.assertEquals("Error: unauthorized", error.getMessage());
         }
     }
 
@@ -60,14 +62,14 @@ public class UserServiceTesting {
         try {
             service.login(request); // This should fail because of an invalid username
             Assertions.fail("Expected DataAccessException to be thrown due to invalid username");
-        } catch (DataAccessException error) {
-            Assertions.assertEquals("unauthorized", error.getMessage());
+        } catch (Exception error) {
+            Assertions.assertEquals("Error: unauthorized", error.getMessage());
         }
     }
 
     // Testing Logout
     @Test
-    public void testLogoutSuccess() throws DataAccessException {
+    public void testLogoutSuccess() throws Exception {
         LoginRequest requestLogin = new LoginRequest("avaryef", "testing");
         LoginResult result = service.login(requestLogin);
         LogoutRequest requestLogout = new LogoutRequest(result.authToken());
@@ -80,14 +82,14 @@ public class UserServiceTesting {
         try {
             service.logout(request); // This should fail due to an invalid auth token
             Assertions.fail("Expected DataAccessException to be thrown due to invalid auth token");
-        } catch (DataAccessException error) {
-            Assertions.assertEquals("unauthorized", error.getMessage());
+        } catch (Exception error) {
+            Assertions.assertEquals("Error: unauthorized", error.getMessage());
         }
     }
 
     // Testing Register
     @Test
-    public void testRegisterSuccess() throws DataAccessException {
+    public void testRegisterSuccess() throws Exception {
         RegisterRequest request = new RegisterRequest("newUser", "password", "newUser@gmail.com");
         RegisterResult result = service.register(request);
 
@@ -102,8 +104,8 @@ public class UserServiceTesting {
         try {
             service.register(request);
             Assertions.fail("Expected DataAccessException to be thrown due to duplicate user");
-        } catch (DataAccessException error) {
-            Assertions.assertEquals("already taken", error.getMessage());
+        } catch (Exception error) {
+            Assertions.assertEquals("Error: already taken", error.getMessage());
         }
     }
 }
