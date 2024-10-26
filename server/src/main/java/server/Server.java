@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
@@ -36,6 +37,7 @@ public class Server {
         Spark.exception(UnauthorizedException.class, this::exceptionHandlerUnauthorized);
         Spark.exception(AlreadyTakenException.class, this::exceptionHandlerAlreadyTaken);
         Spark.exception(BadRequestException.class, this::exceptionHandlerBadRequest);
+        Spark.exception(DataAccessException.class, this::exceptionHandlerDataAccess);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
@@ -118,6 +120,11 @@ public class Server {
 
     private void exceptionHandlerAlreadyTaken(AlreadyTakenException e, Request req, Response res) {
         res.status(403);
+        res.body(new Gson().toJson(new ServerResponse(e.getMessage())));
+    }
+
+    private void exceptionHandlerDataAccess(DataAccessException e, Request req, Response res){
+        res.status(500);
         res.body(new Gson().toJson(new ServerResponse(e.getMessage())));
     }
 
