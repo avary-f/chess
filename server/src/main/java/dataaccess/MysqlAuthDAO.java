@@ -23,7 +23,7 @@ public class MysqlAuthDAO extends MysqlDAO implements AuthDAO{
     @Override
     public AuthData get(AuthData data) {
         String statement = "SELECT username FROM auths WHERE authToken = ?";
-        String usernameResult = executeUpdate(statement, data.authToken());
+        String usernameResult = executeQuery(statement, data.authToken());
         if(!Objects.equals(usernameResult, "")){ //does not exist in DB
             return new AuthData(data.authToken(), usernameResult);
         }
@@ -37,5 +37,11 @@ public class MysqlAuthDAO extends MysqlDAO implements AuthDAO{
         String authToken = UUID.randomUUID().toString();
         executeUpdate(statement, authToken, user.username());
         return new AuthData(authToken, user.username());
+    }
+
+    public boolean isEmpty(){
+        String statement = "SELECT * FROM auths";
+        String resultUser = executeQuery(statement);
+        return resultUser.isEmpty();
     }
 }

@@ -44,7 +44,8 @@ public class DatabaseManager {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
+            System.out.println("in the create db method");
+             new DataAccessException(e.getMessage());
         }
     }
 
