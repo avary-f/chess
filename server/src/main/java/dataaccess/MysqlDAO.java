@@ -1,7 +1,4 @@
 package dataaccess;
-
-import javax.xml.crypto.Data;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -36,20 +33,17 @@ public class MysqlDAO {
                 var rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     return rs.getString("username");
-//                    return rs.getInt(1);
                 }
-
-                // NOTE: Use the return statement if inserting rows into a table with an auto-increment
-                // column (like an id), allows you to get that auto-generated ID.
-                // Useful when you want to reference the inserted row later,
-                // without having to manually query for it by other criteria.
+                /*
+                 NOTE: Use the return statement if inserting rows into a table with an auto-increment
+                 column (like an id), allows you to get that auto-generated ID.
+                 Useful when you want to reference the inserted row later,
+                 without having to manually query for it by other criteria.
+                 */
 
                 return ""; //returns empty string if nothing is found
             }
         } catch (SQLException e) { //if there is a connection issue, throw an error and exit program
-//            System.out.printf("unable to update database: %s, %s%n", statement, e.getMessage());
-//            System.exit(500);
-//            return 0;
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
