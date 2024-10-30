@@ -5,6 +5,12 @@ import model.GameData;
 import java.util.ArrayList;
 
 public class MysqlGameDAO implements GameDAO{
+    DatabaseManager databaseManager;
+
+    public MysqlGameDAO(DatabaseManager databaseManager){
+        this.databaseManager = databaseManager;
+    }
+
     @Override
     public void deleteGame(GameData game) {
 

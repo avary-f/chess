@@ -3,26 +3,39 @@ package dataaccess;
 import model.AuthData;
 import model.UserData;
 
-public class MysqlAuthDAO implements AuthDAO{
+import java.util.Objects;
+import java.util.UUID;
+
+public class MysqlAuthDAO extends MysqlDAO implements AuthDAO{
     @Override
-    public void delete(AuthData data) throws DataAccessException {
-        var statement = "DELETE FROM auth WHERE authToken=?";
-        MysqlDAO.executeUpdate(statement, data.authToken());
+    public void delete(AuthData data) {
+        String statement = "DELETE FROM auth WHERE authToken = ?";
+        //? => this is a placeholder that is provided at runtime
+        executeUpdate(statement, data.authToken());
     }
 
     @Override
-    public void clearAll() throws DataAccessException {
-        var statement = "TRUNCATE auth";
-        MysqlDAO.executeUpdate(statement);
+    public void clearAll() {
+        String statement = "TRUNCATE auths"; //clears the whole table
+        executeUpdate(statement);
     }
 
     @Override
     public AuthData get(AuthData data) {
+        String statement = "SELECT username FROM auths WHERE authToken = ?";
+        String usernameResult = executeUpdate(statement, data.authToken());
+        if(!Objects.equals(usernameResult, "")){ //does not exist in DB
+            return new AuthData(data.authToken(), usernameResult);
+        }
         return null;
+
     }
 
     @Override
-    public AuthData create(UserData data) {
-        return null;
+    public AuthData create(UserData user) {
+        String statement = "INSERT INTO auths (authToken, username) VALUES (?, ?)";
+        String authToken = UUID.randomUUID().toString();
+        executeUpdate(statement, authToken, user.username());
+        return new AuthData(authToken, user.username());
     }
 }

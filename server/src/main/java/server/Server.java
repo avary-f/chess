@@ -1,10 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import request.*;
 import result.*;
 import service.GameService;
@@ -14,9 +11,10 @@ import spark.*;
 import java.util.Map;
 
 public class Server {
-    private MemoryUserDAO userDAO = new MemoryUserDAO();
-    private MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    private MemoryGameDAO gameDAO = new MemoryGameDAO();
+    private UserDAO userDAO = new MemoryUserDAO();
+    private AuthDAO authDAO = new MemoryAuthDAO();
+    private GameDAO gameDAO = new MemoryGameDAO();
+    //change these guys to be the mysql ^^
     private final UserService serviceUser = new UserService(userDAO, authDAO);
     private final GameService serviceGame = new GameService(userDAO, authDAO, gameDAO);
 
@@ -25,9 +23,8 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        // Register your endpoints and handle exceptions here.
-        //register, login, logout, createGame, joinGame, listGames, clear
-        Spark.delete("/db", this::clear); //what are these paths?
+        // Endpoints
+        Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
