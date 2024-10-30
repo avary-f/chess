@@ -11,19 +11,19 @@ public class MysqlAuthDAO extends MysqlDAO implements AuthDAO{
     public void delete(AuthData data) {
         String statement = "DELETE FROM auth WHERE authToken = ?";
         //? => this is a placeholder that is provided at runtime
-        executeUpdate(statement, data.authToken());
+        execute(statement, data.authToken());
     }
 
     @Override
     public void clearAll() {
         String statement = "TRUNCATE auths"; //clears the whole table
-        executeUpdate(statement);
+        execute(statement);
     }
 
     @Override
     public AuthData get(AuthData data) {
         String statement = "SELECT username FROM auths WHERE authToken = ?";
-        String usernameResult = executeQuery(statement, data.authToken());
+        String usernameResult = (String) execute(statement, data.authToken());
         if(!Objects.equals(usernameResult, "")){ //does not exist in DB
             return new AuthData(data.authToken(), usernameResult);
         }
@@ -35,13 +35,13 @@ public class MysqlAuthDAO extends MysqlDAO implements AuthDAO{
     public AuthData create(UserData user) {
         String statement = "INSERT INTO auths (authToken, username) VALUES (?, ?)";
         String authToken = UUID.randomUUID().toString();
-        executeUpdate(statement, authToken, user.username());
+        execute(statement, authToken, user.username());
         return new AuthData(authToken, user.username());
     }
 
     public boolean isEmpty(){
         String statement = "SELECT * FROM auths";
-        String resultUser = executeQuery(statement);
+        String resultUser = (String)execute(statement);
         return resultUser.isEmpty();
     }
 }

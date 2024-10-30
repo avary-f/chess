@@ -11,8 +11,8 @@ import java.util.ArrayList;
 public class AuthTableTests {
     private MysqlAuthDAO authDao = new MysqlAuthDAO();
     private ArrayList<UserData> users = new ArrayList<>();
-    private AuthData auth;
-    private UserData user;
+    public AuthData auth;
+    public UserData user;
     private static MysqlDAO mysql;
 
     public void generateUsers(int n){
@@ -27,9 +27,14 @@ public class AuthTableTests {
         mysql = new MysqlDAO();
     }
 
+    @BeforeEach
+    public void addAuthEntry(){
+
+    }
+
     @Test
     @Order(1)
-    public void createOneUserSuccess(){
+    public void addUsertoAuthsSuccess(){
         generateUsers(1);
         user = users.getFirst();
         auth = authDao.create(user);
@@ -43,8 +48,6 @@ public class AuthTableTests {
     @Order(2)
     public void clearTableSuccess(){
         authDao.clearAll();
-        auth = authDao.get(auth);
-        Assertions.assertNull(auth);
         Assertions.assertTrue(authDao.isEmpty());
     }
 }

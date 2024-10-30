@@ -9,27 +9,23 @@ public class MysqlDAO {
     public MysqlDAO() throws DataAccessException {
         configureDatabase();
     }
-    public static int executeUpdate(String statement, Object... params) { // Object = varargs (variable-length arguments)
-        var rs = execute(statement, params);
-        if (rs.next()) {
-            return rs.getInt(1);
-        }
+//    public static int executeUpdate(String statement, Object... params) throws DataAccessException{ // Object = varargs (variable-length arguments)
+//        var rs = execute(statement, params);
+//        if (rs.next()) {
+//            return rs.getInt(1);
+//        }
+//
+//        return 0;
+//        /*
+//         NOTE: Use the return statement if inserting rows into a table with an auto-increment
+//         column (like an id), allows you to get that auto-generated ID.
+//         Useful when you want to reference the inserted row later,
+//         without having to manually query for it by other criteria.
+//         */
+//
+//    }
 
-        return 0;
-        /*
-         NOTE: Use the return statement if inserting rows into a table with an auto-increment
-         column (like an id), allows you to get that auto-generated ID.
-         Useful when you want to reference the inserted row later,
-         without having to manually query for it by other criteria.
-         */
-
-    }
-
-    public String executeQuery(String statement,){
-
-    }
-
-    private static ResultSet execute(String statement, Object... params) throws SQLException {
+    public static Object execute(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) { //try (with resources) connecting to db
             //makes sure that you don't run out of ports with connectivity
             //auto closes the resource (conn) after block completes
@@ -49,11 +45,25 @@ public class MysqlDAO {
                         }
                     }
                 }
-                ps.executeUpdate();
+                if(statement.trim().startsWith("SELECT")){ //if it requires a select
+                    var rs = ps.executeQuery();
+                    if (rs.next()) {
+                        return rs.getString("username");
+                    }
+                    return ""; //returns empty string if there are no users
+                }
+                else{ //if it requires an update
+                    ps.executeUpdate();
+                    var rs = ps.getGeneratedKeys();
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
 
-                return ps.getGeneratedKeys();
+                    return 0;
+                }
+            }
         } catch (SQLException e) { //if there is a connection issue, throw an error and exit program
-            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+                throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
 
@@ -100,4 +110,5 @@ public class MysqlDAO {
             throw new DataAccessException("Unable to configure database");
         }
     }
+
 }
