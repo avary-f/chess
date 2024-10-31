@@ -1,14 +1,8 @@
 package dataaccess;
-
-import model.AuthData;
 import model.UserData;
-
-import java.util.ArrayList;
-import java.util.Objects;
-
 import static dataaccess.MysqlDAO.execute;
 
-public class MysqlUserDAO implements UserDAO{
+public class MysqlUserDAO extends MysqlDAO implements UserDAO {
 
     @Override
     public UserData get(UserData user) {

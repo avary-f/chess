@@ -22,8 +22,10 @@ public class AuthTableTests {
     }
     public void addAuthEntries(int n){
         generateUsers(n);
+        for (UserData userData : users) {
+            auth = authDao.create(userData);
+        }
         user = users.getFirst();
-        auth = authDao.create(user);
     }
 
     @BeforeAll
@@ -83,14 +85,14 @@ public class AuthTableTests {
     public void getAuthsInvalidAuth(){
         AuthData badAuth = new AuthData("invalidAuthToken", users.getFirst().username());
         Assertions.assertThrows(DataAccessException.class, () -> {
-            authDao.delete(badAuth);
+            authDao.get(badAuth);
         });
     }
 
 
 
     @Test
-    public void clearTableSuccess(){
+    public void clearAuthsTableSuccess(){
         authDao.clearAll();
         Assertions.assertTrue(authDao.isEmpty());
     }

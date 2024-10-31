@@ -41,10 +41,4 @@ public class MysqlAuthDAO extends MysqlDAO implements AuthDAO{
         execute(statement, authToken, user.username());
         return new AuthData(authToken, user.username());
     }
-
-    public boolean isEmpty(){
-        String statement = "SELECT * FROM auths";
-        String resultUser = (String)execute(statement);
-        return resultUser == null;
-    }
 }

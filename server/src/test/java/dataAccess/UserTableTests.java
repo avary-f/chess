@@ -3,17 +3,14 @@ import dataaccess.DataAccessException;
 import dataaccess.MysqlAuthDAO;
 import dataaccess.MysqlDAO;
 import dataaccess.MysqlUserDAO;
-import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
 
 public class UserTableTests {
-    private static MysqlAuthDAO authDao = new MysqlAuthDAO();
-    private static MysqlUserDAO userDao = new MysqlUserDAO();
-    private ArrayList<UserData> auths = new ArrayList<>();
-    public AuthData auth;
+    private static final MysqlUserDAO userDao = new MysqlUserDAO();
+    private final ArrayList<UserData> users = new ArrayList<>();
     public UserData user;
     private static MysqlDAO mysql;
 
@@ -22,10 +19,19 @@ public class UserTableTests {
             users.add(new UserData("user" + i, "password" + i, "gmail.com"));
         }
     }
-    public void addAuthEntries(int n){
+
+    public void addUserEntries(int n){
         generateUsers(n);
+        for (UserData userData : users) {
+            userDao.create(userData);
+        }
         user = users.getFirst();
-        auth = authDao.create(user);
+    }
+
+    public void assertSameUser(UserData userUpdated, UserData user){
+        Assertions.assertEquals(userUpdated.username(), user.username());
+        Assertions.assertEquals(userUpdated.password(), user.password());
+        Assertions.assertEquals(userUpdated.email(), user.email());
     }
 
     @BeforeAll
@@ -34,67 +40,62 @@ public class UserTableTests {
     }
     @AfterAll
     public static void deleteAuths(){
-        authDao.clearAll();
+        userDao.clearAll();
     }
 
     @BeforeEach
     public void configureAuths(){
-        addAuthEntries(10);
+        addUserEntries(10);
     }
 
-    //CREATE AUTHS
+    //CREATE USERS
     @Test
-    public void createAuthsSuccess(){
-        user = users.getFirst();
-        auth = authDao.create(user);
-        AuthData authUpdated = authDao.get(auth);
-        Assertions.assertNotNull(authUpdated);
-        Assertions.assertNotNull(authUpdated.username());
-        Assertions.assertEquals(authUpdated.username(), auth.username());
+    public void createUsersSuccess(){
+        generateUsers(1);
+        UserData newUser = users.getLast();
+        userDao.create(newUser);
+        UserData userUpdated = userDao.get(newUser);
+        Assertions.assertNotNull(userUpdated);
+        Assertions.assertNotNull(userUpdated.username());
+        assertSameUser(userUpdated, newUser);
     }
     @Test
-    public void createAuthsInvalidUser(){
+    public void createUserInvalidUser(){ //should not allow you to make a user with a null username
         UserData badUser = new UserData(null, null, null);
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
-            authDao.create(badUser);
+            userDao.create(badUser);
         });
     }
 
-    //DELETE AUTHS
+    //GET USERS
     @Test
-    public void deleteAuthsSuccess(){
-        authDao.delete(auth);
-        AuthData authUpdated = authDao.get(auth);
-        Assertions.assertNull(authUpdated);
+    public void getUserByUserSuccess(){
+        UserData userUpdated = userDao.get(user);
+        Assertions.assertNotNull(userUpdated);
+        assertSameUser(userUpdated, user);
+
     }
     @Test
-    public void deleteAuthsInvalidAuth(){
-        AuthData badAuth = new AuthData("invalidAuthToken", users.getFirst().username());
+    public void getUserByUsernameSuccess(){
+        UserData userUpdated = userDao.get(user);
+        Assertions.assertNotNull(userUpdated);
+        assertSameUser(userUpdated, user);
+
+    }
+    @Test
+    public void getUserInvalidUser(){
+        UserData badUser = new UserData("badUserName", null, null);
         Assertions.assertThrows(DataAccessException.class, () -> {
-            authDao.delete(badAuth);
-        });
-    }
-
-    //GET AUTHS
-    @Test
-    public void getAuthsSuccess(){
-        AuthData authUpdated = authDao.get(auth);
-        Assertions.assertNotNull(authUpdated.authToken());
-    }
-    @Test
-    public void getAuthsInvalidAuth(){
-        AuthData badAuth = new AuthData("invalidAuthToken", users.getFirst().username());
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            authDao.delete(badAuth);
+            userDao.get(badUser);
         });
     }
 
 
-
+    //CLEAR TABLE
     @Test
-    public void clearTableSuccess(){
-        authDao.clearAll();
-        Assertions.assertTrue(authDao.isEmpty());
+    public void clearUsersTableSuccess(){
+        userDao.clearAll();
+        Assertions.assertTrue(userDao.isEmpty());
     }
 }
 

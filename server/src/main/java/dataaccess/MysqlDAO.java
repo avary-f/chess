@@ -111,5 +111,10 @@ public class MysqlDAO {
             throw new DataAccessException("Unable to configure database");
         }
     }
+    public boolean isEmpty(){
+        String statement = "SELECT * FROM auths";
+        String resultUser = (String)execute(statement);
+        return resultUser == null;
+    }
 
 }
