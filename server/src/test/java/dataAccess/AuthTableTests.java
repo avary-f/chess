@@ -84,9 +84,7 @@ public class AuthTableTests {
     @Test
     public void getAuthsInvalidAuth(){
         AuthData badAuth = new AuthData("invalidAuthToken", users.getFirst().username());
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            authDao.get(badAuth);
-        });
+        Assertions.assertNull(authDao.get(badAuth));
     }
 
 

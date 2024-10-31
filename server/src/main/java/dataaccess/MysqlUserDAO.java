@@ -8,10 +8,12 @@ public class MysqlUserDAO extends MysqlDAO implements UserDAO {
     public UserData get(UserData user) {
         String usernameStatement = "SELECT username FROM users WHERE username = ?";
         String passwordStatement = "SELECT password FROM users WHERE username = ?";
-        String emailStatement = "SELECT username FROM users WHERE username = ?";
-        String userResult = (String) execute(usernameStatement, user.username());
-        if(userResult != null){ //does not exist in DB
-            return new UserData(usernameStatement, passwordStatement, emailStatement);
+        String emailStatement = "SELECT email FROM users WHERE username = ?";
+        String usernameResult = (String) execute(usernameStatement, user.username());
+        String passwordResult = (String) execute(passwordStatement, user.username());
+        String emailResult = (String) execute(emailStatement, user.username());
+        if(usernameResult != null){ //does not exist in DB
+            return new UserData(usernameResult, passwordResult, emailResult);
         }
         return null;
     }

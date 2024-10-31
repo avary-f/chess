@@ -3,6 +3,7 @@ import dataaccess.DataAccessException;
 import dataaccess.MysqlAuthDAO;
 import dataaccess.MysqlDAO;
 import dataaccess.MysqlUserDAO;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 
@@ -39,20 +40,20 @@ public class UserTableTests {
         mysql = new MysqlDAO();
     }
     @AfterAll
-    public static void deleteAuths(){
+    public static void deleteUsers(){
         userDao.clearAll();
     }
 
     @BeforeEach
-    public void configureAuths(){
+    public void configureUser(){
+        deleteUsers();
         addUserEntries(10);
     }
 
     //CREATE USERS
     @Test
     public void createUsersSuccess(){
-        generateUsers(1);
-        UserData newUser = users.getLast();
+        UserData newUser = new UserData("root", "pass", "@gmail");
         userDao.create(newUser);
         UserData userUpdated = userDao.get(newUser);
         Assertions.assertNotNull(userUpdated);
@@ -85,9 +86,7 @@ public class UserTableTests {
     @Test
     public void getUserInvalidUser(){
         UserData badUser = new UserData("badUserName", null, null);
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            userDao.get(badUser);
-        });
+        Assertions.assertNull(userDao.get(badUser));
     }
 
 

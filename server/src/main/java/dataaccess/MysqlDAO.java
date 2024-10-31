@@ -48,7 +48,7 @@ public class MysqlDAO {
                 String[] words = statement.trim().split("\\s+");
                 if(words[0].equals("SELECT")){ //if the first word in the statement is select
                     var rs = ps.executeQuery();
-                    if (rs.next()) {
+                    if (rs.next()) { //if there is one line in the row?
                         return rs.getObject(words[1]);
                     }
                     return null; //returns null if there's nothing found
