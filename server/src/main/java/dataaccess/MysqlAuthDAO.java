@@ -2,6 +2,7 @@ package dataaccess;
 
 import model.AuthData;
 import model.UserData;
+import server.BadRequestException;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -9,7 +10,10 @@ import java.util.UUID;
 public class MysqlAuthDAO extends MysqlDAO implements AuthDAO{
     @Override
     public void delete(AuthData data) {
-        String statement = "DELETE FROM auth WHERE authToken = ?";
+        if(get(data) == null){ //authToken does not exist in the DB
+            throw new DataAccessException("bad request");
+        }
+        String statement = "DELETE FROM auths WHERE authToken = ?";
         //? => this is a placeholder that is provided at runtime
         execute(statement, data.authToken());
     }
