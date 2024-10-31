@@ -29,11 +29,11 @@ public class UserTableTests {
         user = users.getFirst();
     }
 
-    public void assertSameUser(UserData userUpdated, UserData user){
-        Assertions.assertEquals(userUpdated.username(), user.username());
-        Assertions.assertEquals(userUpdated.password(), user.password());
-        Assertions.assertEquals(userUpdated.email(), user.email());
-    }
+//    public void assertSameUser(UserData userUpdated, UserData user){
+//        Assertions.assertEquals(userUpdated.username(), user.username());
+//        Assertions.assertEquals(userUpdated.password(), user.password());
+//        Assertions.assertEquals(userUpdated.email(), user.email());
+//    }
 
     @BeforeAll
     public static void configure(){
@@ -58,7 +58,7 @@ public class UserTableTests {
         UserData userUpdated = userDao.get(newUser);
         Assertions.assertNotNull(userUpdated);
         Assertions.assertNotNull(userUpdated.username());
-        assertSameUser(userUpdated, newUser);
+        Assertions.assertEquals(userUpdated, newUser);
     }
     @Test
     public void createUserInvalidUser(){ //should not allow you to make a user with a null username
@@ -73,14 +73,14 @@ public class UserTableTests {
     public void getUserByUserSuccess(){
         UserData userUpdated = userDao.get(user);
         Assertions.assertNotNull(userUpdated);
-        assertSameUser(userUpdated, user);
+        Assertions.assertEquals(userUpdated, user);
 
     }
     @Test
     public void getUserByUsernameSuccess(){
         UserData userUpdated = userDao.get(user);
         Assertions.assertNotNull(userUpdated);
-        assertSameUser(userUpdated, user);
+        Assertions.assertEquals(userUpdated, user);
 
     }
     @Test

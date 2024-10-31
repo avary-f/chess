@@ -1,7 +1,6 @@
 package service;
 
 import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 import model.AuthData;
@@ -39,7 +38,7 @@ public class GameService {
         AuthData auth = dataAccessAuth.get(req.auth());
         serviceAuth.checkAuthTokenValid(auth);
         GameData game = new GameData(Math.abs(UUID.randomUUID().hashCode()), null, null,  req.gameName(), null);
-        if(dataAccessGame.getName(game)){
+        if(dataAccessGame.nameExists(game)){
             throw new AlreadyTakenException();
         } //will throw an error if it is already taken
         dataAccessGame.create(game);

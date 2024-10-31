@@ -1,6 +1,6 @@
 package dataaccess;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -9,22 +9,6 @@ public class MysqlDAO {
     public MysqlDAO() throws DataAccessException {
         configureDatabase();
     }
-//    public static int executeUpdate(String statement, Object... params) throws DataAccessException{ // Object = varargs (variable-length arguments)
-//        var rs = execute(statement, params);
-//        if (rs.next()) {
-//            return rs.getInt(1);
-//        }
-//
-//        return 0;
-//        /*
-//         NOTE: Use the return statement if inserting rows into a table with an auto-increment
-//         column (like an id), allows you to get that auto-generated ID.
-//         Useful when you want to reference the inserted row later,
-//         without having to manually query for it by other criteria.
-//         */
-//
-//    }
-
     public static Object execute(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) { //try (with resources) connecting to db
             //makes sure that you don't run out of ports with connectivity
@@ -48,8 +32,16 @@ public class MysqlDAO {
                 String[] words = statement.trim().split("\\s+");
                 if(words[0].equals("SELECT")){ //if the first word in the statement is select
                     var rs = ps.executeQuery();
-                    if (rs.next()) { //if there is one line in the row?
-                        return rs.getObject(words[1]);
+                    if (rs.next()) { //if there's at least one thing found
+                        if(!words[words.length - 1].equals("?")){ //check if they need multiple objects
+                            //it will be a ? if they only want one thing
+                            ArrayList<Object> list = new ArrayList<>();
+                            while(rs.next()){
+                                list.add(rs.getObject(words[1]));
+                            }
+                            return list; //trying to select multiple things
+                        }
+                        return rs.getObject(words[1]); //if trying to select one thing
                     }
                     return null; //returns null if there's nothing found
                 }

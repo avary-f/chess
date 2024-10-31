@@ -28,7 +28,7 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public boolean getName(GameData game){
+    public boolean nameExists(GameData game){
         for(GameData cur: games.values()){
             if(cur.gameName().equals(game.gameName())){
                 return true;

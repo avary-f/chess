@@ -8,6 +8,6 @@ public interface GameDAO {
     void clearAll();
     void create(GameData game);
     GameData getID(GameData game);
-    boolean getName(GameData game);
+    boolean nameExists(GameData game);
     ArrayList<GameData> getAll();
 }
