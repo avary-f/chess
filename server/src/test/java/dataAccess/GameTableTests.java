@@ -1,5 +1,7 @@
 package dataAccess;
 
+import chess.ChessBoard;
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.MysqlDAO;
 import dataaccess.MysqlGameDAO;
@@ -13,6 +15,7 @@ public class GameTableTests  {
     private static final MysqlGameDAO gameDAO = new MysqlGameDAO();
     private final ArrayList<UserData> users = new ArrayList<>();
     private final ArrayList<GameData> games = new ArrayList<>();
+    private final ArrayList<ChessGame> chessBoardGames = new ArrayList<>();
     public UserData user1;
     public UserData user2;
     public GameData game;
@@ -24,9 +27,18 @@ public class GameTableTests  {
         }
     }
 
+    public void generateChessBoardGames(int n){
+        for(int i = 0; i < n; i ++){
+            chessBoardGames.add(new ChessGame());
+        }
+    }
+
     public void createGames(int n){
+        generateChessBoardGames(n);
+        generateUsers(n);
         for(int i  = 0; i < n; i++){
-            games.add(new GameData(i, users.get(i))
+            games.add(new GameData(i, users.get(i).username(), users.get(i+2).username(),
+                    "gameName" + i, chessBoardGames.get(i)));
         }
     }
 
@@ -42,7 +54,8 @@ public class GameTableTests  {
     @BeforeEach
     public void configureGame(){
         deleteGames();
-        createGame();
+        createGames(5);
+
     }
 
     //CREATE USERS
