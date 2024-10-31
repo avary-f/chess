@@ -2,7 +2,6 @@ package dataaccess;
 
 import model.AuthData;
 import model.UserData;
-import server.BadRequestException;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -28,7 +27,7 @@ public class MysqlAuthDAO extends MysqlDAO implements AuthDAO{
     public AuthData get(AuthData data) {
         String statement = "SELECT username FROM auths WHERE authToken = ?";
         String usernameResult = (String) execute(statement, data.authToken());
-        if(!Objects.equals(usernameResult, "")){ //does not exist in DB
+        if(usernameResult != null){ //does not exist in DB
             return new AuthData(data.authToken(), usernameResult);
         }
         return null;
@@ -46,6 +45,6 @@ public class MysqlAuthDAO extends MysqlDAO implements AuthDAO{
     public boolean isEmpty(){
         String statement = "SELECT * FROM auths";
         String resultUser = (String)execute(statement);
-        return resultUser.isEmpty();
+        return resultUser == null;
     }
 }

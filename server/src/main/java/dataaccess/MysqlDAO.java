@@ -45,12 +45,13 @@ public class MysqlDAO {
                         }
                     }
                 }
-                if(statement.trim().startsWith("SELECT")){ //if it requires a select
+                String[] words = statement.trim().split("\\s+");
+                if(words[0].equals("SELECT")){ //if the first word in the statement is select
                     var rs = ps.executeQuery();
                     if (rs.next()) {
-                        return rs.getString("username");
+                        return rs.getObject(words[1]);
                     }
-                    return ""; //returns empty string if there are no users
+                    return null; //returns null if there's nothing found
                 }
                 else{ //if it requires an update
                     ps.executeUpdate();

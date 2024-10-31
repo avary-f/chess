@@ -1,23 +1,25 @@
-package dataaccess;
+package dataAccess;
+import dataaccess.DataAccessException;
+import dataaccess.MysqlAuthDAO;
+import dataaccess.MysqlDAO;
+import dataaccess.MysqlUserDAO;
 import model.AuthData;
 import model.UserData;
-import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.*;
-import org.junit.runners.MethodSorters;
-import server.AlreadyTakenException;
 
 import java.util.ArrayList;
 
-public class AuthTableTests {
+public class UserTableTests {
     private static MysqlAuthDAO authDao = new MysqlAuthDAO();
-    private ArrayList<UserData> users = new ArrayList<>();
+    private static MysqlUserDAO userDao = new MysqlUserDAO();
+    private ArrayList<UserData> auths = new ArrayList<>();
     public AuthData auth;
     public UserData user;
     private static MysqlDAO mysql;
 
     public void generateUsers(int n){
         for(int i = 0; i < n; i++){
-           users.add(new UserData("user" + i, "password" + i, "gmail.com"));
+            users.add(new UserData("user" + i, "password" + i, "gmail.com"));
         }
     }
     public void addAuthEntries(int n){
@@ -37,7 +39,7 @@ public class AuthTableTests {
 
     @BeforeEach
     public void configureAuths(){
-       addAuthEntries(10);
+        addAuthEntries(10);
     }
 
     //CREATE AUTHS
@@ -95,3 +97,4 @@ public class AuthTableTests {
         Assertions.assertTrue(authDao.isEmpty());
     }
 }
+
