@@ -1,6 +1,4 @@
 package dataAccess;
-
-import chess.ChessBoard;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.MysqlDAO;
@@ -16,10 +14,10 @@ public class GameTableTests  {
     private final ArrayList<UserData> users = new ArrayList<>();
     private final ArrayList<GameData> games = new ArrayList<>();
     private final ArrayList<ChessGame> chessBoardGames = new ArrayList<>();
-    public UserData user1;
-    public UserData user2;
-    public GameData game;
     private static MysqlDAO mysql;
+    private static GameData game = new GameData(123, "userW", "userB",
+            "testGame", new ChessGame());
+    private GameData badGame = new GameData(-1, null, null, null, null);
 
     public void generateUsers(int n){
         for(int i = 0; i < n * 2; i++){
@@ -44,6 +42,7 @@ public class GameTableTests  {
 
     @BeforeAll
     public static void configure(){
+        deleteGames();
         mysql = new MysqlDAO();
     }
     @AfterAll
@@ -58,50 +57,74 @@ public class GameTableTests  {
 
     }
 
-    //CREATE USERS
+    //CREATE GAMES
     @Test
-    public void createUsersSuccess(){
-        UserData newUser = new UserData("root", "pass", "@gmail");
-        userDao.create(newUser);
-        UserData userUpdated = userDao.get(newUser);
-        Assertions.assertNotNull(userUpdated);
-        Assertions.assertNotNull(userUpdated.username());
-        assertSameUser(userUpdated, newUser);
+    public void createGameSuccess(){
+        game = new GameData(123, "userW", "userB",
+                "testGame", new ChessGame());
+        gameDAO.create(game);
+        GameData gameUpdated = gameDAO.get(game);
+        Assertions.assertEquals(game, gameUpdated);
     }
     @Test
-    public void createUserInvalidUser(){ //should not allow you to make a user with a null username
-        UserData badUser = new UserData(null, null, null);
-        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
-            userDao.create(badUser);
+    public void createUserInvalidGame(){ //should not allow you to make a game with a null gameName
+        GameData badGame = new GameData(321, "userW", "userB",
+                null, new ChessGame());
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            gameDAO.create(badGame);
         });
     }
 
-    //GET USERS
+    //GET GAME
     @Test
-    public void getUserByUserSuccess(){
-        UserData userUpdated = userDao.get(user);
-        Assertions.assertNotNull(userUpdated);
-        assertSameUser(userUpdated, user);
+    public void getGameByGameSuccess(){
+        gameDAO.create(game);
+        GameData newGame = new GameData(123, null, null, null, null);
+        GameData gameUpdated = gameDAO.get(newGame);
+        Assertions.assertEquals(game, gameUpdated);
 
     }
     @Test
-    public void getUserByUsernameSuccess(){
-        UserData userUpdated = userDao.get(user);
-        Assertions.assertNotNull(userUpdated);
-        assertSameUser(userUpdated, user);
+    public void getGameInvalidGameID(){
+        Assertions.assertNull(gameDAO.get(badGame));
+    }
 
+    //DELETE GAMES
+    @Test
+    public void deleteGameSuccess(){
+        if(gameDAO.get(game) == null){
+            gameDAO.create(game);
+        }
+        gameDAO.deleteGame(game);
+        Assertions.assertNull(gameDAO.get(game));
+        gameDAO.create(game); //add it back for later uses
     }
     @Test
-    public void getUserInvalidUser(){
-        UserData badUser = new UserData("badUserName", null, null);
-        Assertions.assertNull(userDao.get(badUser));
+    public void deleteGameInvalidGame(){
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            gameDAO.deleteGame(badGame);
+        });
     }
 
+    //LIST GAMES
+    @Test
+    public void listGamesSuccess(){
+        gameDAO.clearAll();
+        GameData game1 = games.getFirst();
+        GameData game2 = games.getLast();
+        gameDAO.create(game1);
+        gameDAO.create(game2);
+        ArrayList<GameData> listOriginal = new ArrayList<>();
+        listOriginal.add(game1);
+        listOriginal.add(game2);
+        ArrayList<GameData> list = gameDAO.getAll();
+        Assertions.assertEquals(list, listOriginal);
+    }
 
     //CLEAR TABLE
     @Test
     public void clearUsersTableSuccess(){
-        userDao.clearAll();
-        Assertions.assertTrue(userDao.isEmpty());
+        gameDAO.clearAll();
+        Assertions.assertTrue(gameDAO.isEmpty());
     }
 }

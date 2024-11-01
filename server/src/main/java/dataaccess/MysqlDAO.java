@@ -22,8 +22,7 @@ public class MysqlDAO {
                         case String p -> ps.setString(i + 1, p);
                         //  If param is a String, setString is called on ps to bind it
                         //  to the SQL statement at position i + 1.
-                        //case Integer p -> ps.setInt(i + 1, p);
-                        //case PetType p -> ps.setString(i + 1, p.toString());
+                        case Integer p -> ps.setInt(i + 1, p);
                         case null -> ps.setNull(i + 1, NULL);
                         default -> {
                         }
@@ -32,10 +31,11 @@ public class MysqlDAO {
                 String[] words = statement.trim().split("\\s+");
                 if(words[0].equals("SELECT")){ //if the first word in the statement is select
                     var rs = ps.executeQuery();
+                    ArrayList<Object> list = new ArrayList<>();
                     if (rs.next()) { //if there's at least one thing found
                         if(!words[words.length - 1].equals("?")){ //check if they need multiple objects
                             //it will be a ? if they only want one thing
-                            ArrayList<Object> list = new ArrayList<>();
+                            list.add(rs.getObject(words[1]));
                             while(rs.next()){
                                 list.add(rs.getObject(words[1]));
                             }
@@ -83,7 +83,7 @@ public class MysqlDAO {
               `whiteUsername` varchar(256),
               `blackUsername` varchar(256),
               `gameName` varchar(256) NOT NULL,
-              `json` TEXT DEFAULT NULL,
+              `game` TEXT,
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """

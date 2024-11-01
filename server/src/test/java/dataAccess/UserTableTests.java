@@ -70,14 +70,7 @@ public class UserTableTests {
 
     //GET USERS
     @Test
-    public void getUserByUserSuccess(){
-        UserData userUpdated = userDao.get(user);
-        Assertions.assertNotNull(userUpdated);
-        Assertions.assertEquals(userUpdated, user);
-
-    }
-    @Test
-    public void getUserByUsernameSuccess(){
+    public void getUserSuccess(){
         UserData userUpdated = userDao.get(user);
         Assertions.assertNotNull(userUpdated);
         Assertions.assertEquals(userUpdated, user);

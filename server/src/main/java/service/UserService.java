@@ -3,6 +3,7 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 import result.*;
 import request.*;
 import server.AlreadyTakenException;
@@ -19,7 +20,8 @@ public class UserService {
         serviceAuth = new AuthService(dataAccessAuth);
     }
     public RegisterResult register(RegisterRequest request) throws Exception {
-        UserData user = new UserData(request.username(), request.password(), request.email());
+        String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+        UserData user = new UserData(request.username(), hashedPassword, request.email());
         checkUserNotTaken(user);
         dataAccessUser.create(user);
         AuthData auth = dataAccessAuth.create(user);
@@ -52,10 +54,12 @@ public class UserService {
             throw new UnauthorizedException();
         }
     }
-    private void checkPasswordsEqual(UserData user1, UserData user2) throws UnauthorizedException{
-        if(!(user1.password().equals(user2.password()))){
+    private void checkPasswordsEqual(UserData userToHash, UserData userToCompare) throws UnauthorizedException{
+        var userHashed = dataAccessUser.get(new UserData(userToCompare.username(), null, null));
+        if(!BCrypt.checkpw(userToHash.password(), userHashed.password())){
             throw new UnauthorizedException();
         }
+//        BCrypt.checkpw(providedClearTextPassword, hashedPassword);
     }
 }
 

@@ -1,6 +1,6 @@
 package dataaccess;
 import model.UserData;
-import static dataaccess.MysqlDAO.execute;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class MysqlUserDAO extends MysqlDAO implements UserDAO {
 
@@ -29,4 +29,5 @@ public class MysqlUserDAO extends MysqlDAO implements UserDAO {
         String statement = "TRUNCATE users";
         execute(statement);
     }
+
 }

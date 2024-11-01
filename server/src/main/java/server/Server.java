@@ -11,9 +11,12 @@ import spark.*;
 import java.util.Map;
 
 public class Server {
-    private UserDAO userDAO = new MemoryUserDAO();
-    private AuthDAO authDAO = new MemoryAuthDAO();
-    private GameDAO gameDAO = new MemoryGameDAO();
+//    private UserDAO userDAO = new MemoryUserDAO();
+//    private AuthDAO authDAO = new MemoryAuthDAO();
+//    private GameDAO gameDAO = new MemoryGameDAO();
+    private UserDAO userDAO = new MysqlUserDAO();
+    private AuthDAO authDAO = new MysqlAuthDAO();
+    private GameDAO gameDAO = new MysqlGameDAO();
     //change these guys to be the mysql ^^
     private final UserService serviceUser = new UserService(userDAO, authDAO);
     private final GameService serviceGame = new GameService(userDAO, authDAO, gameDAO);

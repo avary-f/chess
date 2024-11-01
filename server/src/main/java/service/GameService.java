@@ -54,7 +54,7 @@ public class GameService {
         AuthData auth = dataAccessAuth.get(req.auth());
         serviceAuth.checkAuthTokenValid(auth);
         GameData game = new GameData(req.gameID(), null, null, null, null);
-        game = dataAccessGame.getID(game);
+        game = dataAccessGame.get(game);
         UserData user = new UserData(serviceAuth.getUsername(req.auth()), null, null);
         user = dataAccessUser.get(user);
         GameData newGame = getNewPlayerGame(user.username(), req.playerColor(), game);
@@ -68,12 +68,12 @@ public class GameService {
     public GameData getNewPlayerGame(String username, String color, GameData game) throws AlreadyTakenException {
         GameData newGame;
         if (color.equals("WHITE")) { //player wants to be white
-            if (dataAccessGame.getID(game).whiteUsername() != null) {
+            if (dataAccessGame.get(game).whiteUsername() != null) {
                 throw new AlreadyTakenException();
             }
             newGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
         } else { //black
-            if (dataAccessGame.getID(game).blackUsername() != null) {
+            if (dataAccessGame.get(game).blackUsername() != null) {
                 throw new AlreadyTakenException();
             }
             newGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
