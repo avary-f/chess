@@ -1,8 +1,5 @@
-package dataAccess;
+package dataaccess;
 import chess.ChessGame;
-import dataaccess.DataAccessException;
-import dataaccess.MysqlDAO;
-import dataaccess.MysqlGameDAO;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
@@ -10,7 +7,7 @@ import org.junit.jupiter.api.*;
 import java.util.ArrayList;
 
 public class GameTableTests  {
-    private static final MysqlGameDAO gameDAO = new MysqlGameDAO();
+    private static MysqlGameDAO gameDao = new MysqlGameDAO();
     private final ArrayList<UserData> users = new ArrayList<>();
     private final ArrayList<GameData> games = new ArrayList<>();
     private final ArrayList<ChessGame> chessBoardGames = new ArrayList<>();
@@ -47,7 +44,7 @@ public class GameTableTests  {
     }
     @AfterAll
     public static void deleteGames(){
-        gameDAO.clearAll();
+        gameDao.clearAll();
     }
 
     @BeforeEach
@@ -62,8 +59,8 @@ public class GameTableTests  {
     public void createGameSuccess(){
         game = new GameData(123, "userW", "userB",
                 "testGame", new ChessGame());
-        gameDAO.create(game);
-        GameData gameUpdated = gameDAO.get(game);
+        gameDao.create(game);
+        GameData gameUpdated = gameDao.get(game);
         Assertions.assertEquals(game, gameUpdated);
     }
     @Test
@@ -71,60 +68,60 @@ public class GameTableTests  {
         GameData badGame = new GameData(321, "userW", "userB",
                 null, new ChessGame());
         Assertions.assertThrows(DataAccessException.class, () -> {
-            gameDAO.create(badGame);
+            gameDao.create(badGame);
         });
     }
 
     //GET GAME
     @Test
     public void getGameByGameSuccess(){
-        gameDAO.create(game);
+        gameDao.create(game);
         GameData newGame = new GameData(123, null, null, null, null);
-        GameData gameUpdated = gameDAO.get(newGame);
+        GameData gameUpdated = gameDao.get(newGame);
         Assertions.assertEquals(game, gameUpdated);
 
     }
     @Test
     public void getGameInvalidGameID(){
-        Assertions.assertNull(gameDAO.get(badGame));
+        Assertions.assertNull(gameDao.get(badGame));
     }
 
     //DELETE GAMES
     @Test
     public void deleteGameSuccess(){
-        if(gameDAO.get(game) == null){
-            gameDAO.create(game);
+        if(gameDao.get(game) == null){
+            gameDao.create(game);
         }
-        gameDAO.deleteGame(game);
-        Assertions.assertNull(gameDAO.get(game));
-        gameDAO.create(game); //add it back for later uses
+        gameDao.deleteGame(game);
+        Assertions.assertNull(gameDao.get(game));
+        gameDao.create(game); //add it back for later uses
     }
     @Test
     public void deleteGameInvalidGame(){
         Assertions.assertThrows(DataAccessException.class, () -> {
-            gameDAO.deleteGame(badGame);
+            gameDao.deleteGame(badGame);
         });
     }
 
     //LIST GAMES
     @Test
     public void listGamesSuccess(){
-        gameDAO.clearAll();
+        gameDao.clearAll();
         GameData game1 = games.getFirst();
         GameData game2 = games.getLast();
-        gameDAO.create(game1);
-        gameDAO.create(game2);
+        gameDao.create(game1);
+        gameDao.create(game2);
         ArrayList<GameData> listOriginal = new ArrayList<>();
         listOriginal.add(game1);
         listOriginal.add(game2);
-        ArrayList<GameData> list = gameDAO.getAll();
+        ArrayList<GameData> list = gameDao.getAll();
         Assertions.assertEquals(list, listOriginal);
     }
 
     //CLEAR TABLE
     @Test
     public void clearUsersTableSuccess(){
-        gameDAO.clearAll();
-        Assertions.assertTrue(gameDAO.isEmpty());
+        gameDao.clearAll();
+        Assertions.assertTrue(gameDao.isEmpty());
     }
 }

@@ -1,16 +1,11 @@
-package dataAccess;
-import dataaccess.DataAccessException;
-import dataaccess.MysqlAuthDAO;
-import dataaccess.MysqlDAO;
-import dataaccess.MysqlUserDAO;
-import model.AuthData;
+package dataaccess;
 import model.UserData;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
 
 public class UserTableTests {
-    private static final MysqlUserDAO userDao = new MysqlUserDAO();
+    private static MysqlUserDAO userDao = new MysqlUserDAO();
     private final ArrayList<UserData> users = new ArrayList<>();
     public UserData user;
     private static MysqlDAO mysql;

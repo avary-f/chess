@@ -1,4 +1,5 @@
 package dataaccess;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -9,11 +10,29 @@ public class MysqlDAO {
     public MysqlDAO() throws DataAccessException {
         configureDatabase();
     }
+
+    public static Object selectExecute(String[] words, PreparedStatement ps) throws SQLException {
+        var rs = ps.executeQuery();
+        ArrayList<Object> list = new ArrayList<>();
+        if (rs.next()) { //if there's at least one thing found
+            if (!words[words.length - 1].equals("?")) { //check if they need multiple objects
+                //it will be a ? if they only want one thing
+                list.add(rs.getObject(words[1]));
+                while (rs.next()) {
+                    list.add(rs.getObject(words[1]));
+                }
+                return list; //trying to select multiple things
+            }
+            return rs.getObject(words[1]); //if trying to select one thing
+        }
+        return null; //returns null if there's nothing found
+    }
+
     public static Object execute(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) { //try (with resources) connecting to db
             //makes sure that you don't run out of ports with connectivity
             //auto closes the resource (conn) after block completes
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 //ps = prepared statement, protects against malicious statements
                 for (var i = 0; i < params.length; i++) {
                     var param = params[i];
@@ -29,34 +48,19 @@ public class MysqlDAO {
                     }
                 }
                 String[] words = statement.trim().split("\\s+");
-                if(words[0].equals("SELECT")){ //if the first word in the statement is select
-                    var rs = ps.executeQuery();
-                    ArrayList<Object> list = new ArrayList<>();
-                    if (rs.next()) { //if there's at least one thing found
-                        if(!words[words.length - 1].equals("?")){ //check if they need multiple objects
-                            //it will be a ? if they only want one thing
-                            list.add(rs.getObject(words[1]));
-                            while(rs.next()){
-                                list.add(rs.getObject(words[1]));
-                            }
-                            return list; //trying to select multiple things
-                        }
-                        return rs.getObject(words[1]); //if trying to select one thing
-                    }
-                    return null; //returns null if there's nothing found
-                }
-                else{ //if it requires an update
+                if (words[0].equals("SELECT")) { //if the first word in the statement is select
+                    return selectExecute(words, ps);
+                } else { //if it requires an update
                     ps.executeUpdate();
                     var rs = ps.getGeneratedKeys();
                     if (rs.next()) {
                         return rs.getInt(1);
                     }
-
                     return 0;
                 }
             }
         } catch (SQLException e) { //if there is a connection issue, throw an error and exit program
-                throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
 
