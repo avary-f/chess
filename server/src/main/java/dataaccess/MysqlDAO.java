@@ -28,31 +28,36 @@ public class MysqlDAO {
         return null; //returns null if there's nothing found
     }
 
+    public static PreparedStatement switchCase(PreparedStatement ps, Object... params) throws SQLException {
+        for (var i = 0; i < params.length; i++) {
+            var param = params[i];
+            //SQL index starts with 1, so shift over 1 index
+            switch (param) { //checks the type of the variable
+                case String p -> ps.setString(i + 1, p);
+                //  If param is a String, setString is called on ps to bind it
+                //  to the SQL statement at position i + 1.
+                case Integer p -> ps.setInt(i + 1, p);
+                case null -> ps.setNull(i + 1, NULL);
+                default -> {
+                }
+            }
+        }
+        return ps;
+    }
+
     public static Object execute(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) { //try (with resources) connecting to db
             //makes sure that you don't run out of ports with connectivity
             //auto closes the resource (conn) after block completes
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 //ps = prepared statement, protects against malicious statements
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    //SQL index starts with 1, so shift over 1 index
-                    switch (param) { //checks the type of the variable
-                        case String p -> ps.setString(i + 1, p);
-                        //  If param is a String, setString is called on ps to bind it
-                        //  to the SQL statement at position i + 1.
-                        case Integer p -> ps.setInt(i + 1, p);
-                        case null -> ps.setNull(i + 1, NULL);
-                        default -> {
-                        }
-                    }
-                }
+                PreparedStatement psNew = switchCase(ps, params);
                 String[] words = statement.trim().split("\\s+");
                 if (words[0].equals("SELECT")) { //if the first word in the statement is select
-                    return selectExecute(words, ps);
+                    return selectExecute(words, psNew);
                 } else { //if it requires an update
                     ps.executeUpdate();
-                    var rs = ps.getGeneratedKeys();
+                    var rs = psNew.getGeneratedKeys();
                     if (rs.next()) {
                         return rs.getInt(1);
                     }
