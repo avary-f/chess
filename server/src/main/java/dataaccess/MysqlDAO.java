@@ -54,10 +54,11 @@ public class MysqlDAO {
                 PreparedStatement psNew = switchCase(ps, params);
                 String[] words = statement.trim().split("\\s+");
                 if (words[0].equals("SELECT")) { //if the first word in the statement is select
+                    if(words[1].equals("*")){
+                        psNew.executeUpdate();
+                        return null;
+                    }
                     return selectExecute(words, psNew);
-                } else if(words[0].equals("TRUNCATE")){
-                    psNew.executeUpdate();
-                    return null;
                 }
                 else { //if it requires an update
                     ps.executeUpdate();
