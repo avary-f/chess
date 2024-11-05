@@ -55,7 +55,11 @@ public class MysqlDAO {
                 String[] words = statement.trim().split("\\s+");
                 if (words[0].equals("SELECT")) { //if the first word in the statement is select
                     return selectExecute(words, psNew);
-                } else { //if it requires an update
+                } else if(words[0].equals("TRUNCATE")){
+                    psNew.executeUpdate();
+                    return null;
+                }
+                else { //if it requires an update
                     ps.executeUpdate();
                     var rs = psNew.getGeneratedKeys();
                     if (rs.next()) {
