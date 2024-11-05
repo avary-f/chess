@@ -14,6 +14,19 @@ public class MysqlDAO {
     public static Object selectExecute(String[] words, PreparedStatement ps) throws SQLException {
         var rs = ps.executeQuery();
         ArrayList<Object> list = new ArrayList<>();
+
+        if (words[1].equals("*")) {
+            var metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            while (rs.next()) { //get all rows
+                ArrayList<Object> row = new ArrayList<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    row.add(rs.getObject(i)); //get each column in the row
+                }
+                list.add(row); //add row to result list
+            }
+        }
+
         if (rs.next()) { //if there's at least one thing found
             if (!words[words.length - 1].equals("?")) { //check if they need multiple objects
                 //it will be a ? if they only want one thing
@@ -54,10 +67,6 @@ public class MysqlDAO {
                 PreparedStatement psNew = switchCase(ps, params);
                 String[] words = statement.trim().split("\\s+");
                 if (words[0].equals("SELECT")) { //if the first word in the statement is select
-                    if(words[1].equals("*")){
-                        psNew.executeUpdate();
-                        return null;
-                    }
                     return selectExecute(words, psNew);
                 }
                 else { //if it requires an update
@@ -117,10 +126,11 @@ public class MysqlDAO {
             throw new DataAccessException("Unable to configure database");
         }
     }
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         String statement = "SELECT * FROM auths";
-        String resultUser = (String)execute(statement);
-        return resultUser == null;
+        Object result = execute(statement);
+        return result == null || ((ArrayList<?>) result).isEmpty();
     }
+
 
 }
