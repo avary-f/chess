@@ -17,13 +17,16 @@ public class Repl{
         ClientPrelogin preClient = new ClientPrelogin(serverUrl);
 //        ClientPostlogin postCient = new ClientPostlogin(serverUrl);
 //        ClientGameplay gameClient = new ClientGameplay(serverUrl);
-        client = preClient; //starts out in Prelogin
+        client = preClient;
+        client.setState(State.LOGGEDOUT);//starts out in Prelogin
     }
 
     public void run() {
         System.out.println("\uD83D\uDC51 Welcome to the 240 Chess.\uD83D\uDC51");
-        System.out.println("    Type 'help' to get started. ");
-        System.out.print(client.help());
+        System.out.println();
+        System.out.println("Type 'help' to get started.");
+        System.out.println();
+        //System.out.print(BLUE + client.help() + RESET); //reset used to return console to default color
 
         Scanner scanner = new Scanner(System.in);
         String result = "";
@@ -31,9 +34,9 @@ public class Repl{
             if(client.isLoggedIn()) { //if client is logged in
                 client = postCient;
             }
-            else if(!client.isLoggedIn()){
-                client = preClient;
-            }
+//            else if(!client.isLoggedIn()){
+//                client = preClient;
+//            }
             printPrompt();
             String line = scanner.nextLine();
             try {
