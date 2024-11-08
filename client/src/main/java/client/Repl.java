@@ -15,8 +15,8 @@ public class Repl{
 
     public Repl(String serverUrl) { //this might need a notification handler
         ClientPrelogin preClient = new ClientPrelogin(serverUrl);
-        ClientPostlogin postCient = new ClientPostlogin(serverUrl);
-        ClientGameplay gameClient = new ClientGameplay(serverUrl);
+//        ClientPostlogin postCient = new ClientPostlogin(serverUrl);
+//        ClientGameplay gameClient = new ClientGameplay(serverUrl);
         client = preClient; //starts out in Prelogin
     }
 
@@ -47,11 +47,11 @@ public class Repl{
         }
         System.out.println();
     }
-
-    public void notify(Notification notification) {
-        System.out.println(RED + notification.message());
-        printPrompt();
-    }
+//
+//    public void notify(Notification notification) {
+//        System.out.println(RED + notification.message());
+//        printPrompt();
+//    }
 
     private void printPrompt() {
         if(!client.isLoggedIn()){ //if they are signed out

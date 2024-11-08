@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public abstract class ChessClient implements ChessClientInterface {
     private String clientName = null;
-    private final ServerFacade server;
+    public final ServerFacade server;
     private final String serverUrl;
     private State state;
 //    final NotificationHandler notificationHandler;
@@ -38,6 +38,10 @@ public abstract class ChessClient implements ChessClientInterface {
 
     protected void setState(State s){
         state = s;
+    }
+
+    protected void setClientName(String clientName){
+        this.clientName = clientName;
     }
 
     public abstract String help();
