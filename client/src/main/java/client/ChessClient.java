@@ -8,7 +8,7 @@ import server.ServerFacade;
 import java.util.Arrays;
 //import client.websocket.WebSocketFacade;
 
-public abstract class ChessClient implements ChessClientInterface {
+public abstract class ChessClient {
     private String clientName = null;
     public final ServerFacade server;
     private final String serverUrl;
