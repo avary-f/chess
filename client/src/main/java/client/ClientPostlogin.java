@@ -1,4 +1,4 @@
 package client;
 
-public class ClientPostlogin {
+public class ClientPostlogin extends ChessClient{
 }

@@ -3,32 +3,29 @@ package client;
 import com.sun.nio.sctp.NotificationHandler;
 import server.ResponseException;
 
-import java.util.Arrays;
+public class ClientPrelogin extends ChessClient implements ChessClientInterface{
 
-public class ClientPrelogin extends ChessClient {
-    public ClientPrelogin(String serverUrl, NotificationHandler notificationHandler) {
-        super(serverUrl, notificationHandler);
+    public ClientPrelogin(String serverUrl) {
+        super(serverUrl);
     }
 
     @Override
-    public String eval(String input) {
-        try {
-            var tokens = input.toLowerCase().split(" ");
-            var cmd = (tokens.length > 0) ? tokens[0] : "help";
-            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            return switch (cmd) {
-                case "login" -> login();
-                case "register" -> register();
-                case "quit" -> "quit";
-                default -> help();
-            };
-        } catch (ResponseException ex) {
-            return ex.getMessage();
-        }
+    public String performCmd(String cmd) {
+        return switch (cmd) {
+            case "login" -> {
+                login();
+                ClientPostlogin clientPostlogin = new ClientPostlogin(serverurl);
+                clientPostlogin.eval();
+            }
+            case "register" -> register();
+            case "quit" -> "quit";
+            default -> help();
+        };
     }
 
     public String login(String... params) throws ResponseException {
         if (params.length >= 1) {
+            setState(State.LOGGEDIN);
             state = State.SIGNEDIN;
             visitorName = String.join("-", params);
             ws = new WebSocketFacade(serverUrl, notificationHandler);
@@ -50,22 +47,12 @@ public class ClientPrelogin extends ChessClient {
     }
 
     public String help() {
-       String helpString = """
-                    register <username> <password> <email>
-                    login <username> <password>
-                    quit
-                    help
-                    """;
-        if (state == State.SIGNEDOUT) {
-            return helpString;
-        }
-        else{
-            ClientPostlogin clientPostlogin = new ClientPostlogin(serverurl, notificationHandler);
-            clientPostlogin.help();
-            clientPostlogin.eval();
-            //not sure how to do the above part
-            return helpString;
-        }
+       return """
+            register <username> <password> <email>
+            login <username> <password>
+            quit
+            help
+            """;
     }
 
 }
