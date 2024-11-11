@@ -10,7 +10,7 @@ import static ui.EscapeSequences.*;
 public class Repl{
     private ChessClient client;
     private ClientPrelogin preClient;
-    private ClientPostlogin postCient;
+//    private ClientPostlogin postCient;
     private ClientGameplay gameClient;
 
     public Repl(String serverUrl) { //this might need a notification handler
@@ -32,7 +32,7 @@ public class Repl{
         String result = "";
         while (!result.equals("quit")) {
             if(client.isLoggedIn()) { //if client is logged in
-                client = postCient;
+//                client = postCient;
             }
 //            else if(!client.isLoggedIn()){
 //                client = preClient;

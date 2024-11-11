@@ -25,7 +25,7 @@ public abstract class ChessClient {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            return performCmd(cmd);
+            return performCmd(cmd, params);
         }
         catch (ResponseException ex) {
             return ex.getMessage();
@@ -46,7 +46,7 @@ public abstract class ChessClient {
 
     public abstract String help();
 
-    public abstract String performCmd(String cmd);
+    public abstract String performCmd(String cmd, String[] params);
 
     public String getServerUrl() {
         return serverUrl;

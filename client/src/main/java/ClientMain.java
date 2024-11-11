@@ -1,4 +1,4 @@
-package client;
+import client.Repl;
 
 public class ClientMain {
     public static void main(String[] args) {

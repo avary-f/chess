@@ -17,10 +17,10 @@ public class ClientPrelogin extends ChessClient{
     }
 
     @Override
-    public String performCmd(String cmd) {
+    public String performCmd(String cmd, String[] params) {
         return switch (cmd) {
-            case "login" -> login();
-            case "register" -> register();
+            case "login" -> login(params);
+            case "register" -> register(params);
             case "quit" -> "quit";
             default -> help();
         };
@@ -37,13 +37,18 @@ public class ClientPrelogin extends ChessClient{
     }
 
     public String register(String... params) throws ResponseException {
-        printLoginPrompt();
-        Scanner scanner = new Scanner(System.in);
-        String line = scanner.nextLine();
+//        printLoginPrompt();
+//        Scanner scanner = new Scanner(System.in);
+//        String line = scanner.nextLine();
+//        System.out.println();
         if (params.length >= 3) {
-            setState(State.LOGGEDIN);
+            System.out.println("made it here");
             setClientName(params[0]);
-            server.register(new RegisterRequest(getClientName(), params[1], params[2]));
+            System.out.println("here");
+            RegisterRequest reg = new RegisterRequest(getClientName(), params[1], params[2]);
+            server.register(reg);
+            System.out.println("here?");
+            setState(State.LOGGEDIN);
             return String.format("You're logged in as %s.", getClientName());
         }
         throw new ResponseException(400, "Expected: <username> <password> <email>");
