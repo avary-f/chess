@@ -17,44 +17,43 @@ public class ServerFacade {
     }
 
     public RegisterResult register(RegisterRequest request) throws ResponseException{
-        return this.makeRequest("POST", "/user", request, RegisterResult.class);
+        return this.makeRequest("POST", "/user", request, RegisterResult.class, null);
     }
 
     public LoginResult login(LoginRequest request) throws ResponseException{
-        return this.makeRequest("POST", "/session", request, LoginResult.class);
+        return this.makeRequest("POST", "/session", request, LoginResult.class, null);
     }
 
     public void logout(LogoutRequest request) throws ResponseException{
-        this.makeRequest("DELETE", "/session", request, null);
+        this.makeRequest("DELETE", "/session", request, null, request.authToken());
     }
 
     public void deleteAll() throws ResponseException{
-        this.makeRequest("DELETE", "/session", null, null);
+        this.makeRequest("DELETE", "/session", null, null, null);
     }
 
     public ListResult listGames(ListRequest request) throws ResponseException{
-        return this.makeRequest("GET", "/game", request, ListResult.class);
+        return this.makeRequest("GET", "/game", request, ListResult.class, request.auth().authToken());
     }
 
     public CreateResult createGame(CreateRequest request) throws ResponseException{
-        return this.makeRequest("POST", "/game", request, CreateResult.class);
+        return this.makeRequest("POST", "/game", request, CreateResult.class, request.auth().authToken());
     }
 
     public JoinResult joinGame(JoinRequest request) throws ResponseException{
-        return this.makeRequest("PUT", "/game", request, JoinResult.class);
+        return this.makeRequest("PUT", "/game", request, JoinResult.class, request.auth().authToken());
     }
 
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL(); // make a url to the server
             HttpURLConnection http = (HttpURLConnection) url.openConnection(); //opens a connection to that url (the server)
-            if(it is a request that has an authtoken){
-                http.setRequestProperty("authorization", request.authToken());
+            if(authToken != null){
+                http.setRequestProperty("authorization", authToken);
             }
             http.setRequestMethod(method); //tells if you will be using POST, DELETE, etc
             http.setDoOutput(true); //magic, do it always
-
             writeBody(request, http); //sets the format for the HTTP request using your request that you passed in
             http.connect(); //actually makes the request
             throwIfNotSuccessful(http); //if there was an error when you made the request (not 200)
