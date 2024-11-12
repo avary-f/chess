@@ -10,15 +10,15 @@ import static ui.EscapeSequences.*;
 public class Repl{
     private ChessClient client;
     private ClientPrelogin preClient;
-//    private ClientPostlogin postCient;
+    private ClientPostlogin postClient;
     private ClientGameplay gameClient;
+    private String serverUrl;
 
     public Repl(String serverUrl) { //this might need a notification handler
-        ClientPrelogin preClient = new ClientPrelogin(serverUrl);
-//        ClientPostlogin postCient = new ClientPostlogin(serverUrl);
-//        ClientGameplay gameClient = new ClientGameplay(serverUrl);
-        client = preClient;
+        this.serverUrl = serverUrl;
+        client = new ClientPrelogin(serverUrl);
         client.setState(State.LOGGEDOUT);//starts out in Prelogin
+
     }
 
     public void run() {
@@ -30,13 +30,9 @@ public class Repl{
 
         Scanner scanner = new Scanner(System.in);
         String result = "";
-        while (!result.equals("quit")) {
-            if(client.isLoggedIn()) { //if client is logged in
-//                client = postCient;
-            }
-//            else if(!client.isLoggedIn()){
-//                client = preClient;
-//            }
+        while (!(result.equals("quit") && client instanceof ClientPrelogin)) {
+        //if you press quit & you are in the prelogin repl loop
+            clientUpdate();
             printPrompt();
             String line = scanner.nextLine();
             try {
@@ -56,8 +52,24 @@ public class Repl{
 //        printPrompt();
 //    }
 
+    private void clientUpdate(){
+        if(client.isLoggedIn()) { //if client is logged in
+            String auth = client.getAuth();
+            String clientName = client.getClientName();
+            client = new ClientPostlogin(serverUrl);
+            client.setClientName(clientName);
+            client.setState(State.LOGGEDIN);
+            client.setAuth(auth);
+        }
+        else if(!client.isLoggedIn()){
+            client = new ClientPrelogin(serverUrl);
+        }
+//        else{
+//            client = gameClient;
+//        }
+    }
     private void printPrompt() {
-        if(!client.isLoggedIn()){ //if they are signed out
+        if(client instanceof ClientPrelogin && !client.isLoggedIn()){ //if they are signed out
             System.out.print("\n" + RESET + "[LOGGED_OUT] >>> " + GREEN);
         }
         else{ //if they are signed in

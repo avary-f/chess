@@ -45,19 +45,13 @@ public class ServerFacade {
     }
 
 
-//    public Pet[] listPets() throws ResponseException { //this error gets caught in the client
-//        var path = "/pet";
-//        record listPetResponse(Pet[] pet) {
-//        }
-//        var response = this.makeRequest("GET", path, null, listPetResponse.class);
-//        return response.pet();
-//    }
-    //in your client code, that's where you dumb down the error and omit the error code
-
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL(); // make a url to the server
             HttpURLConnection http = (HttpURLConnection) url.openConnection(); //opens a connection to that url (the server)
+            if(it is a request that has an authtoken){
+                http.setRequestProperty("authorization", request.authToken());
+            }
             http.setRequestMethod(method); //tells if you will be using POST, DELETE, etc
             http.setDoOutput(true); //magic, do it always
 
@@ -84,7 +78,7 @@ public class ServerFacade {
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
-            throw new ResponseException(status, "failure: " + status);
+            throw new ResponseException(status, getErrorMessage(status));
         }
     }
 
@@ -106,4 +100,20 @@ public class ServerFacade {
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
     }
+
+    private String getErrorMessage(int status){
+        return switch (status) {
+            case 400 -> "Bad request";
+            case 401 -> "Invalid username or password";
+            case 403 -> "Username already taken"; //Forbidden (invalid credentials or auth fails) -
+            // happens when username is taken, server understood the request but refused to process it
+            case 404 -> "Not found";
+            case 500 -> "Internal Server Error";
+            case 501 -> "Not implemented";
+            default -> "Unknown status";
+        };
+
+
+    }
+
 }

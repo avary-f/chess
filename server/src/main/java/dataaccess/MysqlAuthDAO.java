@@ -2,8 +2,6 @@ package dataaccess;
 
 import model.AuthData;
 import model.UserData;
-
-import java.util.Objects;
 import java.util.UUID;
 
 public class MysqlAuthDAO extends MysqlDAO implements AuthDAO{

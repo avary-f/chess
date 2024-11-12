@@ -3,6 +3,8 @@ package client;
 import com.sun.nio.sctp.NotificationHandler;
 import request.LoginRequest;
 import request.RegisterRequest;
+import result.LoginResult;
+import result.RegisterResult;
 import server.ResponseException;
 
 import java.util.Scanner;
@@ -28,26 +30,21 @@ public class ClientPrelogin extends ChessClient{
 
     public String login(String... params) throws ResponseException {
         if (params.length >= 2) {
-            setState(State.LOGGEDIN);
             setClientName(params[0]);
-            server.login(new LoginRequest(getClientName(), params[1]));
+            LoginResult result = server.login(new LoginRequest(getClientName(), params[1]));
+            setAuth(result.authToken());
+            setState(State.LOGGEDIN);
             return String.format("You're logged in as %s.", getClientName());
         }
         throw new ResponseException(400, "Expected: <username> <password>");
     }
 
     public String register(String... params) throws ResponseException {
-//        printLoginPrompt();
-//        Scanner scanner = new Scanner(System.in);
-//        String line = scanner.nextLine();
-//        System.out.println();
         if (params.length >= 3) {
-            System.out.println("made it here");
             setClientName(params[0]);
-            System.out.println("here");
             RegisterRequest reg = new RegisterRequest(getClientName(), params[1], params[2]);
-            server.register(reg);
-            System.out.println("here?");
+            RegisterResult result = server.register(reg);
+            setAuth(result.authToken());
             setState(State.LOGGEDIN);
             return String.format("You're logged in as %s.", getClientName());
         }
@@ -56,17 +53,11 @@ public class ClientPrelogin extends ChessClient{
 
     public String help() {
        return """
-            register
-            login
+            register <username> <password> <email>
+            login <username> <password>
             quit
             help
             """;
-    }
-
-    public void printLoginPrompt(){
-        System.out.println("\n" + RESET + "Enter credentials: <username> <password> <email> ");
-        System.out.println();
-        System.out.print("[LOGGED_OUT] >>> " + GREEN);
     }
 
 }

@@ -13,6 +13,7 @@ public abstract class ChessClient {
     public final ServerFacade server;
     private final String serverUrl;
     private State state;
+    private String auth;
 //    final NotificationHandler notificationHandler;
 
     public ChessClient(String serverUrl){
@@ -42,6 +43,14 @@ public abstract class ChessClient {
 
     protected void setClientName(String clientName){
         this.clientName = clientName;
+    }
+
+    protected void setAuth(String auth){
+        this.auth = auth;
+    }
+
+    protected String getAuth(){
+        return auth;
     }
 
     public abstract String help();
