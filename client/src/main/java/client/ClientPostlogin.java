@@ -18,36 +18,60 @@ public class ClientPostlogin extends ChessClient{
             case "create" -> create(params); //does not join the user to the game, only makes it in the server
             case "list" -> list(params);
             case "join" -> join(params);
-//            case "observe" -> observe(params);
+            case "observe" -> observe(params);
             case "logout" -> logout();
             default -> help();
         };
     }
 
-    public String join(String... params){
-        if(params.length == 2){
-            try{
-                int index = Integer.parseInt(params[0]);
-                String playerColor = params[1].toUpperCase(); //convert their entry to uppercase
+    private int validateIDInput(String gameID){
+        try {
+            return Integer.parseInt(gameID);
+        }
+        catch(NumberFormatException ex){ //this is an exception thrown by parseInt from the java standard lib
+            throw new ResponseException(400, "Invalid input format. Expected: <ID> [WHITE|BLACK]");
+        }
+    }
 
-                if(playerColor.equals("WHITE") || playerColor.equals("BLACK")){
-                    HashMap<Integer, GameData> gameIndexMap = getGameIndex();
-                    if(gameIndexMap.isEmpty()){ //if no games exist
-                        return "No games exist yet. Type 'create <GAME_NAME>' to create a new game.";
-                    }
-                    GameData game = gameIndexMap.get(index);
-                    if(game == null){
-                        throw new ResponseException(400, "Game ID = " + index + " not found.");
-                    }
+    private GameData getGameFromGameIndexMap(int index){
+        HashMap<Integer, GameData> gameIndexMap = getGameIndex();
+        if(gameIndexMap.isEmpty()){ //if no games exist
+            throw new ResponseException(400, "No games exist yet. Type 'create <GAME_NAME>' to create a new game.");
+        }
+        GameData game = gameIndexMap.get(index);
+        if(game == null){
+            throw new ResponseException(400, "Game ID = " + index + " not found.");
+        }
+        return game;
+    }
+
+    public String observe(String... params) {
+        if(params.length == 1){
+            int index = validateIDInput(params[0]);
+            GameData game = getGameFromGameIndexMap(index);
+//            server.joinGame(new JoinRequest(getAuth(), playerColor, game.gameID()));
+            return "You joined " + game.gameName() + " as an observer.";
+        }
+        else{
+            throw new ResponseException(400, "Expected: <ID> ");
+        }
+    }
+
+    public String join(String... params) {
+        if(params.length == 2){
+            int index = validateIDInput(params[0]);
+            String playerColor = params[1].toUpperCase(); //convert their entry to uppercase
+            if(playerColor.equals("WHITE") || playerColor.equals("BLACK")){
+                GameData game = getGameFromGameIndexMap(index);
+                try{
                     server.joinGame(new JoinRequest(getAuth(), playerColor, game.gameID()));
-                    return "You joined " + gameIndexMap.get(index).gameName() + " as " + playerColor;
-                }
-                else{
-                    throw new ResponseException(400, "Expected: <ID> [WHITE|BLACK]");
+                    return "You joined " + game.gameName() + " as " + playerColor;
+                } catch (RuntimeException ex) {
+                    throw new ResponseException(403, "Player already taken.");
                 }
             }
-            catch(NumberFormatException ex){ //this is an exception thrown by parseInt from the java standard lib
-                throw new ResponseException(400, "Invalid input format. Expected: <ID> [WHITE|BLACK]");
+            else{
+                throw new ResponseException(400, "Expected: <ID> [WHITE|BLACK]");
             }
         }
         else{
