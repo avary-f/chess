@@ -8,7 +8,7 @@ public class GameData {
     private String whiteUsername;
     private String blackUsername;
     private final String gameName;
-    private ChessGame game;
+    public ChessGame game;
 
     public GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
         this.gameID = gameID;
