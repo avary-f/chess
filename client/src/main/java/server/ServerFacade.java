@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import model.GameData;
 import request.*;
 import result.*;
 import spark.Spark;
@@ -36,7 +37,8 @@ public class ServerFacade {
         return this.makeRequest("GET", "/game", request, ListResult.class, request.auth().authToken());
     }
 
-    public CreateResult createGame(CreateRequest request) throws ResponseException{
+    public CreateResult createGame(CreateRequest request, String authToken) throws ResponseException{
+        request.setAuthtoken(authToken);
         return this.makeRequest("POST", "/game", request, CreateResult.class, request.auth().authToken());
     }
 
