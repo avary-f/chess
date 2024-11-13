@@ -1,4 +1,5 @@
 package dataaccess;
+import chess.ChessGame;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -35,6 +36,16 @@ public class MemoryGameDAO implements GameDAO {
             }
         }
         return false;
+    }
+
+    @Override
+    public void updatePlayer(GameData game, String playerColor, String username) {
+        if(playerColor.equals("WHITE")){
+            get(game).setWhiteUsername(username);
+        }
+        else{
+            get(game).setBlackUsername(username);
+        }
     }
 
     @Override

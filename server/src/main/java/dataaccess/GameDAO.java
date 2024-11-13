@@ -1,4 +1,5 @@
 package dataaccess;
+import chess.ChessGame;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -9,5 +10,6 @@ public interface GameDAO {
     void create(GameData game);
     GameData get(GameData game);
     boolean nameExists(GameData game);
+    void updatePlayer(GameData game, String playerColor, String username);
     ArrayList<GameData> getAll();
 }

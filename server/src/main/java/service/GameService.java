@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
@@ -37,7 +38,7 @@ public class GameService {
     public CreateResult createGame(CreateRequest req) throws Exception {
         AuthData auth = dataAccessAuth.get(req.auth());
         serviceAuth.checkAuthTokenValid(auth);
-        GameData game = new GameData(Math.abs(UUID.randomUUID().hashCode()), null, null,  req.gameName(), null);
+        GameData game = new GameData(Math.abs(UUID.randomUUID().hashCode()), null, null,  req.gameName(), new ChessGame());
         if(dataAccessGame.nameExists(game)){
             throw new AlreadyTakenException();
         } //will throw an error if it is already taken
@@ -57,32 +58,25 @@ public class GameService {
         game = dataAccessGame.get(game);
         UserData user = new UserData(serviceAuth.getUsername(req.auth()), null, null);
         user = dataAccessUser.get(user);
-        GameData newGame = getNewPlayerGame(user.username(), req.playerColor(), game);
-        updateGame(game, newGame);
-        return new JoinResult(newGame.gameID(), newGame.whiteUsername(), newGame.blackUsername());
+        playerTaken(game, passedInColor);
+        dataAccessGame.updatePlayer(game, passedInColor, user.username());
+        return new JoinResult(game.gameID(), game.whiteUsername(), game.blackUsername());
     }
 
     public void clearAllGames(){
         dataAccessGame.clearAll();
     }
-    public GameData getNewPlayerGame(String username, String color, GameData game) throws AlreadyTakenException {
-        GameData newGame;
+
+    private void playerTaken(GameData game, String color) throws AlreadyTakenException {
         if (color.equals("WHITE")) { //player wants to be white
             if (dataAccessGame.get(game).whiteUsername() != null) {
                 throw new AlreadyTakenException();
             }
-            newGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
         } else { //black
             if (dataAccessGame.get(game).blackUsername() != null) {
                 throw new AlreadyTakenException();
             }
-            newGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
         }
-        return newGame;
-    }
-    private void updateGame(GameData game, GameData newGame){
-        dataAccessGame.deleteGame(game);
-        dataAccessGame.create(newGame);
     }
 
 }

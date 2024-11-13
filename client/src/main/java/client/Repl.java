@@ -46,11 +46,6 @@ public class Repl{
         }
         System.out.println();
     }
-//
-//    public void notify(Notification notification) {
-//        System.out.println(RED + notification.message());
-//        printPrompt();
-//    }
 
     private void clientUpdate(){
         if(client.isLoggedIn()) { //if client is logged in

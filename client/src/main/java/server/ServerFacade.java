@@ -55,8 +55,10 @@ public class ServerFacade {
                 http.setRequestProperty("authorization", authToken);
             }
             http.setRequestMethod(method); //tells if you will be using POST, DELETE, etc
-            http.setDoOutput(true); //magic, do it always
-            writeBody(request, http); //sets the format for the HTTP request using your request that you passed in
+            if(!method.equals("GET")){
+                http.setDoOutput(true); //magic, do it always
+                writeBody(request, http); //sets the format for the HTTP request using your request that you passed in
+            }
             http.connect(); //actually makes the request
             throwIfNotSuccessful(http); //if there was an error when you made the request (not 200)
             return readBody(http, responseClass); //reads the result, converts it into the response type that you passed in

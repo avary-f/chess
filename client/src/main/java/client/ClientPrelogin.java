@@ -7,11 +7,6 @@ import result.LoginResult;
 import result.RegisterResult;
 import server.ResponseException;
 
-import java.util.Scanner;
-
-import static ui.EscapeSequences.GREEN;
-import static ui.EscapeSequences.RESET;
-
 public class ClientPrelogin extends ChessClient{
 
     public ClientPrelogin(String serverUrl) {
@@ -29,7 +24,7 @@ public class ClientPrelogin extends ChessClient{
     }
 
     public String login(String... params) throws ResponseException {
-        if (params.length >= 2) {
+        if (params.length == 2) {
             setClientName(params[0]);
             LoginResult result = server.login(new LoginRequest(getClientName(), params[1]));
             setAuth(result.authToken());
@@ -40,7 +35,7 @@ public class ClientPrelogin extends ChessClient{
     }
 
     public String register(String... params) throws ResponseException {
-        if (params.length >= 3) {
+        if (params.length == 3) {
             setClientName(params[0]);
             RegisterRequest reg = new RegisterRequest(getClientName(), params[1], params[2]);
             RegisterResult result = server.register(reg);

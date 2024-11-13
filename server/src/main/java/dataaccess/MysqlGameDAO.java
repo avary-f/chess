@@ -55,6 +55,13 @@ public class MysqlGameDAO extends MysqlDAO implements GameDAO{
     }
 
     @Override
+    public void updatePlayer(GameData game, String playerColor, String username) {
+        String statement = playerColor.equals("WHITE") ? "UPDATE games SET whiteUsername = ? WHERE gameName = ?" :
+                "UPDATE games SET blackUsername = ? WHERE gameName = ?";
+        execute(statement, username, game.gameName());
+    }
+
+    @Override
     public ArrayList<GameData> getAll() {
         String statement = "SELECT id FROM games";
         Object result = execute(statement);
@@ -64,7 +71,8 @@ public class MysqlGameDAO extends MysqlDAO implements GameDAO{
         }
         List<Object> gameIDlist = (List<Object>) result;
         for(Object cur: gameIDlist){
-            gameList.add(get(new GameData((Integer) cur, null, null, null, null)));
+            GameData curGame = get(new GameData((Integer) cur, null, null, null, null));
+            gameList.add(curGame);
         }
         return gameList;
     }
