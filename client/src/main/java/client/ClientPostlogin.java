@@ -28,7 +28,7 @@ public class ClientPostlogin extends ChessClient{
         if(params.length == 2){
             try{
                 int index = Integer.parseInt(params[0]);
-                String playerColor = params[1].toUpperCase();
+                String playerColor = params[1].toUpperCase(); //convert their entry to uppercase
 
                 if(playerColor.equals("WHITE") || playerColor.equals("BLACK")){
                     HashMap<Integer, GameData> gameIndexMap = getGameIndex();
