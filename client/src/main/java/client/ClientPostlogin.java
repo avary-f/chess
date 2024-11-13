@@ -49,8 +49,8 @@ public class ClientPostlogin extends ChessClient{
         if(params.length == 1){
             int index = validateIDInput(params[0]);
             GameData game = getGameFromGameIndexMap(index);
-//            server.joinGame(new JoinRequest(getAuth(), playerColor, game.gameID()));
-            return "You joined " + game.gameName() + " as an observer.";
+            BoardReader printedBoard = new BoardReader(game, "WHITE"); //default to watching white as observer
+            return "You joined " + game.gameName() + " as an observer.\n" ; //+ printedBoard.printBoard()
         }
         else{
             throw new ResponseException(400, "Expected: <ID> ");
@@ -65,7 +65,8 @@ public class ClientPostlogin extends ChessClient{
                 GameData game = getGameFromGameIndexMap(index);
                 try{
                     server.joinGame(new JoinRequest(getAuth(), playerColor, game.gameID()));
-                    return "You joined " + game.gameName() + " as " + playerColor;
+                    //BoardReader printedBoard = new BoardReader(game, playerColor); //orient board based on your color
+                    return "You joined " + game.gameName() + " as " + playerColor +"\n";//printedBoard.toString()
                 } catch (RuntimeException ex) {
                     throw new ResponseException(403, "Player already taken.");
                 }
@@ -142,6 +143,7 @@ public class ClientPostlogin extends ChessClient{
         int gameIndex = 1;
         for(GameData game: resultList.games()){
             gameIndexNameMap.put(gameIndex, game);
+            gameIndex++;
         }
         return gameIndexNameMap;
     }
