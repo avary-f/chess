@@ -48,7 +48,7 @@ public class ServerFacade {
             URL url = (new URI(serverUrl + path)).toURL(); // make a url to the server
             HttpURLConnection http = (HttpURLConnection) url.openConnection(); //opens a connection to that url (the server)
             if(authToken != null){
-                http.setRequestProperty("authorization", authToken);
+                http.setRequestProperty("authorization", authToken); //set the headers
             }
             http.setRequestMethod(method); //tells if you will be using POST, DELETE, etc
             if(!method.equals("GET")){
