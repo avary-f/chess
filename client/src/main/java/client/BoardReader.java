@@ -61,7 +61,7 @@ public class BoardReader { //prints out the board
     public void drawChessBoard() {
         setup();
         drawHeaders();
-        for (int row = 1; row <= BOARD_SIZE_IN_SQUARES; row++) {
+        for (int row = BOARD_SIZE_IN_SQUARES; row > 0 ; row--) {
             out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
             printCharText(rows.get(row - 1));
             out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));

@@ -1,7 +1,6 @@
 package client;
 import model.GameData;
 import request.*;
-import result.JoinResult;
 import result.ListResult;
 import server.ResponseException;
 
@@ -49,7 +48,8 @@ public class ClientPostlogin extends ChessClient{
         if(params.length == 1){
             int index = validateIDInput(params[0]);
             GameData game = getGameFromGameIndexMap(index);
-            BoardReader printedBoard = new BoardReader(game, "WHITE"); //default to watching white as observer
+            BoardReader boardToObserve = new BoardReader(game, "WHITE"); //default to watching white as observer
+            boardToObserve.drawChessBoard();
             return "You joined " + game.gameName() + " as an observer.\n" ; //+ printedBoard.printBoard()
         }
         else{
