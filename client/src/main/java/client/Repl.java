@@ -59,9 +59,6 @@ public class Repl{
         else if(!client.isLoggedIn()){
             client = new ClientPrelogin(serverUrl);
         }
-//        else{
-//            client = gameClient;
-//        }
     }
     private void printPrompt() {
         if(client instanceof ClientPrelogin && !client.isLoggedIn()){ //if they are signed out

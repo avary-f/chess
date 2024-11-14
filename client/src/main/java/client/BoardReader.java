@@ -12,8 +12,8 @@ public class BoardReader { //prints out the board
     private PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
     private GameData game;
     private final String playerColor;
-    private final int BOARD_SIZE_IN_SQUARES = 8;
-    private final int SQUARE_SIZE_IN_PADDED_CHARS = 1;
+    private final static int BOARD_SIZE_IN_SQUARES = 8;
+    private final static int SQUARE_SIZE_IN_PADDED_CHARS = 1;
     private final ArrayList<String> columns = new ArrayList<>(List.of("a", "b", "c", "d", "e", "f", "g", "h")); //white orientation by default
     private final ArrayList<String> rows = new ArrayList<>(List.of("1", "2", "3", "4", "5", "6", "7", "8")); //white orientation by default
     private int reverseCount = 9; //int used in the reversal process

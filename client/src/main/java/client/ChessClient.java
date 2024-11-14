@@ -61,10 +61,6 @@ public abstract class ChessClient {
         return serverUrl;
     }
 
-//    public NotificationHandler getNotificationHandler() {
-//        return notificationHandler;
-//    }
-
     public String getClientName(){return clientName;}
 }
 
