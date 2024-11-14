@@ -57,6 +57,15 @@ public class ClientPostlogin extends ChessClient{
         }
     }
 
+    private String getOtherPlayerColor(String playerColor){ //only for phase 5?
+        if(playerColor.equals("WHITE")){
+            return "BLACK";
+        }
+        else{
+            return  "WHITE";
+        }
+    }
+
     public String join(String... params) {
         if(params.length == 2){
             int index = validateIDInput(params[0]);
@@ -65,7 +74,11 @@ public class ClientPostlogin extends ChessClient{
                 GameData game = getGameFromGameIndexMap(index);
                 try{
                     server.joinGame(new JoinRequest(getAuth(), playerColor, game.gameID()));
-                    //BoardReader printedBoard = new BoardReader(game, playerColor); //orient board based on your color
+                    BoardReader boardReaderMyColor = new BoardReader(game, playerColor); //orient board based on your color
+                    BoardReader boardReaderOppColor = new BoardReader(game, getOtherPlayerColor(playerColor));
+                    boardReaderMyColor.drawChessBoard();
+                    System.out.println();
+                    boardReaderOppColor.drawChessBoard();
                     return "You joined " + game.gameName() + " as " + playerColor +"\n";//printedBoard.toString()
                 } catch (RuntimeException ex) {
                     throw new ResponseException(403, "Player already taken.");
