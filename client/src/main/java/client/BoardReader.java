@@ -13,7 +13,6 @@ public class BoardReader { //prints out the board
     private GameData game;
     private final String playerColor;
     private final static int BOARD_SIZE_IN_SQUARES = 8;
-    private final static int SQUARE_SIZE_IN_PADDED_CHARS = 1;
     private final ArrayList<String> columns = new ArrayList<>(List.of("a", "b", "c", "d", "e", "f", "g", "h")); //white orientation by default
     private final ArrayList<String> rows = new ArrayList<>(List.of("1", "2", "3", "4", "5", "6", "7", "8")); //white orientation by default
     private int reverseCount = 9; //int used in the reversal process
@@ -34,7 +33,7 @@ public class BoardReader { //prints out the board
     private void drawHeaders() {
         setBlack(out);
         out.print(" ");
-        out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS * 2)); //empty spaces for alignment
+        out.print(EMPTY.repeat(2)); //empty spaces for alignment
         for (int col = 0; col < BOARD_SIZE_IN_SQUARES; col++) {
             printCharText(columns.get(col));
             if (col < BOARD_SIZE_IN_SQUARES - 1) { //help line up the columns
@@ -62,9 +61,9 @@ public class BoardReader { //prints out the board
         setup();
         drawHeaders();
         for (int row = BOARD_SIZE_IN_SQUARES; row > 0 ; row--) {
-            out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
+            out.print(EMPTY);
             printCharText(rows.get(row - 1));
-            out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
+            out.print(EMPTY);
             for (int col = 1; col <= BOARD_SIZE_IN_SQUARES; col++) {
                 if ((row + col) % 2 == 0) {
                     setWhite(out);
@@ -82,11 +81,11 @@ public class BoardReader { //prints out the board
                     printPlayer(out, tempR, tempC, piece.getTeamColor()); // Print the piece on this square
 
                 } else {
-                    out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS)); // Empty space in non-middle rows of square
+                    out.print(WHITE_PAWN); // Empty space in non-middle rows of square
                 }
                 setBlack(out); //reset for the next square
             }
-            out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
+            out.print(EMPTY);
             printCharText(rows.get(row - 1));
             out.println(); //move to next row
         }
@@ -95,13 +94,14 @@ public class BoardReader { //prints out the board
 
     private void setWhite(PrintStream out) {
         out.print(SET_BG_COLOR_LIGHT_GREY);
-        out.print(SET_TEXT_COLOR_WHITE);
+        out.print(SET_TEXT_COLOR_LIGHT_GREY);
     }
 
     private void setMagenta(PrintStream out) {
         out.print(SET_BG_COLOR_MAGENTA);
-        out.print(SET_TEXT_COLOR_BLACK);
+        out.print(SET_TEXT_COLOR_MAGENTA);
     }
+
 
     private void setBlack(PrintStream out) {
         out.print(SET_BG_COLOR_BLACK);
