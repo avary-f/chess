@@ -30,7 +30,7 @@ public class ServerFacade {
     }
 
     public void deleteAll() throws ResponseException{
-        this.makeRequest("DELETE", "/session", null, null, null);
+        this.makeRequest("DELETE", "/db", null, null, null);
     }
 
     public ListResult listGames(ListRequest request) throws ResponseException{

@@ -6,6 +6,9 @@ import server.ResponseException;
 
 import java.util.HashMap;
 
+import static ui.EscapeSequences.RED;
+import static ui.EscapeSequences.SET_TEXT_BLINKING;
+
 public class ClientPostlogin extends ChessClient{
     public ClientPostlogin(String serverUrl) {
         super(serverUrl);
@@ -19,6 +22,7 @@ public class ClientPostlogin extends ChessClient{
             case "join" -> join(params);
             case "observe" -> observe(params);
             case "logout" -> logout();
+            case "delete" -> delete(params);
             default -> help();
         };
     }
@@ -42,6 +46,23 @@ public class ClientPostlogin extends ChessClient{
             throw new ResponseException(400, "Game ID = " + index + " not found.");
         }
         return game;
+    }
+
+    public String delete(String... params) throws ResponseException {
+        if (params.length == 1) {
+            String passwordForDeleting = params[0];
+            if(passwordForDeleting.equals("eraseallofit")) {
+                server.deleteAll();
+            }
+            else{
+                throw new ResponseException(400, RED + "Invalid password.");
+            }
+            setState(State.LOGGEDOUT);
+            return RED + "Successfully deleted all data in auth, user, and game tables.";
+        }
+        else{
+            throw new ResponseException(400, RED + "Enter password to delete all data.");
+        }
     }
 
     public String observe(String... params) {
