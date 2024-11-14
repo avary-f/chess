@@ -93,11 +93,15 @@ public class Server {
     private Object joinGame(Request req, Response res) throws Exception {
         Map<String, Object> bodyParams = new Gson().fromJson(req.body(), Map.class);
         String playerColor = (String) bodyParams.get("playerColor");
-        double gameIDdouble = (double) bodyParams.get("gameID");
-        int gameID = (int) gameIDdouble;
-        JoinRequest request = new JoinRequest(req.headers("authorization"), playerColor, gameID);
-        serviceGame.joinGame(request);
-        return "";
+        JoinRequest request;
+        try {
+            double gameIDdouble = (double) bodyParams.get("gameID");
+            int gameID = (int) gameIDdouble;
+            request = new JoinRequest(req.headers("authorization"), playerColor, gameID);
+        } catch (Exception ex) {
+            throw new BadRequestException();
+        }
+        return serviceGame.joinGame(request);
         //this used to have a check for if there's 3 params. If not throw a bad request error, but might not need that?
     }
 

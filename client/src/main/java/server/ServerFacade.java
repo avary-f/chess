@@ -1,11 +1,7 @@
 package server;
-
 import com.google.gson.Gson;
-import model.GameData;
 import request.*;
 import result.*;
-import spark.Spark;
-
 import java.io.*;
 import java.net.*;
 
@@ -42,8 +38,8 @@ public class ServerFacade {
         return this.makeRequest("POST", "/game", request, CreateResult.class, request.auth().authToken());
     }
 
-    public JoinResult joinGame(JoinRequest request) throws ResponseException{
-        return this.makeRequest("PUT", "/game", request, JoinResult.class, request.auth().authToken());
+    public Object joinGame(JoinRequest request) throws ResponseException{
+        return this.makeRequest("PUT", "/game", request, Object.class, request.auth().authToken());
     }
 
 

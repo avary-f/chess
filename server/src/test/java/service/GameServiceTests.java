@@ -6,9 +6,12 @@ import dataaccess.MemoryUserDAO;
 import model.AuthData;
 
 import java.util.Random;
+
+import model.GameData;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import request.*;
 import result.CreateResult;
-import result.JoinResult;
 import result.ListResult;
 import result.LoginResult;
 import org.junit.jupiter.api.*;
@@ -25,7 +28,6 @@ public class GameServiceTests {
     private LoginResult resultLogin;
     private CreateResult resultCreate;
     private AuthData data;
-    private JoinResult resultJoin;
     private Random random = new Random();
 
     public void createGames(String authToken, int count) throws Exception{
@@ -101,23 +103,32 @@ public class GameServiceTests {
         });
     }
 
-    @Test
-    public void testJoinGameSuccessWhite()  throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"WHITE", "BLACK"})
+    public void testJoinGameSuccessWhiteAndBlack(String teamColor)  throws Exception {
         createGames(resultLogin.authToken(), 1);
         int gameID = resultCreate.gameID();
-        JoinRequest requestJoin = new JoinRequest(data.authToken(), "WHITE", gameID);
-        resultJoin = serviceGame.joinGame(requestJoin);
-        Assertions.assertEquals(resultJoin.gameID(), requestJoin.gameID());
-        Assertions.assertEquals(resultJoin.whiteUser(), data.username()); // need to check what the username of the request was
-    }
-    @Test
-    public void testJoinGameSuccessBlack()  throws Exception {
-        createGames(resultLogin.authToken(), 1);
-        int gameID = resultCreate.gameID();
-        JoinRequest requestJoin = new JoinRequest(data.authToken(), "BLACK", gameID);
-        resultJoin = serviceGame.joinGame(requestJoin);
-        Assertions.assertEquals(resultJoin.gameID(), requestJoin.gameID());
-        Assertions.assertEquals(resultJoin.blackUser(), data.username());
+        JoinRequest requestJoin = new JoinRequest(data.authToken(), teamColor, gameID);
+        serviceGame.joinGame(requestJoin);
+        ListRequest request = new ListRequest(data.authToken());
+        ListResult result = serviceGame.listGames(request);
+        boolean isAdded = false;
+        GameData gameFound = new GameData(123, null, null, null, null);
+        for(GameData game: result.games()){
+            if(game.gameID() == requestJoin.gameID()){
+                isAdded = true;
+                gameFound = game;
+            }
+        }
+        Assertions.assertTrue(isAdded);
+        if(teamColor.equals("WHITE")){
+            Assertions.assertEquals(gameFound.whiteUsername(), data.username()); // need to check what the username of the request was
+
+        }
+        else{
+            Assertions.assertEquals(gameFound.blackUsername(), data.username()); // need to check what the username of the request was
+
+        }
     }
 
     @Test

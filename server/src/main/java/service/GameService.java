@@ -11,7 +11,6 @@ import request.CreateRequest;
 import request.JoinRequest;
 import request.ListRequest;
 import result.CreateResult;
-import result.JoinResult;
 import result.ListResult;
 import server.AlreadyTakenException;
 import server.BadRequestException;
@@ -47,7 +46,7 @@ public class GameService {
 
     }
 
-    public JoinResult joinGame(JoinRequest req) throws Exception {
+    public Object joinGame(JoinRequest req) throws Exception {
         String passedInColor = req.playerColor();
         if(passedInColor == null || (!passedInColor.equals("WHITE") && !req.playerColor().equals("BLACK"))){
             throw new BadRequestException();
@@ -60,7 +59,7 @@ public class GameService {
         user = dataAccessUser.get(user);
         playerTaken(game, passedInColor);
         dataAccessGame.updatePlayer(game, passedInColor, user.username());
-        return new JoinResult(game.gameID(), game.whiteUsername(), game.blackUsername());
+        return "{}"; //json for empty object
     }
 
     public void clearAllGames(){
