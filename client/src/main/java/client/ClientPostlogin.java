@@ -72,6 +72,7 @@ public class ClientPostlogin extends ChessClient{
             BoardReader boardToObserve = new BoardReader(game, "WHITE"); //default to watching white as observer
             boardToObserve.drawChessBoard();
             setGame(game);
+            setTeamColor("WHITE");
             setState(State.GAMEPLAY);
             return "You joined " + game.gameName() + " as an observer.\n" ; //+ printedBoard.printBoard()
         }
@@ -91,6 +92,7 @@ public class ClientPostlogin extends ChessClient{
                     BoardReader boardReaderMyColor = new BoardReader(game, playerColor); //orient board based on your color
                     boardReaderMyColor.drawChessBoard();
                     setGame(game);
+                    setTeamColor(playerColor);
                     setState(State.GAMEPLAY);
                     return "You joined " + game.gameName() + " as " + playerColor +"\n";
                 } catch (RuntimeException ex) {

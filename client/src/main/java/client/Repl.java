@@ -54,9 +54,11 @@ public class Repl{
             if(client.isInGameplay()){
                 String auth = client.getAuth();
                 String clientName = client.getClientName();
+                String teamColor = client.getTeamColor();
                 GameData game = client.getGame();
                 client = new ClientGameplay(serverUrl);
                 client.setGame(game);
+                client.setTeamColor(teamColor);
                 client.setClientName(clientName);
                 client.setState(State.GAMEPLAY);
                 client.setAuth(auth);

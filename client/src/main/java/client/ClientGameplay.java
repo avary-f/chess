@@ -23,14 +23,7 @@ public class ClientGameplay extends ChessClient{
     }
 
     private String redraw() {
-        GameData game = getGame();
-        if(game.blackUsername() != null && game.blackUsername().equals(getClientName())){
-            teamColor = "BLACK";
-        }
-        else if(game.whiteUsername() != null && game.whiteUsername().equals(getClientName())){
-            teamColor = "WHITE";
-        }
-        BoardReader boardReaderMyColor = new BoardReader(game, teamColor); //orient board based on your color
+        BoardReader boardReaderMyColor = new BoardReader(getGame(), getTeamColor());
         boardReaderMyColor.drawChessBoard();
         return "";
     }

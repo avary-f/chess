@@ -16,6 +16,7 @@ public abstract class ChessClient {
     private State state;
     private String auth;
     private GameData game;
+    private String teamColor;
 //    final NotificationHandler notificationHandler;
 
     public ChessClient(String serverUrl){
@@ -65,6 +66,14 @@ public abstract class ChessClient {
 
     protected GameData getGame(){
         return game;
+    }
+
+    protected void setTeamColor(String teamColor){
+        this.teamColor = teamColor;
+    }
+
+    protected String getTeamColor(){
+        return teamColor;
     }
 
     public abstract String help();
