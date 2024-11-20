@@ -2,6 +2,7 @@ package client;
 
 //import client.websocket.NotificationHandler;
 import com.sun.nio.sctp.NotificationHandler;
+import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
 
@@ -14,6 +15,7 @@ public abstract class ChessClient {
     private final String serverUrl;
     private State state;
     private String auth;
+    private GameData game;
 //    final NotificationHandler notificationHandler;
 
     public ChessClient(String serverUrl){
@@ -34,7 +36,11 @@ public abstract class ChessClient {
     }
 
     public boolean isLoggedIn(){
-        return state == State.LOGGEDIN;
+        return state == State.LOGGEDIN || state == State.GAMEPLAY;
+    }
+
+    public boolean isInGameplay(){
+        return state == State.GAMEPLAY;
     }
 
     protected void setState(State s){
@@ -51,6 +57,14 @@ public abstract class ChessClient {
 
     protected String getAuth(){
         return auth;
+    }
+
+    protected void setGame(GameData game){
+        this.game = game;
+    }
+
+    protected GameData getGame(){
+        return game;
     }
 
     public abstract String help();

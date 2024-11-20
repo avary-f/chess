@@ -3,6 +3,8 @@ package client;
 //import client.websocket.NotificationHandler;
 //import webSocketMessages.Notification;
 
+import model.GameData;
+
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -49,19 +51,31 @@ public class Repl{
 
     private void clientUpdate(){
         if(client.isLoggedIn()) { //if client is logged in
-            String auth = client.getAuth();
-            String clientName = client.getClientName();
-            client = new ClientPostlogin(serverUrl);
-            client.setClientName(clientName);
-            client.setState(State.LOGGEDIN);
-            client.setAuth(auth);
+            if(client.isInGameplay()){
+                String auth = client.getAuth();
+                String clientName = client.getClientName();
+                GameData game = client.getGame();
+                client = new ClientGameplay(serverUrl);
+                client.setGame(game);
+                client.setClientName(clientName);
+                client.setState(State.GAMEPLAY);
+                client.setAuth(auth);
+            }
+            else{
+                String auth = client.getAuth();
+                String clientName = client.getClientName();
+                client = new ClientPostlogin(serverUrl);
+                client.setClientName(clientName);
+                client.setState(State.LOGGEDIN);
+                client.setAuth(auth);
+            }
         }
         else if(!client.isLoggedIn()){
             client = new ClientPrelogin(serverUrl);
         }
     }
     private void printPrompt() {
-        if(client instanceof ClientPrelogin && !client.isLoggedIn()){ //if they are signed out
+        if(client instanceof ClientPrelogin && !client.isLoggedIn() && !client.isInGameplay()){ //if they are signed out
             System.out.print("\n" + RESET + "[LOGGED_OUT] >>> " + GREEN);
         }
         else{ //if they are signed in

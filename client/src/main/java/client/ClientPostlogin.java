@@ -7,9 +7,9 @@ import server.ResponseException;
 import java.util.HashMap;
 
 import static ui.EscapeSequences.RED;
-import static ui.EscapeSequences.SET_TEXT_BLINKING;
 
 public class ClientPostlogin extends ChessClient{
+
     public ClientPostlogin(String serverUrl) {
         super(serverUrl);
     }
@@ -71,19 +71,12 @@ public class ClientPostlogin extends ChessClient{
             GameData game = getGameFromGameIndexMap(index);
             BoardReader boardToObserve = new BoardReader(game, "WHITE"); //default to watching white as observer
             boardToObserve.drawChessBoard();
+            setGame(game);
+            setState(State.GAMEPLAY);
             return "You joined " + game.gameName() + " as an observer.\n" ; //+ printedBoard.printBoard()
         }
         else{
             throw new ResponseException(400, "Expected: <ID> ");
-        }
-    }
-
-    private String getOtherPlayerColor(String playerColor){ //only for phase 5?
-        if(playerColor.equals("WHITE")){
-            return "BLACK";
-        }
-        else{
-            return  "WHITE";
         }
     }
 
@@ -96,11 +89,10 @@ public class ClientPostlogin extends ChessClient{
                 try{
                     server.joinGame(new JoinRequest(getAuth(), playerColor, game.gameID()));
                     BoardReader boardReaderMyColor = new BoardReader(game, playerColor); //orient board based on your color
-                    BoardReader boardReaderOppColor = new BoardReader(game, getOtherPlayerColor(playerColor));
                     boardReaderMyColor.drawChessBoard();
-                    System.out.println();
-                    boardReaderOppColor.drawChessBoard();
-                    return "You joined " + game.gameName() + " as " + playerColor +"\n";//printedBoard.toString()
+                    setGame(game);
+                    setState(State.GAMEPLAY);
+                    return "You joined " + game.gameName() + " as " + playerColor +"\n";
                 } catch (RuntimeException ex) {
                     throw new ResponseException(403, "Player already taken.");
                 }
