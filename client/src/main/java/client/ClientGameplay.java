@@ -1,6 +1,7 @@
 package client;
 
 import model.GameData;
+import server.ResponseException;
 
 public class ClientGameplay extends ChessClient{
     private String teamColor;
@@ -27,6 +28,25 @@ public class ClientGameplay extends ChessClient{
         boardReaderMyColor.drawChessBoard();
         return "";
     }
+
+    private String leave() {
+        setState(State.LOGGEDIN); //move out of gameplay
+        setGame(null);
+        setTeamColor(null);
+        //create a new game data and stick it back in the dB
+        //use existing update game functionality
+        //through websocket, leave is one of the commands that it sends
+        return "You have left the game. Type 'help' to continue.";
+    }
+
+//    private String highlight(String[] params){
+//        if(params.length == 1){
+//
+//        }
+//        else{
+//            throw new ResponseException(400, "")
+//        }
+//    }
 
     @Override
     public String help() {

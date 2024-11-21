@@ -80,10 +80,6 @@ public abstract class ChessClient {
 
     public abstract String performCmd(String cmd, String[] params);
 
-    public String getServerUrl() {
-        return serverUrl;
-    }
-
     public String getClientName(){return clientName;}
 }
 

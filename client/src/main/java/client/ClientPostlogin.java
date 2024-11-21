@@ -74,7 +74,7 @@ public class ClientPostlogin extends ChessClient{
             setGame(game);
             setTeamColor("WHITE");
             setState(State.GAMEPLAY);
-            return "You joined " + game.gameName() + " as an observer.\n" ; //+ printedBoard.printBoard()
+            return "You joined " + game.gameName() + " as an observer.\n" ;
         }
         else{
             throw new ResponseException(400, "Expected: <ID> ");
