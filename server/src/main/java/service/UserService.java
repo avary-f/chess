@@ -19,6 +19,10 @@ public class UserService {
         this.dataAccessUser = dataAccessUser;
         serviceAuth = new AuthService(dataAccessAuth);
     }
+
+    public AuthService getServiceAuth(){
+        return serviceAuth;
+    }
     public RegisterResult register(RegisterRequest request) throws Exception {
         String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
         UserData user = new UserData(request.username(), hashedPassword, request.email());
@@ -27,6 +31,7 @@ public class UserService {
         AuthData auth = dataAccessAuth.create(user);
         return new RegisterResult(request.username(), auth.authToken());
     }
+
     public LoginResult login(LoginRequest request) throws Exception{
         UserData userRequest = new UserData(request.username(), request.password(), null);
         UserData userOnRecord = dataAccessUser.get(userRequest);

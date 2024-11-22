@@ -11,6 +11,7 @@ public class ClientPrelogin extends ChessClient{
 
     public ClientPrelogin(String serverUrl) {
         super(serverUrl);
+        this.setState(State.LOGGEDOUT);
     }
 
     @Override

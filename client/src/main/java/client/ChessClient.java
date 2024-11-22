@@ -1,28 +1,33 @@
 package client;
 
-//import client.websocket.NotificationHandler;
-import com.sun.nio.sctp.NotificationHandler;
+import server.websocket.NotificationHandler;
 import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
 
 import java.util.Arrays;
-//import client.websocket.WebSocketFacade;
+import server.websocket.WebSocketFacade;
 
 public abstract class ChessClient {
     private String clientName = null;
     public final ServerFacade server;
+    public WebSocketFacade ws;
     private final String serverUrl;
     private State state;
     private String auth;
     private GameData game;
     private String teamColor;
-//    final NotificationHandler notificationHandler;
+    NotificationHandler notificationHandler;
 
+    public ChessClient(String serverUrl, NotificationHandler notificationHandler){
+        server = new ServerFacade(serverUrl);
+        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        this.serverUrl = serverUrl;
+        this.notificationHandler = notificationHandler;
+    }
     public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
-//        this.notificationHandler = notificationHandler;
     }
     public String eval(String input) {
         try {

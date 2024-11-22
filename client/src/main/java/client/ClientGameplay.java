@@ -2,13 +2,19 @@ package client;
 
 import model.GameData;
 import server.ResponseException;
+import server.websocket.NotificationHandler;
 
 public class ClientGameplay extends ChessClient{
     private String teamColor;
 
 
-    public ClientGameplay(String serverUrl) {
-        super(serverUrl);
+    public ClientGameplay(String serverUrl, NotificationHandler notificationHandler, String auth, String clientName, GameData game, String teamColor) {
+        super(serverUrl, notificationHandler);
+        this.setState(State.GAMEPLAY);
+        this.setAuth(auth);
+        this.teamColor = teamColor;
+        this.setClientName(clientName);
+        this.setGame(game);
     }
 
     @Override

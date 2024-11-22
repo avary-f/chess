@@ -1,19 +1,16 @@
 package client;
 
-//import client.websocket.NotificationHandler;
-//import webSocketMessages.Notification;
-
-import model.GameData;
+import server.websocket.NotificationHandler;
+import server.websocket.ServerMessagesHandler;
+import websocket.messages.Notification;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class Repl{
+public class Repl implements NotificationHandler{
     private ChessClient client;
-    private ClientPrelogin preClient;
-    private ClientPostlogin postClient;
-    private ClientGameplay gameClient;
     private String serverUrl;
 
     public Repl(String serverUrl) { //this might need a notification handler
@@ -52,24 +49,10 @@ public class Repl{
     private void clientUpdate(){
         if(client.isLoggedIn()) { //if client is logged in
             if(client.isInGameplay()){
-                String auth = client.getAuth();
-                String clientName = client.getClientName();
-                String teamColor = client.getTeamColor();
-                GameData game = client.getGame();
-                client = new ClientGameplay(serverUrl);
-                client.setGame(game);
-                client.setTeamColor(teamColor);
-                client.setClientName(clientName);
-                client.setState(State.GAMEPLAY);
-                client.setAuth(auth);
+                client = new ClientGameplay(serverUrl, this, client.getAuth(), client.getClientName(), client.getGame(), client.getTeamColor());
             }
             else{
-                String auth = client.getAuth();
-                String clientName = client.getClientName();
-                client = new ClientPostlogin(serverUrl);
-                client.setClientName(clientName);
-                client.setState(State.LOGGEDIN);
-                client.setAuth(auth);
+                client = new ClientPostlogin(serverUrl, this, client.getAuth(), client.getClientName());
             }
         }
         else if(!client.isLoggedIn()){
@@ -84,6 +67,10 @@ public class Repl{
             System.out.print("\n" + RESET + "[" + client.getClientName().toUpperCase() + "] >>> " + GREEN);
         }
 
+    }
+    public void notify(ServerMessage message) {
+        System.out.println(RED + message.getMessage());
+        printPrompt();
     }
 
 }

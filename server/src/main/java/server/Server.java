@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import request.*;
 import result.*;
+import server.websocket.WebSocketHandler;
 import service.GameService;
 import service.UserService;
 import spark.*;
@@ -17,6 +18,7 @@ public class Server {
     //change these guys to be the memory if needed ^^
     private final UserService serviceUser = new UserService(userDAO, authDAO);
     private final GameService serviceGame = new GameService(userDAO, authDAO, gameDAO);
+    private WebSocketHandler webSocketHandler = new WebSocketHandler(serviceUser, serviceGame);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -24,6 +26,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Endpoints
+        Spark.webSocket("/ws", webSocketHandler);
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);

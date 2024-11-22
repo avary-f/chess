@@ -3,6 +3,7 @@ import model.GameData;
 import request.*;
 import result.ListResult;
 import server.ResponseException;
+import server.websocket.NotificationHandler;
 
 import java.util.HashMap;
 
@@ -10,8 +11,11 @@ import static ui.EscapeSequences.RED;
 
 public class ClientPostlogin extends ChessClient{
 
-    public ClientPostlogin(String serverUrl) {
-        super(serverUrl);
+    public ClientPostlogin(String serverUrl, NotificationHandler notificationHandler, String auth, String clientName) {
+        super(serverUrl, notificationHandler);
+        this.setAuth(auth);
+        this.setClientName(clientName);
+        this.setState(State.LOGGEDIN);
     }
 
     @Override
@@ -74,6 +78,7 @@ public class ClientPostlogin extends ChessClient{
             setGame(game);
             setTeamColor("WHITE");
             setState(State.GAMEPLAY);
+            ws.connect(getAuth(), game);
             return "You joined " + game.gameName() + " as an observer.\n" ;
         }
         else{
