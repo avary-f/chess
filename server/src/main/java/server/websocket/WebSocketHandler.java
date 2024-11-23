@@ -34,13 +34,13 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand cmd = new Gson().fromJson(message, UserGameCommand.class);
         switch (cmd.getCommandType()) {
-            case CONNECT -> connect(cmd.getAuthToken(), session);
+            case CONNECT -> connect(cmd.getAuthToken(), cmd.getGameID(), session);
 //            case EXIT -> exit(action.visitorName());
         }
     }
 
-    private void connect(String auth, Session session) throws IOException {
-        connections.add(auth, session);
+    private void connect(String auth, Integer gameID, Session session) throws IOException {
+        connections.add(auth, gameID, session);
         String username = serviceAuth.getUsername(new AuthData(auth, null));
         String message = String.format("%s has joined the game", username);
         ServerMessage notification = new Notification(message);
