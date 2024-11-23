@@ -40,12 +40,11 @@ public class WebSocketHandler {
     }
 
     private void connect(String auth, Session session) throws IOException {
-        System.out.println("Testing");
         connections.add(auth, session);
         String username = serviceAuth.getUsername(new AuthData(auth, null));
         String message = String.format("%s has joined the game", username);
-        Notification notification = new Notification(ServerMessage.ServerMessageType.LOAD_GAME, message);
-        connections.broadcast(username, notification);
+        ServerMessage notification = new Notification(message);
+        connections.broadcast(auth, notification); //auth to exclude, ServerMessage to broadcast
     }
 
 //    private void exit(String visitorName) throws IOException {

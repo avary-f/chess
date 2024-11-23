@@ -8,8 +8,8 @@ public class Connection {
     public String auth;
     public Session session;
 
-    public Connection(String visitorName, Session session) {
-        this.auth = visitorName;
+    public Connection(String auth, Session session) {
+        this.auth = auth;
         this.session = session;
     }
 

@@ -3,7 +3,7 @@ import model.GameData;
 import request.*;
 import result.ListResult;
 import server.ResponseException;
-import server.websocket.NotificationHandler;
+import server.websocket.ServerMessageHandler;
 
 import java.util.HashMap;
 
@@ -11,8 +11,8 @@ import static ui.EscapeSequences.RED;
 
 public class ClientPostlogin extends ChessClient{
 
-    public ClientPostlogin(String serverUrl, NotificationHandler notificationHandler, String auth, String clientName) {
-        super(serverUrl, notificationHandler);
+    public ClientPostlogin(String serverUrl, ServerMessageHandler serverMessageHandler, String auth, String clientName) {
+        super(serverUrl, serverMessageHandler);
         this.setAuth(auth);
         this.setClientName(clientName);
         this.setState(State.LOGGEDIN);

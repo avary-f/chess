@@ -1,11 +1,12 @@
 package client;
 
-import server.websocket.NotificationHandler;
+import server.websocket.ServerMessageHandler;
 import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
 
 import java.util.Arrays;
+
 import server.websocket.WebSocketFacade;
 
 public abstract class ChessClient {
@@ -17,13 +18,13 @@ public abstract class ChessClient {
     private String auth;
     private GameData game;
     private String teamColor;
-    NotificationHandler notificationHandler;
+    ServerMessageHandler serverMessageHandler;
 
-    public ChessClient(String serverUrl, NotificationHandler notificationHandler){
+    public ChessClient(String serverUrl, ServerMessageHandler serverMessageHandler){
         server = new ServerFacade(serverUrl);
-        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        ws = new WebSocketFacade(serverUrl, serverMessageHandler);
         this.serverUrl = serverUrl;
-        this.notificationHandler = notificationHandler;
+        this.serverMessageHandler = serverMessageHandler;
     }
     public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
