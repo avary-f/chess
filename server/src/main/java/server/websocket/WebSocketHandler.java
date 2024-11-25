@@ -3,6 +3,8 @@ package server.websocket;
 import com.google.gson.Gson;
 //import dataaccess.DataAccess;
 import model.AuthData;
+import request.JoinRequest;
+import request.UnjoinRequest;
 import server.ServerResponse;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -31,11 +33,11 @@ public class WebSocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException {
+    public void onMessage(Session session, String message) throws Exception {
         UserGameCommand cmd = new Gson().fromJson(message, UserGameCommand.class);
         switch (cmd.getCommandType()) {
             case CONNECT -> connect(cmd.getAuthToken(), cmd.getGameID(), session);
-//            case EXIT -> exit(action.visitorName());
+            case LEAVE -> leave(cmd.getAuthToken(), cmd.getGameID());
         }
     }
     //once you open a connection in websocket, this is the main place that messages go
@@ -48,12 +50,14 @@ public class WebSocketHandler {
         connections.broadcast(auth, notification); //auth to exclude, ServerMessage to broadcast
     }
 
-//    private void exit(String visitorName) throws IOException {
-//        connections.remove(visitorName);
-//        var message = String.format("%s left the shop", visitorName);
-//        var notification = new Notification(Notification.Type.DEPARTURE, message);
-//        connections.broadcast(visitorName, notification);
-//    }
+    private void leave(String auth, Integer gameID) throws Exception {
+        serviceGame.unjoinGame(new UnjoinRequest(auth, gameID));
+        connections.remove(auth);
+        String username = serviceAuth.getUsername(new AuthData(auth, null));
+        var message = String.format("%s has left the game", username);
+        ServerMessage notification = new Notification(message);
+        connections.broadcast(auth, notification);
+    }
 //
 //    public void makeNoise(String petName, String sound) throws ResponseException {
 //        try {

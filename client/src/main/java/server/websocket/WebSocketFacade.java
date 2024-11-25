@@ -24,6 +24,7 @@ public class WebSocketFacade extends Endpoint { //need to extend Endpoint for we
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
+//            this.session.getBasicRemote().sendText(new Gson().toJson(new Connect("test", 2)));
 
             //set message handler
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
@@ -47,21 +48,21 @@ public class WebSocketFacade extends Endpoint { //need to extend Endpoint for we
     //Connect - Used for a user to request to connect to a game as a player or observer
     public void connect(String auth, GameData game) throws ResponseException {
         try {
-            Connect connect = new Connect(UserGameCommand.CommandType.CONNECT, auth, game.gameID());
+            Connect connect = new Connect(auth, game.gameID());
             this.session.getBasicRemote().sendText(new Gson().toJson(connect));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage()); //what should go here? should this be a good user response?
         }
     }
 
-//    public void leavePetShop(String visitorName) throws ResponseException {
-//        try {
-//            var action = new Action(Action.Type.EXIT, visitorName);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-//            this.session.close();
-//        } catch (IOException ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
+    public void leave(String auth, GameData game) throws ResponseException {
+        try{
+            Leave leave = new Leave(auth, game.gameID());
+            this.session.getBasicRemote().sendText(new Gson().toJson(leave));
+            this.session.close();
+        } catch (IOException ex){
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
 
 }

@@ -10,6 +10,7 @@ import model.UserData;
 import request.CreateRequest;
 import request.JoinRequest;
 import request.ListRequest;
+import request.UnjoinRequest;
 import result.CreateResult;
 import result.ListResult;
 import server.AlreadyTakenException;
@@ -60,6 +61,25 @@ public class GameService {
         playerTaken(game, passedInColor);
         dataAccessGame.updatePlayer(game, passedInColor, user.username());
         return "{}"; //json for empty object
+    }
+
+    public void unjoinGame(UnjoinRequest req) throws Exception {
+        AuthData auth = dataAccessAuth.get(req.auth());
+        serviceAuth.checkAuthTokenValid(auth);
+        GameData game = new GameData(req.gameID(), null, null, null, null);
+        game = dataAccessGame.get(game);
+        UserData user = new UserData(serviceAuth.getUsername(req.auth()), null, null);
+        user = dataAccessUser.get(user);
+        String playerToChange = null;
+        if(game.whiteUsername() != null && game.whiteUsername().equals(user.username())){
+            playerToChange = "WHITE";
+        }
+        else if(game.blackUsername() != null && game.blackUsername().equals(user.username())){
+            playerToChange = "BLACK";
+        }
+        if(playerToChange != null){ //if the person was an observer
+            dataAccessGame.updatePlayer(game, playerToChange, null);
+        }
     }
 
     public void clearAllGames(){

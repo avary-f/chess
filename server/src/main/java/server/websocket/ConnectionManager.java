@@ -39,10 +39,9 @@ public class ConnectionManager {
             CopyOnWriteArrayList<Connection> list = connections.get(gameID);
             for(Connection c: list){
                 if (c.session.isOpen()) {
-//                    if (!c.auth.equals(excludeAuth)) { //don't send the notification to yourself
-
-                    c.send(message.toString());
-//                    }
+                    if (!c.auth.equals(excludeAuth)) { //don't send the notification to yourself
+                        c.send(message);
+                    }
                 } else {
                     list.remove(c);
                     if(list.isEmpty()){
