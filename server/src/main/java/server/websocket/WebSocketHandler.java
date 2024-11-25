@@ -38,6 +38,7 @@ public class WebSocketHandler {
 //            case EXIT -> exit(action.visitorName());
         }
     }
+    //once you open a connection in websocket, this is the main place that messages go
 
     private void connect(String auth, Integer gameID, Session session) throws IOException {
         connections.add(auth, gameID, session);

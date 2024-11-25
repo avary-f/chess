@@ -99,6 +99,7 @@ public class ClientPostlogin extends ChessClient{
                     setGame(game);
                     setTeamColor(playerColor);
                     setState(State.GAMEPLAY);
+                    ws.connect(getAuth(), game);
                     return "You joined " + game.gameName() + " as " + playerColor +"\n";
                 } catch (RuntimeException ex) {
                     throw new ResponseException(403, "Player already taken.");

@@ -1,18 +1,15 @@
 package client;
 
 import model.GameData;
-import server.ResponseException;
 import server.websocket.ServerMessageHandler;
 
 public class ClientGameplay extends ChessClient{
-    private String teamColor;
-
 
     public ClientGameplay(String serverUrl, ServerMessageHandler serverMessageHandler, String auth, String clientName, GameData game, String teamColor) {
         super(serverUrl, serverMessageHandler);
         this.setState(State.GAMEPLAY);
         this.setAuth(auth);
-        this.teamColor = teamColor;
+        setTeamColor(teamColor);
         this.setClientName(clientName);
         this.setGame(game);
     }
@@ -30,7 +27,7 @@ public class ClientGameplay extends ChessClient{
     }
 
     private String redraw() {
-        BoardReader boardReaderMyColor = new BoardReader(getGame(), getTeamColor());
+        BoardReader boardReaderMyColor = new BoardReader(this.getGame(), this.getTeamColor());
         boardReaderMyColor.drawChessBoard();
         return "";
     }

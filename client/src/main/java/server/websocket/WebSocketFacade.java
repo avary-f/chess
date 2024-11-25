@@ -31,7 +31,7 @@ public class WebSocketFacade extends Endpoint { //need to extend Endpoint for we
                 public void onMessage(String message) {
                     ServerMessage messages = new Gson().fromJson(message, ServerMessage.class);
                     messageHandler.notify(messages);
-                }
+                } //this works with the on message in the websockethandler
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new ResponseException(500, ex.getMessage());
