@@ -36,11 +36,12 @@ public class ClientGameplay extends ChessClient{
 
     private String highlight(String[] params) {
         if(params.length == 1) {
+            String input = params[0];
             BoardReader boardReaderMyColor = new BoardReader(this.getGame(), this.getTeamColor());
-            boardReaderMyColor.drawChessBoard();
+            boardReaderMyColor.drawHighlightChessBoard(input);
             return "";
         } else{
-            throw new ResponseException(400, "Expected: <RowCol> (ex: e5) ");
+            throw new ResponseException(400, "Expected: <ColRow> (ex: e5) ");
         }
     }
 
@@ -53,21 +54,12 @@ public class ClientGameplay extends ChessClient{
         return "You have left the game. Type 'help' to continue.";
     }
 
-//    private String highlight(String[] params){
-//        if(params.length == 1){
-//
-//        }
-//        else{
-//            throw new ResponseException(400, "")
-//        }
-//    }
-
     @Override
     public String help() {
         return """
             redraw chess board
-            highlight legal moves <RowCol>
-            make move <Current_RowCol> <Desired_RowCol>
+            highlight legal moves <ColRow>
+            make move <Current_ColRow> <Desired_ColRow>
             resign
             leave
             help

@@ -1,8 +1,13 @@
 package client;
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
+import server.ResponseException;
+import server.ServerResponse;
+import websocket.messages.Error;
+
 import static ui.EscapeSequences.*;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -66,7 +71,7 @@ public class BoardReader { //prints out the board
             out.print(EMPTY);
             for (int col = 1; col <= BOARD_SIZE_IN_SQUARES; col++) {
                 if ((row + col) % 2 == 0) {
-                    setWhite(out);
+                    setGrey(out);
                 } else {
                     setMagenta(out);
                 }
@@ -92,7 +97,82 @@ public class BoardReader { //prints out the board
         drawHeaders();
     }
 
-    private void setWhite(PrintStream out) {
+    public void drawHighlightChessBoard(String input) {
+        if(!rows.contains(input.substring(0, 1)) || !columns.contains(input.substring(1, 2))){ //has to be valid input
+            throw new ResponseException(400, "Invalid chess position");
+        }
+        ChessPosition position = getPiecePosition(input);
+        Collection<ChessMove> validMoves = game.game.validMoves(position);
+        setup();
+        drawHeaders();
+        for (int row = BOARD_SIZE_IN_SQUARES; row > 0 ; row--) {
+            out.print(EMPTY);
+            printCharText(rows.get(row - 1));
+            out.print(EMPTY);
+            for (int col = 1; col <= BOARD_SIZE_IN_SQUARES; col++) {
+                if ((row + col) % 2 == 0) {
+                    setGrey(out);
+                    for (ChessMove move : validMoves) {
+                        if (move.getEndPosition().equals(new ChessPosition(row, col))) {
+                            setDarkRed(out);
+                            break;
+                        }
+                    }
+                } else {
+                    setMagenta(out);
+                    for (ChessMove move : validMoves) {
+                        if (move.getEndPosition().equals(new ChessPosition(row, col))) {
+                            setLightRed(out);
+                            break;
+                        }
+                    }
+                }
+                int tempR = row;
+                int tempC = col;
+                if(playerColor.equals("BLACK")){ //change orientation if necessary
+                    tempR = reverseCount - tempR;
+                    tempC = reverseCount - tempC;
+                }
+                ChessPiece piece = game.game.getBoard().getPiece(new ChessPosition(tempR, tempC));
+                if (piece != null) {
+                    printPlayer(out, tempR, tempC, piece.getTeamColor()); // Print the piece on this square
+
+                } else {
+                    out.print(WHITE_PAWN); // Empty space in non-middle rows of square
+                }
+                setBlack(out); //reset for the next square
+            }
+            out.print(EMPTY);
+            printCharText(rows.get(row - 1));
+            out.println(); //move to next row
+        }
+        drawHeaders();
+    }
+
+    private ChessPosition getPiecePosition(String position) {
+        return new ChessPosition(getRow(position.substring(0, 1)), getCol(position.substring(1, 2)));
+    }
+
+    private int getCol(String c) {
+        for(int i = 0; i < 8; i++){
+            if(c.equals(columns.get(i))){
+                return i + 1;
+            }
+        }
+        return -1;
+
+    }
+
+    private int getRow(String r) {
+        for(int i = 0; i < 8; i++){
+            if(r.equals(rows.get(i))){
+                return i + 1;
+            }
+        }
+        return -1;
+    }
+
+    private void setGrey(PrintStream out) {
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(SET_TEXT_COLOR_LIGHT_GREY);
     }
@@ -106,6 +186,16 @@ public class BoardReader { //prints out the board
     private void setBlack(PrintStream out) {
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_BLACK);
+    }
+
+    private void setLightRed(PrintStream out) {
+        out.print(SET_BG_COLOR_LIGHT_RED);
+        out.print(SET_TEXT_COLOR_LIGHT_RED);
+    }
+
+    private void setDarkRed(PrintStream out) {
+        out.print(SET_BG_COLOR_RED);
+        out.print(SET_TEXT_COLOR_RED);
     }
 
     private void printPlayer(PrintStream out, int row, int col, ChessGame.TeamColor teamColor) {
