@@ -34,6 +34,18 @@ public class BoardReader { //prints out the board
         Collections.reverse(rows); //modifies rows directly
     }
 
+    private ChessPosition reversePosition(ChessPosition position){
+        int tempR = position.getRow();
+        int tempC = position.getColumn();
+        if(playerColor.equals(ChessGame.TeamColor.BLACK)){ //change orientation if necessary
+            //int used in the reversal process
+            int reverseCount = 9;
+            tempR = reverseCount - tempR;
+            tempC = reverseCount - tempC;
+        }
+        return new ChessPosition(tempR, tempC);
+    }
+
     private void drawHeaders() {
         setBlack(out);
         out.print(" ");
@@ -84,15 +96,7 @@ public class BoardReader { //prints out the board
     public void highlightChessBoard(Collection<ChessMove> validMoves, ChessPosition position) {
         boolean highlight = position != null && validMoves != null;
         if(position != null){
-            int tempR = position.getRow();
-            int tempC = position.getColumn();
-            if(playerColor.equals(ChessGame.TeamColor.BLACK)){ //change orientation if necessary
-                //int used in the reversal process
-                int reverseCount = 9;
-                tempR = reverseCount - tempR;
-                tempC = reverseCount - tempC;
-            }
-            position = new ChessPosition(tempR, tempC);
+            position = reversePosition(position);
         }
         setup();
         drawHeaders();
@@ -108,18 +112,10 @@ public class BoardReader { //prints out the board
                     setMagenta(out);
                     if(highlight) {checkForHighlight(true, validMoves, row, col, position);} //1 = light squares
                 }
-                //Reverse the board if needed
-                int tempR = row;
-                int tempC = col;
-                if(playerColor.equals(ChessGame.TeamColor.BLACK)){ //change orientation if necessary
-                    //int used in the reversal process
-                    int reverseCount = 9;
-                    tempR = reverseCount - tempR;
-                    tempC = reverseCount - tempC;
-                }
-                ChessPiece piece = game.game.getBoard().getPiece(new ChessPosition(tempR, tempC));
+                ChessPosition curPos = reversePosition(new ChessPosition(row, col));
+                ChessPiece piece = game.game.getBoard().getPiece(curPos);
                 if (piece != null) {
-                    printPlayer(out, tempR, tempC, piece.getTeamColor()); // print the piece on this square
+                    printPlayer(out, curPos, piece.getTeamColor()); // print the piece on this square
 
                 } else {
                     out.print(WHITE_PAWN); // empty space
@@ -149,14 +145,6 @@ public class BoardReader { //prints out the board
                 setColor(lightSquare);
                 break;
             }
-        }
-    }
-
-    private void setColor(boolean lightSquare){
-        if (lightSquare) {
-            setLightBlue(out);
-        } else {
-            setDarkBlue(out);
         }
     }
 
@@ -193,6 +181,35 @@ public class BoardReader { //prints out the board
         }
     }
 
+    private void printPlayer(PrintStream out, ChessPosition pos, ChessGame.TeamColor teamColor) {
+        if(teamColor.equals(ChessGame.TeamColor.WHITE)){
+            out.print(SET_TEXT_COLOR_WHITE);
+        }
+        else{
+            out.print(SET_TEXT_COLOR_BLACK);
+        }
+        String mappedPeice = mappedPiece(game.game.getBoard().getPiece(pos));
+        out.print(mappedPeice);
+    }
+
+    private String mappedPiece(ChessPiece piece){
+        return switch (piece.getPieceType()) {
+            case QUEEN -> BLACK_QUEEN;
+            case PAWN -> BLACK_PAWN;
+            case KING -> BLACK_KING;
+            case KNIGHT -> BLACK_KNIGHT;
+            case ROOK -> BLACK_ROOK;
+            case BISHOP -> BLACK_BISHOP;
+        };
+    }
+
+    private void setColor(boolean lightSquare){
+        if (lightSquare) {
+            setLightBlue(out);
+        } else {
+            setDarkBlue(out);
+        }
+    }
 
     private void setGrey(PrintStream out) {
         out.print(SET_BG_COLOR_LIGHT_GREY);
@@ -218,27 +235,5 @@ public class BoardReader { //prints out the board
     private void setDarkBlue(PrintStream out) {
         out.print(SET_BG_COLOR_DARK_BLUE);
         out.print(SET_TEXT_COLOR_DARK_BLUE);
-    }
-
-    private void printPlayer(PrintStream out, int row, int col, ChessGame.TeamColor teamColor) {
-        if(teamColor.equals(ChessGame.TeamColor.WHITE)){
-            out.print(SET_TEXT_COLOR_WHITE);
-        }
-        else{
-            out.print(SET_TEXT_COLOR_BLACK);
-        }
-        String mappedPeice = mappedPiece(game.game.getBoard().getPiece(new ChessPosition(row, col)));
-        out.print(mappedPeice);
-    }
-
-    private String mappedPiece(ChessPiece piece){
-        return switch (piece.getPieceType()) {
-            case QUEEN -> BLACK_QUEEN;
-            case PAWN -> BLACK_PAWN;
-            case KING -> BLACK_KING;
-            case KNIGHT -> BLACK_KNIGHT;
-            case ROOK -> BLACK_ROOK;
-            case BISHOP -> BLACK_BISHOP;
-        };
     }
 }
