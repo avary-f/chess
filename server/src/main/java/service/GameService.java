@@ -87,6 +87,7 @@ public class GameService {
         GameData game = new GameData(req.gameID(), null, null, null, null);
         game = dataAccessGame.get(game);
         game.game.makeMove(move);
+        dataAccessGame.updateGame(game);
     }
 
     public void clearAllGames(){

@@ -11,5 +11,7 @@ public interface GameDAO {
     GameData get(GameData game);
     boolean nameExists(GameData game);
     void updatePlayer(GameData game, String playerColor, String username);
+    void updateGame(GameData game);
+
     ArrayList<GameData> getAll();
 }

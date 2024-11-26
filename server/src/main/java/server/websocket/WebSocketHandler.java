@@ -44,19 +44,21 @@ public class WebSocketHandler {
         switch (cmd.getCommandType()) {
             case CONNECT -> connect(cmd.getAuthToken(), cmd.getGameID(), session);
             case LEAVE -> leave(cmd.getAuthToken(), cmd.getGameID());
-            case MAKE_MOVE -> makeMove(cmd.getAuthToken(), cmd.getGameID(), cmd);
+            case MAKE_MOVE -> makeMove(cmd.getAuthToken(), cmd.getGameID(), message);
         }
     }//once you open a connection in websocket, this is the main place that messages go
 
-    private void makeMove(String auth, Integer gameID, UserGameCommand cmd) throws Exception {
-        MakeMove moveCmd = (MakeMove) cmd; // Cast cmd to MakeMove
-        ChessMove move = moveCmd.getMove();
+    private void makeMove(String auth, Integer gameID, String msg) throws Exception {
+        MakeMove cmdMove = new Gson().fromJson(msg, MakeMove.class);
+        ChessMove move = cmdMove.getMove();
         String username = serviceAuth.getUsername(new AuthData(auth, null));
         serviceGame.makeMove(new MoveRequest(auth, gameID, move));
         var message = String.format("%s moved " + convertColumns(move.getStartPosition()) + " to " +
                 convertColumns(move.getEndPosition()), username);
         ServerMessage notification = new Notification(message);
         connections.broadcast(auth, notification);
+        //need to check if there is anything to broadcast to the user about game status
+        // need to do a loadgame message
     }
 
     private String convertColumns(ChessPosition pos){

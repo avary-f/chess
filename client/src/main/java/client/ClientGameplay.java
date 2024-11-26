@@ -11,15 +11,17 @@ import java.util.List;
 
 public class ClientGameplay extends ChessClient{
 
-    private BoardReader boardReader = new BoardReader(getGame(), getTeamColor());
+    private final BoardReader boardReader;
 
-    public ClientGameplay(String serverUrl, ServerMessageHandler serverMessageHandler, String auth, String clientName, GameData game, String teamColor) {
+    public ClientGameplay(String serverUrl, ServerMessageHandler serverMessageHandler, String auth, String clientName,
+                          GameData game, String teamColor) {
         super(serverUrl, serverMessageHandler);
         this.setState(State.GAMEPLAY);
         this.setAuth(auth);
         setTeamColor(teamColor);
         this.setClientName(clientName);
         this.setGame(game);
+        boardReader = new BoardReader(getGame(), getTeamColor());
     }
 
     @Override
@@ -36,7 +38,7 @@ public class ClientGameplay extends ChessClient{
 
     private void checkValidInput(String[] input){
         for(String s: input){
-            if(!boardReader.getColumns().contains(s.substring(0, 1))
+            if(s.length() != 2 || !boardReader.getColumns().contains(s.substring(0, 1))
                     || !boardReader.getRows().contains(s.substring(1, 2))){ //has to be valid input
                 throw new ResponseException(400, "Invalid chess position");
             }
@@ -44,13 +46,14 @@ public class ClientGameplay extends ChessClient{
     }
 
     private String makeMove(String[] params) {
-        if(params.length == 2) {
+        if(params.length == 2 || params.length == 3) { //the 3rd param is the promotion piece
             checkValidInput(params);
             String moveFrom = params[0];
             String moveTo = params[1];
             ChessMove move = new ChessMove(convertColumns(moveFrom), convertColumns(moveTo), null);
             //is passing in a null value for the promotion piece bad? Will that be changed later?
             ws.makeMove(getAuth(), getGame(), move);
+            boardReader.drawMoveChessBoard(move);
             //print the board where the piece was moved to
             return "";
         } else{

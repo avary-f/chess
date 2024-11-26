@@ -97,9 +97,10 @@ public class BoardReader { //prints out the board
         highlightChessBoard(validMoves, position);
     }
 
-    public void drawMoveChessBoard(){
-        Collection<ChessMove> moveToMake;
-//        highlightChessBoard(moveToMake, position);
+    public void drawMoveChessBoard(ChessMove move){
+        Collection<ChessMove> moveToMake = new ArrayList<>();
+        moveToMake.add(move);
+        highlightChessBoard(moveToMake, move.getStartPosition());
     }
 
     public void highlightChessBoard(Collection<ChessMove> validMoves, ChessPosition position) {

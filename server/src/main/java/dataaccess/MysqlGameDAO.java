@@ -62,6 +62,13 @@ public class MysqlGameDAO extends MysqlDAO implements GameDAO{
     }
 
     @Override
+    public void updateGame(GameData game) {
+        String statement = "UPDATE games SET game = ? WHERE gameName = ?";
+        String gameJsonString = new Gson().toJson(game.game());
+        execute(statement, gameJsonString, game.gameName());
+    }
+
+    @Override
     public ArrayList<GameData> getAll() {
         String statement = "SELECT id FROM games";
         Object result = execute(statement);
