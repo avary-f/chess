@@ -113,16 +113,16 @@ public class BoardReader { //prints out the board
                 if ((row + col) % 2 == 0) {
                     setGrey(out);
                     for (ChessMove move : validMoves) {
-                        if (move.getEndPosition().equals(new ChessPosition(row, col))) {
-                            setDarkRed(out);
+                        if (move.getEndPosition().equals(new ChessPosition(row, col)) || position.equals(new ChessPosition(row, col))) {
+                            setDarkGrey(out);
                             break;
                         }
                     }
                 } else {
                     setMagenta(out);
                     for (ChessMove move : validMoves) {
-                        if (move.getEndPosition().equals(new ChessPosition(row, col))) {
-                            setLightRed(out);
+                        if (move.getEndPosition().equals(new ChessPosition(row, col)) || position.equals(new ChessPosition(row, col))) {
+                            setPurple(out);
                             break;
                         }
                     }
@@ -188,14 +188,14 @@ public class BoardReader { //prints out the board
         out.print(SET_TEXT_COLOR_BLACK);
     }
 
-    private void setLightRed(PrintStream out) {
-        out.print(SET_BG_COLOR_LIGHT_RED);
-        out.print(SET_TEXT_COLOR_LIGHT_RED);
+    private void setPurple(PrintStream out) {
+        out.print(SET_BG_COLOR_BLUE);
+        out.print(SET_TEXT_COLOR_BLUE);
     }
 
-    private void setDarkRed(PrintStream out) {
-        out.print(SET_BG_COLOR_RED);
-        out.print(SET_TEXT_COLOR_RED);
+    private void setDarkGrey(PrintStream out) {
+        out.print(SET_BG_COLOR_PURPLE);
+        out.print(SET_TEXT_COLOR_PURPLE);
     }
 
     private void printPlayer(PrintStream out, int row, int col, ChessGame.TeamColor teamColor) {
