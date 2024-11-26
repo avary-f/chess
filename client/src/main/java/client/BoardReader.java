@@ -29,6 +29,14 @@ public class BoardReader { //prints out the board
         this.game = game;
     }
 
+    public ArrayList<String> getColumns() {
+        return columns;
+    }
+
+    public ArrayList<String> getRows() {
+        return rows;
+    }
+
     private void reverseOrinetation(){
         Collections.reverse(columns); //modifies columns directly
         Collections.reverse(rows); //modifies rows directly
@@ -78,9 +86,6 @@ public class BoardReader { //prints out the board
     }
 
     public void drawHighlightChessBoard(String input){
-        if(!columns.contains(input.substring(0, 1)) || !rows.contains(input.substring(1, 2))){ //has to be valid input
-            throw new ResponseException(400, "Invalid chess position");
-        }
         ChessPosition position = getPiecePosition(input);
         Collection<ChessMove> validMoves = game.game.validMoves(position);
         if(game.game.getBoard().getPiece(position) == null){
@@ -89,8 +94,12 @@ public class BoardReader { //prints out the board
         else if(!game.game.getBoard().getPiece(position).getTeamColor().equals(playerColor)){ //if it's the other teams piece
             throw new ResponseException(400, "Invalid chess position: You cannot highlight opponent pieces");
         }
-
         highlightChessBoard(validMoves, position);
+    }
+
+    public void drawMoveChessBoard(){
+        Collection<ChessMove> moveToMake;
+//        highlightChessBoard(moveToMake, position);
     }
 
     public void highlightChessBoard(Collection<ChessMove> validMoves, ChessPosition position) {

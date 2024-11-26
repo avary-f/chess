@@ -1,5 +1,7 @@
 package server.websocket;
 
+import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import model.GameData;
 import server.ResponseException;
@@ -11,6 +13,8 @@ import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WebSocketFacade extends Endpoint { //need to extend Endpoint for websocket to work properly
     Session session; //this is a class from Spark? or from Glass fish?
@@ -52,6 +56,15 @@ public class WebSocketFacade extends Endpoint { //need to extend Endpoint for we
             this.session.getBasicRemote().sendText(new Gson().toJson(connect));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage()); //what should go here? should this be a good user response?
+        }
+    }
+
+    public void makeMove(String auth, GameData game, ChessMove move) throws ResponseException {
+        try {
+            MakeMove makeMove = new MakeMove(auth, game.gameID(), move);
+            this.session.getBasicRemote().sendText(new Gson().toJson(makeMove));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
         }
     }
 

@@ -1,16 +1,14 @@
 package service;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import request.CreateRequest;
-import request.JoinRequest;
-import request.ListRequest;
-import request.UnjoinRequest;
+import request.*;
 import result.CreateResult;
 import result.ListResult;
 import server.AlreadyTakenException;
@@ -80,6 +78,15 @@ public class GameService {
         if(playerToChange != null){ //if the person was an observer
             dataAccessGame.updatePlayer(game, playerToChange, null);
         }
+    }
+
+    public void makeMove(MoveRequest req) throws Exception {
+        AuthData auth = dataAccessAuth.get(req.auth());
+        serviceAuth.checkAuthTokenValid(auth);
+        ChessMove move = req.move();
+        GameData game = new GameData(req.gameID(), null, null, null, null);
+        game = dataAccessGame.get(game);
+        game.game.makeMove(move);
     }
 
     public void clearAllGames(){

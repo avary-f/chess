@@ -1,9 +1,13 @@
 package server.websocket;
 
+import chess.ChessBoard;
+import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 //import dataaccess.DataAccess;
 import model.AuthData;
 import request.JoinRequest;
+import request.MoveRequest;
 import request.UnjoinRequest;
 import server.ServerResponse;
 import org.eclipse.jetty.websocket.api.Session;
@@ -17,6 +21,8 @@ import websocket.commands.*;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebSocket
 public class WebSocketHandler {
@@ -38,9 +44,25 @@ public class WebSocketHandler {
         switch (cmd.getCommandType()) {
             case CONNECT -> connect(cmd.getAuthToken(), cmd.getGameID(), session);
             case LEAVE -> leave(cmd.getAuthToken(), cmd.getGameID());
+            case MAKE_MOVE -> makeMove(cmd.getAuthToken(), cmd.getGameID(), cmd);
         }
+    }//once you open a connection in websocket, this is the main place that messages go
+
+    private void makeMove(String auth, Integer gameID, UserGameCommand cmd) throws Exception {
+        MakeMove moveCmd = (MakeMove) cmd; // Cast cmd to MakeMove
+        ChessMove move = moveCmd.getMove();
+        String username = serviceAuth.getUsername(new AuthData(auth, null));
+        serviceGame.makeMove(new MoveRequest(auth, gameID, move));
+        var message = String.format("%s moved " + convertColumns(move.getStartPosition()) + " to " +
+                convertColumns(move.getEndPosition()), username);
+        ServerMessage notification = new Notification(message);
+        connections.broadcast(auth, notification);
     }
-    //once you open a connection in websocket, this is the main place that messages go
+
+    private String convertColumns(ChessPosition pos){
+        ArrayList<String> columns = new ArrayList<>(List.of("a", "b", "c", "d", "e", "f", "g", "h"));
+        return columns.get(pos.getColumn()) + pos.getRow();
+    }
 
     private void connect(String auth, Integer gameID, Session session) throws IOException {
         connections.add(auth, gameID, session);
@@ -58,14 +80,5 @@ public class WebSocketHandler {
         ServerMessage notification = new Notification(message);
         connections.broadcast(auth, notification);
     }
-//
-//    public void makeNoise(String petName, String sound) throws ResponseException {
-//        try {
-//            var message = String.format("%s says %s", petName, sound);
-//            var notification = new Notification(Notification.Type.NOISE, message);
-//            connections.broadcast("", notification);
-//        } catch (Exception ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
+
 }
