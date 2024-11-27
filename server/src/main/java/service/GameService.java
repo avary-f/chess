@@ -46,8 +46,8 @@ public class GameService {
     }
 
     public Object joinGame(JoinRequest req) throws Exception {
-        String passedInColor = req.playerColor();
-        if(passedInColor == null || (!passedInColor.equals("WHITE") && !req.playerColor().equals("BLACK"))){
+        ChessGame.TeamColor passedInColor = convertToColorType(req.playerColor());
+        if(passedInColor == null){
             throw new BadRequestException();
         }
         AuthData auth = dataAccessAuth.get(req.auth());
@@ -61,6 +61,16 @@ public class GameService {
         return "{}"; //json for empty object
     }
 
+    private ChessGame.TeamColor convertToColorType(String s) {
+        if(s.equals("WHITE")){
+            return ChessGame.TeamColor.WHITE;
+        }
+        else if(s.equals("BLACK")){
+            return ChessGame.TeamColor.BLACK;
+        }
+        return null;
+    }
+
     public void unjoinGame(UnjoinRequest req) throws Exception {
         AuthData auth = dataAccessAuth.get(req.auth());
         serviceAuth.checkAuthTokenValid(auth);
@@ -68,34 +78,41 @@ public class GameService {
         game = dataAccessGame.get(game);
         UserData user = new UserData(serviceAuth.getUsername(req.auth()), null, null);
         user = dataAccessUser.get(user);
-        String playerToChange = null;
-        if(game.whiteUsername() != null && game.whiteUsername().equals(user.username())){
-            playerToChange = "WHITE";
-        }
-        else if(game.blackUsername() != null && game.blackUsername().equals(user.username())){
-            playerToChange = "BLACK";
-        }
+        ChessGame.TeamColor playerToChange = getPlayerColor(game, user);
         if(playerToChange != null){ //if the person was an observer
             dataAccessGame.updatePlayer(game, playerToChange, null);
         }
     }
 
-    public void makeMove(MoveRequest req) throws Exception {
+    private ChessGame.TeamColor getPlayerColor(GameData game, UserData user){
+        if(game.whiteUsername() != null && game.whiteUsername().equals(user.username())){
+            return ChessGame.TeamColor.WHITE;
+        }
+        else if(game.blackUsername() != null && game.blackUsername().equals(user.username())){
+            return ChessGame.TeamColor.BLACK;
+        }
+        return null;
+    }
+
+    public GameData makeMove(MoveRequest req) throws Exception {
         AuthData auth = dataAccessAuth.get(req.auth());
         serviceAuth.checkAuthTokenValid(auth);
         ChessMove move = req.move();
         GameData game = new GameData(req.gameID(), null, null, null, null);
         game = dataAccessGame.get(game);
-        game.game.makeMove(move);
+//        UserData user = new UserData(serviceAuth.getUsername(req.auth()), null, null);
+//        user = dataAccessUser.get(user);
+        game.game.makeMove(move); //throws invalid MoveException
         dataAccessGame.updateGame(game);
+        return game;
     }
 
     public void clearAllGames(){
         dataAccessGame.clearAll();
     }
 
-    private void playerTaken(GameData game, String color) throws AlreadyTakenException {
-        if (color.equals("WHITE")) { //player wants to be white
+    private void playerTaken(GameData game, ChessGame.TeamColor color) throws AlreadyTakenException {
+        if (color.equals(ChessGame.TeamColor.WHITE)) { //player wants to be white
             if (dataAccessGame.get(game).whiteUsername() != null) {
                 throw new AlreadyTakenException();
             }
@@ -106,4 +123,8 @@ public class GameService {
         }
     }
 
+    public GameData getGame(Integer gameID) {
+        GameData game = new GameData(gameID, null, null, null, null);
+        return dataAccessGame.get(game);
+    }
 }

@@ -33,7 +33,6 @@ public class ConnectionManager {
         }
     }
 
-
     public void broadcast(String excludeAuth, ServerMessage message) throws IOException {
         for (Integer gameID : connections.keySet()) {
             CopyOnWriteArrayList<Connection> list = connections.get(gameID);
@@ -47,6 +46,17 @@ public class ConnectionManager {
                     if(list.isEmpty()){
                         connections.remove(gameID); //if there are no connections
                     }
+                }
+            }
+        }
+    }
+
+    public void broadcastToMe(String myAuth, ServerMessage message) throws IOException {
+        for (Integer gameID : connections.keySet()) {
+            CopyOnWriteArrayList<Connection> list = connections.get(gameID);
+            for(Connection c: list){
+                if (c.session.isOpen() && c.auth.equals(myAuth)) {
+                    c.send(message);
                 }
             }
         }

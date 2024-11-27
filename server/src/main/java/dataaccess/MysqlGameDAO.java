@@ -55,8 +55,8 @@ public class MysqlGameDAO extends MysqlDAO implements GameDAO{
     }
 
     @Override
-    public void updatePlayer(GameData game, String playerColor, String username) {
-        String statement = playerColor.equals("WHITE") ? "UPDATE games SET whiteUsername = ? WHERE gameName = ?" :
+    public void updatePlayer(GameData game, ChessGame.TeamColor playerColor, String username) {
+        String statement = playerColor.equals(ChessGame.TeamColor.WHITE) ? "UPDATE games SET whiteUsername = ? WHERE gameName = ?" :
                 "UPDATE games SET blackUsername = ? WHERE gameName = ?";
         execute(statement, username, game.gameName());
     }

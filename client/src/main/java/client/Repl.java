@@ -1,13 +1,16 @@
 package client;
 
 import server.websocket.ServerMessageHandler;
+import websocket.messages.Error;
+import websocket.messages.LoadGame;
+import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class Repl implements ServerMessageHandler {
+public class Repl {
     private ChessClient client;
     private String serverUrl;
 
@@ -30,7 +33,7 @@ public class Repl implements ServerMessageHandler {
         while (!(result.equals("quit") && client instanceof ClientPrelogin)) {
         //if you press quit & you are in the prelogin repl loop
             clientUpdate();
-            printPrompt();
+            client.printPrompt();
             String line = scanner.nextLine();
             try {
                 result = client.eval(line);
@@ -47,28 +50,15 @@ public class Repl implements ServerMessageHandler {
     private void clientUpdate(){
         if(client.isLoggedIn()) { //if client is logged in
             if(client.isInGameplay()){
-                client = new ClientGameplay(serverUrl, this, client.getAuth(), client.getClientName(), client.getGame(), client.getTeamColor());
+                client = new ClientGameplay(serverUrl, client.getAuth(), client.getClientName(), client.getGame(), client.getTeamColor());
             }
             else{
-                client = new ClientPostlogin(serverUrl, this, client.getAuth(), client.getClientName());
+                client = new ClientPostlogin(serverUrl, client.getAuth(), client.getClientName());
             }
         }
         else if(!client.isLoggedIn()){
             client = new ClientPrelogin(serverUrl);
         }
-    }
-    private void printPrompt() {
-        if(client instanceof ClientPrelogin && !client.isLoggedIn() && !client.isInGameplay()){ //if they are signed out
-            System.out.print("\n" + RESET + "[LOGGED_OUT] >>> " + GREEN);
-        }
-        else{ //if they are signed in
-            System.out.print("\n" + RESET + "[" + client.getClientName().toUpperCase() + "] >>> " + GREEN);
-        }
-
-    }
-    public void notify(ServerMessage message) {
-        System.out.println(RED + message.getMessage());
-        printPrompt();
     }
 
 }

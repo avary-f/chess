@@ -10,7 +10,7 @@ public interface GameDAO {
     void create(GameData game);
     GameData get(GameData game);
     boolean nameExists(GameData game);
-    void updatePlayer(GameData game, String playerColor, String username);
+    void updatePlayer(GameData game, ChessGame.TeamColor playerColor, String username);
     void updateGame(GameData game);
 
     ArrayList<GameData> getAll();

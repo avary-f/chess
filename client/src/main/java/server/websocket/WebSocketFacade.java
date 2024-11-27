@@ -1,11 +1,12 @@
 package server.websocket;
 
 import chess.ChessMove;
-import chess.ChessPosition;
 import com.google.gson.Gson;
 import model.GameData;
 import server.ResponseException;
 import websocket.commands.*;
+import websocket.messages.Error;
+import websocket.messages.LoadGame;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
@@ -13,8 +14,7 @@ import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class WebSocketFacade extends Endpoint { //need to extend Endpoint for websocket to work properly
     Session session; //this is a class from Spark? or from Glass fish?
@@ -28,14 +28,17 @@ public class WebSocketFacade extends Endpoint { //need to extend Endpoint for we
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(new Connect("test", 2)));
 
             //set message handler
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage messages = new Gson().fromJson(message, ServerMessage.class);
-                    messageHandler.notify(messages);
+                    switch (messages.getServerMessageType()){
+                        case NOTIFICATION -> messageHandler.notify(new Gson().fromJson(message, Notification.class));
+                        case ERROR -> messageHandler.notify(new Gson().fromJson(message, Error.class));
+                        case LOAD_GAME -> messageHandler.notify(new Gson().fromJson(message, LoadGame.class));
+                    }
                 } //this works with the on message in the websockethandler
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
