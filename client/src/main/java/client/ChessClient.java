@@ -106,7 +106,6 @@ public abstract class ChessClient implements ServerMessageHandler{
         printPrompt();
     }
     public void notify(LoadGame message) {
-        System.out.println("testing");
         System.out.print(RESET_BG_COLOR);
         setGame(message.game());
         boardReader = new BoardReader(getGame(), getTeamColor());
@@ -116,7 +115,7 @@ public abstract class ChessClient implements ServerMessageHandler{
     }
     public void notify(Error message) {
         System.out.print(RESET_BG_COLOR);
-        System.out.println(RED + message.getMessage());
+        System.out.println(RED + message.getErrorMessage());
         printPrompt();
     }
 

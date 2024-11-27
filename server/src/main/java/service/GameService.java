@@ -100,8 +100,11 @@ public class GameService {
         ChessMove move = req.move();
         GameData game = new GameData(req.gameID(), null, null, null, null);
         game = dataAccessGame.get(game);
-//        UserData user = new UserData(serviceAuth.getUsername(req.auth()), null, null);
-//        user = dataAccessUser.get(user);
+        UserData user = new UserData(serviceAuth.getUsername(req.auth()), null, null);
+        user = dataAccessUser.get(user);
+        if(!game.game.getBoard().getPiece(move.getStartPosition()).getTeamColor().equals(getPlayerColor(game, user))){
+            throw new BadRequestException();
+        }//check that I am asking to move my own piece
         game.game.makeMove(move); //throws invalid MoveException
         dataAccessGame.updateGame(game);
         return game;
@@ -123,8 +126,12 @@ public class GameService {
         }
     }
 
-    public GameData getGame(Integer gameID) {
+    public GameData getGame(Integer gameID) throws BadRequestException {
         GameData game = new GameData(gameID, null, null, null, null);
-        return dataAccessGame.get(game);
+        game = dataAccessGame.get(game);
+        if(game == null){
+            throw new BadRequestException();
+        }
+        return game;
     }
 }

@@ -1,5 +1,6 @@
 package server.websocket;
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
@@ -51,14 +52,9 @@ public class ConnectionManager {
         }
     }
 
-    public void broadcastToMe(String myAuth, ServerMessage message) throws IOException {
-        for (Integer gameID : connections.keySet()) {
-            CopyOnWriteArrayList<Connection> list = connections.get(gameID);
-            for(Connection c: list){
-                if (c.session.isOpen() && c.auth.equals(myAuth)) {
-                    c.send(message);
-                }
-            }
+    public void broadcastToMe(Session session, ServerMessage message) throws IOException {
+        if (session.isOpen()) {
+            session.getRemote().sendString(new Gson().toJson(message));
         }
     }
 }

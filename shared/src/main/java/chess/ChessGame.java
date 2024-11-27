@@ -141,8 +141,11 @@ public class ChessGame{
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
-        if(moves == null || moves.isEmpty() || !moves.contains(move) || board.getPiece(move.getStartPosition()).getTeamColor() != getTeamTurn()){
+        if(moves == null || moves.isEmpty() || !moves.contains(move)){
             throw new InvalidMoveException("Invalid Move");
+        }
+        if(!board.getPiece(move.getStartPosition()).getTeamColor().equals(getTeamTurn())){
+            throw new InvalidMoveException("Other player's turn");
         }
         else {
             ChessPiece piece = board.removePiece(move.getStartPosition());
