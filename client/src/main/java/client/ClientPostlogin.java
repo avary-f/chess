@@ -93,13 +93,12 @@ public class ClientPostlogin extends ChessClient{
                 GameData game = getGameFromGameIndexMap(index);
                 try{
                     server.joinGame(new JoinRequest(getAuth(), playerColor, game.gameID()));
-                    BoardReader boardReaderMyColor = new BoardReader(game, playerColor); //orient board based on your color
-                    boardReaderMyColor.drawChessBoard();
                     setGame(game);
                     setTeamColor(playerColor);
                     setState(State.GAMEPLAY);
                     ws.connect(getAuth(), game);
-                    return "You joined " + game.gameName() + " as " + playerColor +"\n";
+//                    return "You joined " + game.gameName() + " as " + playerColor +"\n";
+                    return "";
                 } catch (RuntimeException ex) {
                     throw new ResponseException(403, "Player already taken.");
                 }

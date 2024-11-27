@@ -110,7 +110,6 @@ public abstract class ChessClient implements ServerMessageHandler{
         setGame(message.game());
         boardReader = new BoardReader(getGame(), getTeamColor());
         boardReader.drawChessBoard();
-        System.out.println(BLUE + message.getMessage());
         printPrompt();
     }
     public void notify(Error message) {
