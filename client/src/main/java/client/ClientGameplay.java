@@ -28,10 +28,16 @@ public class ClientGameplay extends ChessClient{
             case "redraw" -> redraw();
             case "highlight" -> highlight(params);
             case "move" -> makeMove(params);
-//            case "resign" -> resign();
+            case "resign" -> resign();
             case "leave" -> leave();
             default -> help();
         };
+    }
+
+    private String resign() {
+        getGame().game.setEndOfGame();
+        ws.resign(getAuth(), getGame());
+        return "Game over. You have resigned";
     }
 
     private void checkValidInput(String[] input){
@@ -46,6 +52,9 @@ public class ClientGameplay extends ChessClient{
     private String makeMove(String[] params) throws ResponseException {
         if(params.length == 2 || params.length == 3) { //the 3rd param is the promotion piece
             checkValidInput(params);
+            if(getGame().game.isGameEnded()){
+                throw new ResponseException(422, "Error: Game has ended");
+            }
             ChessPiece.PieceType promotion = null;
             if(params.length == 3){
                 promotion = getPromotionPieceType(params[2]);

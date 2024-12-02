@@ -54,31 +54,29 @@ public class WebSocketFacade extends Endpoint { //need to extend Endpoint for we
 
     //Connect - Used for a user to request to connect to a game as a player or observer
     public void connect(String auth, GameData game) throws ResponseException {
-        try {
-            Connect connect = new Connect(auth, game.gameID());
-            this.session.getBasicRemote().sendText(new Gson().toJson(connect));
-        } catch (IOException ex) {
-            throw new ResponseException(500, ex.getMessage()); //what should go here? should this be a good user response?
-        }
+        sendWsCmd(new Connect(auth, game.gameID()));
     }
 
     public void makeMove(String auth, GameData game, ChessMove move) throws ResponseException {
-        try {
-            MakeMove makeMove = new MakeMove(auth, game.gameID(), move);
-            this.session.getBasicRemote().sendText(new Gson().toJson(makeMove));
-        } catch (IOException ex) {
-            throw new ResponseException(500, ex.getMessage());
-        }
+        sendWsCmd(new MakeMove(auth, game.gameID(), move));
     }
 
     public void leave(String auth, GameData game) throws ResponseException {
+        sendWsCmd(new Leave(auth, game.gameID()));
+    }
+
+    public void resign(String auth, GameData game) {
+        sendWsCmd(new Resign(auth, game.gameID()));
+    }
+
+    private void sendWsCmd(Object wsCmd){
         try{
-            Leave leave = new Leave(auth, game.gameID());
-            this.session.getBasicRemote().sendText(new Gson().toJson(leave));
-            this.session.close();
+            this.session.getBasicRemote().sendText(new Gson().toJson(wsCmd));
+            if(wsCmd instanceof Leave | wsCmd instanceof Resign ){
+                this.session.close();
+            }
         } catch (IOException ex){
             throw new ResponseException(500, ex.getMessage());
         }
     }
-
 }

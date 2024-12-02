@@ -84,6 +84,15 @@ public class GameService {
         }
     }
 
+    public void endGame(EndGameRequest req) throws Exception {
+        AuthData auth = dataAccessAuth.get(req.auth());
+        serviceAuth.checkAuthTokenValid(auth);
+        GameData game = new GameData(req.gameID(), null, null, null, null);
+        game = dataAccessGame.get(game);
+        game.game.setEndOfGame();
+        dataAccessGame.updateGame(game);
+    }
+
     private ChessGame.TeamColor getPlayerColor(GameData game, UserData user){
         if(game.whiteUsername() != null && game.whiteUsername().equals(user.username())){
             return ChessGame.TeamColor.WHITE;
@@ -134,4 +143,5 @@ public class GameService {
         }
         return game;
     }
+
 }

@@ -13,11 +13,20 @@ import static chess.ChessGame.TeamColor.*;
  * signature of the existing methods.
  */
 public class ChessGame{
+    private boolean gameEnded = false;
+    private TeamColor winnerUser;
     private TeamColor turnColor = WHITE;
     private ChessBoard board = new ChessBoard();
 
     public ChessGame() {
         board.resetBoard();
+    }
+
+    public TeamColor getWinnerUser() {
+        return winnerUser;
+    }
+    private void setWinnerUser(TeamColor color) {
+        winnerUser = color;
     }
 
     /**
@@ -26,6 +35,14 @@ public class ChessGame{
     public enum TeamColor {
         WHITE,
         BLACK
+    }
+
+    public void setEndOfGame(){
+        gameEnded = true;
+    }
+
+    public boolean isGameEnded(){
+        return gameEnded;
     }
 
     /**
@@ -191,6 +208,23 @@ public class ChessGame{
             }
         }
         return false;
+    }
+
+    public boolean isInCheckBothTeams(){
+        boolean inCheckmate = false;
+        if(isInCheckmate(WHITE)){
+            setWinnerUser(WHITE);
+            inCheckmate = true;
+        }
+        else if(isInCheckmate(BLACK)){
+            setWinnerUser(BLACK);
+            inCheckmate = true;
+        }
+        return inCheckmate; //if either is true, it returns true
+    }
+
+    public boolean isInStalemateBothTeams(){
+        return isInStalemate(WHITE) || isInStalemate(BLACK); //if either is true, it returns true
     }
 
 

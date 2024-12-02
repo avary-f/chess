@@ -1,11 +1,13 @@
 package server.websocket;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 //import dataaccess.DataAccess;
 import model.AuthData;
 import model.GameData;
+import request.EndGameRequest;
 import request.MoveRequest;
 import request.UnjoinRequest;
 import server.BadRequestException;
@@ -62,13 +64,25 @@ public class WebSocketHandler {
             ServerMessage notification = new Notification(message);
             connections.broadcast(auth.authToken(), notification);
             ServerMessage loadGame = new LoadGame(updatedGame, null);
-            connections.broadcast(null, loadGame); //will send this to everyone
+            connections.broadcast(null, loadGame);//will send this to everyone
+            if(checkIfGameEnded(updatedGame)){
+                String winnerUsername = endGame(auth, gameID);
+                String newMessage = String.format("Game over, %s won!", winnerUsername);
+                connections.broadcast(auth.authToken(), notification);
+                ServerMessage newNotification = new Notification(newMessage);
+                connections.broadcast(auth.authToken(), newNotification);
+            }
         } catch (Exception ex){
             throwServerError(session, ex);
         }
 
         //need to check if there is anything to broadcast to the user about game status
         // need to do a loadgame message
+    }
+
+    private boolean checkIfGameEnded(GameData updatedGame) throws BadRequestException {
+        ChessGame game = serviceGame.getGame(updatedGame.gameID()).game;
+        return game.isInCheckBothTeams() || game.isInStalemateBothTeams();
     }
 
     private void throwServerError(Session session, Exception ex) throws IOException {
@@ -124,6 +138,27 @@ public class WebSocketHandler {
         var message = String.format("%s has left the game", username);
         ServerMessage notification = new Notification(message);
         connections.broadcast(auth.authToken(), notification);
+    }
+
+    private void resign(String authToken, Integer gameID) throws Exception {
+        AuthData auth = checkAuth(authToken);
+        endGame(auth, gameID);
+        String username = serviceAuth.getUsername(auth);
+        var message = String.format("Game over: %s resigned from the game", username);
+        ServerMessage notification = new Notification(message);
+//        connections.broadcast(auth.authToken(), notification);
+        connections.broadcast(null, notification);
+    }
+
+    private String endGame(AuthData auth, Integer gameID) throws Exception {
+        serviceGame.endGame(new EndGameRequest(auth.authToken(), gameID));
+        ChessGame.TeamColor winnerColor = serviceGame.getGame(gameID).game.getWinnerUser();
+        if(winnerColor.equals(ChessGame.TeamColor.WHITE)){
+            return serviceGame.getGame(gameID).whiteUsername();
+        }
+        else{
+            return serviceGame.getGame(gameID).blackUsername();
+        }
     }
 
 }
