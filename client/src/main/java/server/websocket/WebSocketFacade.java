@@ -72,7 +72,7 @@ public class WebSocketFacade extends Endpoint { //need to extend Endpoint for we
     private void sendWsCmd(Object wsCmd){
         try{
             this.session.getBasicRemote().sendText(new Gson().toJson(wsCmd));
-            if(wsCmd instanceof Leave | wsCmd instanceof Resign ){
+            if(wsCmd instanceof Leave){
                 this.session.close();
             }
         } catch (IOException ex){

@@ -37,7 +37,8 @@ public class ClientGameplay extends ChessClient{
     private String resign() {
         getGame().game.setEndOfGame();
         ws.resign(getAuth(), getGame());
-        return "Game over. You have resigned";
+        moveOutOfGamePlay();
+        return "Game over, you have resigned. Type 'help' to continue.";
     }
 
     private void checkValidInput(String[] input){
@@ -115,10 +116,14 @@ public class ClientGameplay extends ChessClient{
     private String leave() {
         //by default make it like the other game (in case person leaving is an observer)
         ws.leave(getAuth(), getGame());
+        moveOutOfGamePlay();
+        return "You have left the game. Type 'help' to continue.";
+    }
+
+    private void moveOutOfGamePlay(){
         setState(State.LOGGEDIN); //move out of gameplay
         setGame(null);
         setTeamColor(null);
-        return "You have left the game. Type 'help' to continue.";
     }
 
     @Override

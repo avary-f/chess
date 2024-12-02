@@ -49,8 +49,22 @@ public class WebSocketHandler {
             case CONNECT -> connect(cmd.getAuthToken(), cmd.getGameID(), session);
             case LEAVE -> leave(cmd.getAuthToken(), cmd.getGameID());
             case MAKE_MOVE -> makeMove(cmd.getAuthToken(), cmd.getGameID(), message, session);
+            case RESIGN -> resign(cmd.getAuthToken(), cmd.getGameID(), session);
         }
     }//once you open a connection in websocket, this is the main place that messages go
+
+    private void resign(String authToken, Integer gameID, Session session) throws Exception {
+        try{
+            AuthData auth = checkAuth(authToken);
+            endGame(auth, gameID, true);
+            String username = serviceAuth.getUsername(auth);
+            var message = String.format("Game over: %s resigned from the game", username);
+            ServerMessage notification = new Notification(message);
+            connections.broadcast(null, notification);
+        } catch (Exception ex){
+            throwServerError(session, ex);
+        }
+    }
 
     private void makeMove(String authToken, Integer gameID, String msg, Session session) throws Exception {
         try{
@@ -65,12 +79,15 @@ public class WebSocketHandler {
             connections.broadcast(auth.authToken(), notification);
             ServerMessage loadGame = new LoadGame(updatedGame, null);
             connections.broadcast(null, loadGame);//will send this to everyone
-            if(checkIfGameEnded(updatedGame)){
-                String winnerUsername = endGame(auth, gameID);
-                String newMessage = String.format("Game over, %s won!", winnerUsername);
-                connections.broadcast(auth.authToken(), notification);
-                ServerMessage newNotification = new Notification(newMessage);
-                connections.broadcast(auth.authToken(), newNotification);
+            ChessGame.TeamColor otherTeamColor = getOtherTeamColor(gameID, username);
+            if(checkForCheck(updatedGame, otherTeamColor)){
+                sendInCheckNotification(updatedGame, otherTeamColor);
+            }
+            if(checkForCheckmate(updatedGame, otherTeamColor)){
+                sendGameOverCheckmateNotification(auth, gameID);
+            }
+            if(checkForStalemate(updatedGame, otherTeamColor)){
+                sendGameOverStalemateNotification(auth, gameID);
             }
         } catch (Exception ex){
             throwServerError(session, ex);
@@ -80,9 +97,45 @@ public class WebSocketHandler {
         // need to do a loadgame message
     }
 
-    private boolean checkIfGameEnded(GameData updatedGame) throws BadRequestException {
+    private boolean checkForCheckmate(GameData updatedGame, ChessGame.TeamColor otherTeamColor) throws BadRequestException {
         ChessGame game = serviceGame.getGame(updatedGame.gameID()).game;
-        return game.isInCheckBothTeams() || game.isInStalemateBothTeams();
+        return game.isInCheckmate(otherTeamColor);
+    }
+
+    private boolean checkForStalemate(GameData updatedGame, ChessGame.TeamColor otherTeamColor) throws BadRequestException {
+        ChessGame game = serviceGame.getGame(updatedGame.gameID()).game;
+        return game.isInStalemate(otherTeamColor);
+    }
+
+    private void sendGameOverCheckmateNotification(AuthData auth, Integer gameID) throws Exception {
+        String winnerUsername = endGame(auth, gameID, false); //not resigning, still in play
+        String newMessage = String.format("%s is in checkmate. Game over, %s won!", loserUsername, winnerUsername);
+        ServerMessage newNotification = new Notification(newMessage);
+        connections.broadcast(null, newNotification);
+    }
+
+    private void sendGameOverStalemateNotification(AuthData auth, Integer gameID) throws Exception {
+        String winnerUsername = endGame(auth, gameID, false); //not resigning, still in play
+        String newMessage = String.format("Game ended in a stalemate. Both %s and %s tied!", loserUsername, winnerUsername);
+        ServerMessage newNotification = new Notification(newMessage);
+        connections.broadcast(null, newNotification);
+    }
+
+    private void sendInCheckNotification(GameData updatedGame, ChessGame.TeamColor otherTeamColor) throws IOException {
+        String otherUsername;
+        if(otherTeamColor.equals(ChessGame.TeamColor.WHITE)){
+            otherUsername = updatedGame.whiteUsername();
+        }
+        else{
+            otherUsername = updatedGame.blackUsername();
+        }
+        String message = String.format("%s is in check", otherUsername);
+        ServerMessage newNotification = new Notification(message);
+        connections.broadcast(null, newNotification);
+    }
+
+    private boolean checkForCheck(GameData game, ChessGame.TeamColor otherTeamColor) {
+        return game.game.isInCheck(otherTeamColor);
     }
 
     private void throwServerError(Session session, Exception ex) throws IOException {
@@ -130,6 +183,16 @@ public class WebSocketHandler {
         }
     }
 
+    private ChessGame.TeamColor getOtherTeamColor(Integer gameID, String username) throws BadRequestException {
+        String myColor = getMyColor(gameID, username);
+        if(myColor.equals("white")){
+            return ChessGame.TeamColor.BLACK;
+        }
+        else{
+            return ChessGame.TeamColor.WHITE;
+        }
+    }
+
     private void leave(String authToken, Integer gameID) throws Exception {
         AuthData auth = checkAuth(authToken);
         serviceGame.unjoinGame(new UnjoinRequest(auth.authToken(), gameID));
@@ -140,18 +203,8 @@ public class WebSocketHandler {
         connections.broadcast(auth.authToken(), notification);
     }
 
-    private void resign(String authToken, Integer gameID) throws Exception {
-        AuthData auth = checkAuth(authToken);
-        endGame(auth, gameID);
-        String username = serviceAuth.getUsername(auth);
-        var message = String.format("Game over: %s resigned from the game", username);
-        ServerMessage notification = new Notification(message);
-//        connections.broadcast(auth.authToken(), notification);
-        connections.broadcast(null, notification);
-    }
-
-    private String endGame(AuthData auth, Integer gameID) throws Exception {
-        serviceGame.endGame(new EndGameRequest(auth.authToken(), gameID));
+    private String endGame(AuthData auth, Integer gameID, boolean resigning) throws Exception {
+        serviceGame.endGame(new EndGameRequest(auth.authToken(), gameID, resigning)); //make the resigner lose
         ChessGame.TeamColor winnerColor = serviceGame.getGame(gameID).game.getWinnerUser();
         if(winnerColor.equals(ChessGame.TeamColor.WHITE)){
             return serviceGame.getGame(gameID).whiteUsername();

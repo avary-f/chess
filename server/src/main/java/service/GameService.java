@@ -87,9 +87,13 @@ public class GameService {
     public void endGame(EndGameRequest req) throws Exception {
         AuthData auth = dataAccessAuth.get(req.auth());
         serviceAuth.checkAuthTokenValid(auth);
+        UserData user = new UserData(serviceAuth.getUsername(req.auth()), null, null);
+        user = dataAccessUser.get(user);
         GameData game = new GameData(req.gameID(), null, null, null, null);
         game = dataAccessGame.get(game);
+        ChessGame.TeamColor color = getPlayerColor(game, user);
         game.game.setEndOfGame();
+        game.game.setWinner(req.isResigning(), color);
         dataAccessGame.updateGame(game);
     }
 

@@ -25,8 +25,11 @@ public class ChessGame{
     public TeamColor getWinnerUser() {
         return winnerUser;
     }
-    private void setWinnerUser(TeamColor color) {
-        winnerUser = color;
+
+    public void setWinner(boolean resigning, TeamColor color) {
+        if(resigning){ //if player is resigning
+            winnerUser = color;
+        }
     }
 
     /**
@@ -210,17 +213,16 @@ public class ChessGame{
         return false;
     }
 
-    public boolean isInCheckBothTeams(){
-        boolean inCheckmate = false;
+    public boolean isInCheckmateBothTeams(){
         if(isInCheckmate(WHITE)){
-            setWinnerUser(WHITE);
-            inCheckmate = true;
+            winnerUser = WHITE;
+            return true;
         }
         else if(isInCheckmate(BLACK)){
-            setWinnerUser(BLACK);
-            inCheckmate = true;
+            winnerUser = BLACK;
+            return true;
         }
-        return inCheckmate; //if either is true, it returns true
+        return false; //if either is true, it returns true
     }
 
     public boolean isInStalemateBothTeams(){
