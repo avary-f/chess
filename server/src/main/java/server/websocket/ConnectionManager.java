@@ -34,19 +34,17 @@ public class ConnectionManager {
         }
     }
 
-    public void broadcast(String excludeAuth, ServerMessage message) throws IOException {
-        for (Integer gameID : connections.keySet()) {
-            CopyOnWriteArrayList<Connection> list = connections.get(gameID);
-            for(Connection c: list){
-                if (c.session.isOpen()) {
-                    if (!c.auth.equals(excludeAuth)) { //don't send the notification to yourself
-                        c.send(message);
-                    }
-                } else {
-                    list.remove(c);
-                    if(list.isEmpty()){
-                        connections.remove(gameID); //if there are no connections
-                    }
+    public void broadcast(String excludeAuth, ServerMessage message, Integer gameID) throws IOException {
+        CopyOnWriteArrayList<Connection> list = connections.get(gameID);
+        for(Connection c: list){
+            if (c.session.isOpen()) {
+                if (!c.auth.equals(excludeAuth)) { //don't send the notification to yourself
+                    c.send(message);
+                }
+            } else {
+                list.remove(c);
+                if(list.isEmpty()){
+                    connections.remove(gameID); //if there are no connections
                 }
             }
         }

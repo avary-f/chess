@@ -66,7 +66,7 @@ public class WebSocketHandler {
             String username = serviceAuth.getUsername(auth);
             var message = String.format("Game over: %s resigned from the game", username);
             ServerMessage notification = new Notification(message);
-            connections.broadcast(null, notification);
+            connections.broadcast(null, notification, gameID);
         } catch (Exception ex){
             throwServerError(session, ex);
         }
@@ -88,9 +88,9 @@ public class WebSocketHandler {
             var message = String.format("%s moved " + convertColumns(move.getStartPosition()) + " to " +
                     convertColumns(move.getEndPosition()), username.toUpperCase());
             ServerMessage notification = new Notification(message);
-            connections.broadcast(auth.authToken(), notification);
+            connections.broadcast(auth.authToken(), notification, gameID);
             ServerMessage loadGame = new LoadGame(updatedGame, null);
-            connections.broadcast(null, loadGame);//will send this to everyone
+            connections.broadcast(null, loadGame, gameID);//will send this to everyone
             ChessGame.TeamColor otherTeamColor = getOtherTeamColor(gameID, username);
             if(checkForCheck(updatedGame, otherTeamColor)){
                 sendInCheckNotification(updatedGame, otherTeamColor);
@@ -122,7 +122,7 @@ public class WebSocketHandler {
         String loserUsername = getUsername(gameID, getOtherTeamColor(gameID, winnerUsername));
         String newMessage = String.format("%s is in checkmate. Game over, %s won!", loserUsername, winnerUsername);
         ServerMessage newNotification = new Notification(newMessage);
-        connections.broadcast(null, newNotification);
+        connections.broadcast(null, newNotification, gameID);
     }
 
     private void sendGameOverStalemateNotification(AuthData auth, Integer gameID) throws Exception {
@@ -130,7 +130,7 @@ public class WebSocketHandler {
         String loserUsername = getUsername(gameID, getOtherTeamColor(gameID, winnerUsername));
         String newMessage = String.format("Game ended in a stalemate. Both %s and %s tied!", loserUsername, winnerUsername);
         ServerMessage newNotification = new Notification(newMessage);
-        connections.broadcast(null, newNotification);
+        connections.broadcast(null, newNotification, gameID);
     }
 
     private void sendInCheckNotification(GameData updatedGame, ChessGame.TeamColor otherTeamColor) throws IOException {
@@ -143,7 +143,7 @@ public class WebSocketHandler {
         }
         String message = String.format("%s is in check", otherUsername);
         ServerMessage newNotification = new Notification(message);
-        connections.broadcast(null, newNotification);
+        connections.broadcast(null, newNotification, updatedGame.gameID());
     }
 
     private boolean checkForCheck(GameData game, ChessGame.TeamColor otherTeamColor) {
@@ -158,7 +158,7 @@ public class WebSocketHandler {
 
     private String convertColumns(ChessPosition pos){
         ArrayList<String> columns = new ArrayList<>(List.of("a", "b", "c", "d", "e", "f", "g", "h"));
-        return columns.get(pos.getColumn()) + pos.getRow();
+        return columns.get(pos.getColumn() - 1) + pos.getRow();
     }
 
     private AuthData checkAuth(String authToken) throws Exception {
@@ -175,7 +175,7 @@ public class WebSocketHandler {
             String role = getMyColor(gameID, username);
             String message = String.format("%s has joined the game as %s", username, role);
             ServerMessage notification = new Notification(message);
-            connections.broadcast(auth.authToken(), notification); //auth to exclude, ServerMessage to broadcast
+            connections.broadcast(auth.authToken(), notification, gameID); //auth to exclude, ServerMessage to broadcast
             LoadGame loadGame = new LoadGame(serviceGame.getGame(gameID), null);
             connections.broadcastToMe(session, loadGame);
         } catch (Exception ex){
@@ -222,7 +222,7 @@ public class WebSocketHandler {
         String username = serviceAuth.getUsername(auth);
         var message = String.format("%s has left the game", username);
         ServerMessage notification = new Notification(message);
-        connections.broadcast(auth.authToken(), notification);
+        connections.broadcast(auth.authToken(), notification, gameID);
     }
 
     private String endGame(AuthData auth, Integer gameID, boolean resigning) throws Exception {
