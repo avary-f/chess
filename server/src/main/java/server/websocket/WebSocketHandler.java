@@ -109,6 +109,7 @@ public class WebSocketHandler {
 
     private void sendGameOverCheckmateNotification(AuthData auth, Integer gameID) throws Exception {
         String winnerUsername = endGame(auth, gameID, false); //not resigning, still in play
+        String loserUsername = getUsername(gameID, getOtherTeamColor(gameID, winnerUsername));
         String newMessage = String.format("%s is in checkmate. Game over, %s won!", loserUsername, winnerUsername);
         ServerMessage newNotification = new Notification(newMessage);
         connections.broadcast(null, newNotification);
@@ -116,6 +117,7 @@ public class WebSocketHandler {
 
     private void sendGameOverStalemateNotification(AuthData auth, Integer gameID) throws Exception {
         String winnerUsername = endGame(auth, gameID, false); //not resigning, still in play
+        String loserUsername = getUsername(gameID, getOtherTeamColor(gameID, winnerUsername));
         String newMessage = String.format("Game ended in a stalemate. Both %s and %s tied!", loserUsername, winnerUsername);
         ServerMessage newNotification = new Notification(newMessage);
         connections.broadcast(null, newNotification);
@@ -190,6 +192,16 @@ public class WebSocketHandler {
         }
         else{
             return ChessGame.TeamColor.WHITE;
+        }
+    }
+
+    private String getUsername(Integer gameID, ChessGame.TeamColor otherTeamColor) throws BadRequestException {
+        GameData game = serviceGame.getGame(gameID);
+        if(otherTeamColor.equals(ChessGame.TeamColor.BLACK)){
+            return game.blackUsername();
+        }
+        else{
+            return game.whiteUsername();
         }
     }
 
