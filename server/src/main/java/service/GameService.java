@@ -62,6 +62,9 @@ public class GameService {
     }
 
     private ChessGame.TeamColor convertToColorType(String s) {
+        if(s == null){
+            return null;
+        }
         if(s.equals("WHITE")){
             return ChessGame.TeamColor.WHITE;
         }

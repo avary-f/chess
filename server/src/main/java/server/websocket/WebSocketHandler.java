@@ -55,6 +55,12 @@ public class WebSocketHandler {
 
     private void resign(String authToken, Integer gameID, Session session) throws Exception {
         try{
+            GameData game = serviceGame.getGame(gameID);
+            if(game.game.isGameEnded()){
+                var message = "Error: Game already ended";
+                ServerMessage error = new Error(message);
+                connections.broadcastToMe(session, error);
+            }
             AuthData auth = checkAuth(authToken);
             endGame(auth, gameID, true);
             String username = serviceAuth.getUsername(auth);
@@ -68,6 +74,12 @@ public class WebSocketHandler {
 
     private void makeMove(String authToken, Integer gameID, String msg, Session session) throws Exception {
         try{
+            GameData game = serviceGame.getGame(gameID);
+            if(game.game.isGameEnded()){
+                var message = "Error: Game ended, no more moves can be made";
+                ServerMessage error = new Error(message);
+                connections.broadcastToMe(session, error);
+            }
             AuthData auth = checkAuth(authToken);
             MakeMove cmdMove = new Gson().fromJson(msg, MakeMove.class);
             ChessMove move = cmdMove.getMove();
@@ -92,9 +104,6 @@ public class WebSocketHandler {
         } catch (Exception ex){
             throwServerError(session, ex);
         }
-
-        //need to check if there is anything to broadcast to the user about game status
-        // need to do a loadgame message
     }
 
     private boolean checkForCheckmate(GameData updatedGame, ChessGame.TeamColor otherTeamColor) throws BadRequestException {
@@ -104,7 +113,8 @@ public class WebSocketHandler {
 
     private boolean checkForStalemate(GameData updatedGame, ChessGame.TeamColor otherTeamColor) throws BadRequestException {
         ChessGame game = serviceGame.getGame(updatedGame.gameID()).game;
-        return game.isInStalemate(otherTeamColor);
+        boolean stale = game.isInStalemate(otherTeamColor);
+        return stale;
     }
 
     private void sendGameOverCheckmateNotification(AuthData auth, Integer gameID) throws Exception {

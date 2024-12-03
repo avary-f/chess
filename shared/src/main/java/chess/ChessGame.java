@@ -213,23 +213,6 @@ public class ChessGame{
         return false;
     }
 
-    public boolean isInCheckmateBothTeams(){
-        if(isInCheckmate(WHITE)){
-            winnerUser = WHITE;
-            return true;
-        }
-        else if(isInCheckmate(BLACK)){
-            winnerUser = BLACK;
-            return true;
-        }
-        return false; //if either is true, it returns true
-    }
-
-    public boolean isInStalemateBothTeams(){
-        return isInStalemate(WHITE) || isInStalemate(BLACK); //if either is true, it returns true
-    }
-
-
     public Collection<ChessMove> getTotalTeamMoves(TeamColor teamColor){
         ChessPosition kingPos = board.getKing(teamColor); //get king position we are checking
         if(kingPos == null){
