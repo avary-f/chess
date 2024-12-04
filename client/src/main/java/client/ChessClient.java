@@ -1,5 +1,7 @@
 package client;
 
+import com.google.gson.Gson;
+import server.BadRequestException;
 import server.websocket.ServerMessageHandler;
 import model.GameData;
 import server.ResponseException;
@@ -10,6 +12,7 @@ import java.util.Arrays;
 import server.websocket.WebSocketFacade;
 import websocket.messages.Error;
 import websocket.messages.LoadGame;
+import websocket.messages.LoadGameHighlight;
 import websocket.messages.Notification;
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.GREEN;
@@ -110,6 +113,20 @@ public abstract class ChessClient implements ServerMessageHandler{
         boardReader.drawChessBoard();
         printPrompt();
     }
+
+    public void notify(LoadGameHighlight message){
+        System.out.print(RESET_BG_COLOR);
+        setGame(message.game());
+        System.out.println();
+        boardReader = new BoardReader(getGame(), getTeamColor());
+        try{
+            boardReader.drawHighlightChessBoard(message.getHighlightSquare());
+        } catch (Exception ex){
+            throw new RuntimeException(ex.getMessage());
+        }
+        printPrompt();
+    }
+
     public void notify(Error message) {
         System.out.print(RESET_BG_COLOR);
         System.out.println(RED + message.getErrorMessage());

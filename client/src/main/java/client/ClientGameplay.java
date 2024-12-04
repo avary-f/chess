@@ -71,8 +71,9 @@ public class ClientGameplay extends ChessClient{
     }
 
     private void checkValidInput(String[] input){
-        for(String s: input){
-            if(s.length() != 2 || !getBoardReader().getColumns().contains(s.substring(0, 1))
+        for(int i = 0; i < 2; i++){
+            var s = input[i];
+            if((s.length() != 2) || !getBoardReader().getColumns().contains(s.substring(0, 1))
                     || !getBoardReader().getRows().contains(s.substring(1, 2))){ //has to be valid input
                 throw new ResponseException(400, "Invalid chess position");
             }
@@ -86,28 +87,16 @@ public class ClientGameplay extends ChessClient{
                 throw new ResponseException(422, "Error: Game has ended");
             }
             ChessPiece.PieceType promotion = null;
-            if(params.length == 3){
-                promotion = getPromotionPieceType(params[2]);
+            if (params.length == 3 && !params[2].trim().isEmpty()) { // prevent empty or whitespace promotion piece
+                promotion = getPromotionPieceType(params[2].trim());
             }
             String moveFrom = params[0];
             String moveTo = params[1];
             ChessMove move = new ChessMove(convertColumns(moveFrom), convertColumns(moveTo), promotion);
-//            if(!getGame().game.getTeamTurn().equals(convertColors(getTeamColor()))){
-//                throw new ResponseException(422, "Error: Waiting on the other player's move...");
-//            }
             ws.makeMove(getAuth(), getGame(), move);
             return "";
         } else{
-            throw new ResponseException(400, "Expected: <Current_ColRow> <Desired_ColRow> PromotionPiece (ex: e2 e3 queen) ");
-        }
-    }
-
-    private ChessGame.TeamColor convertColors(String color){
-        if(color.equals("WHITE")){
-            return ChessGame.TeamColor.WHITE;
-        }
-        else{
-            return ChessGame.TeamColor.BLACK;
+            throw new ResponseException(400, "Expected: <Current_ColRow> <Desired_ColRow> [PromotionPiece] (ex: e2 e3 queen)");
         }
     }
 
@@ -134,8 +123,8 @@ public class ClientGameplay extends ChessClient{
     private String highlight(String[] params) {
         if(params.length == 1 && params[0].length() == 2) {
             checkValidInput(params);
-            String input = params[0];
-            getBoardReader().drawHighlightChessBoard(input);
+            String highlightSquare = params[0];
+            ws.highlight(getAuth(), getGame(), highlightSquare);
             return "";
         } else{
             throw new ResponseException(400, "Expected: <ColRow> (ex: e5) ");

@@ -20,16 +20,20 @@ public class ConnectionManager {
     }
 
     public void remove(String auth) {
-        for(Integer gameID: connections.keySet()){
+        for(Integer gameID: connections.keySet()) {
             CopyOnWriteArrayList<Connection> list = connections.get(gameID);
-            for(Connection c: list){
-                if(c.auth.equals(auth)){
-                    list.remove(c); //remove that specific connection to the game
-                    if(list.isEmpty()){ //if no one is joined to the game
-                        connections.remove(gameID);
+            if (list != null) {
+                for (Connection c : list) {
+                    if (c.auth.equals(auth)) {
+                        list.remove(c); //remove that specific connection to the game
+                        if (list.isEmpty()) { //if no one is joined to the game
+                            connections.remove(gameID);
+                        }
+                        return; //if you found the thing you need to remove, end the function
                     }
-                    return; //if you found the thing you need to remove, end the function
                 }
+            } else {
+                System.out.println("Having trouble connecting to the other client. Try logging out and back in."); // Nothing to broadcast
             }
         }
     }
@@ -38,18 +42,24 @@ public class ConnectionManager {
 
     public void broadcast(String excludeAuth, ServerMessage message, Integer gameID) throws IOException {
         CopyOnWriteArrayList<Connection> list = connections.get(gameID);
-        for(Connection c: list){
-            if (c.session.isOpen()) {
-                if (!c.auth.equals(excludeAuth)) { //don't send the notification to yourself
-                    c.send(message);
-                }
-            } else {
-                list.remove(c);
-                if(list.isEmpty()){
-                    connections.remove(gameID); //if there are no connections
+        if(list != null) {
+            for (Connection c : list) {
+                if (c.session.isOpen()) {
+                    if (!c.auth.equals(excludeAuth)) { //don't send the notification to yourself
+                        c.send(message);
+                    }
+                } else {
+                    list.remove(c);
+                    if (list.isEmpty()) {
+                        connections.remove(gameID); //if there are no connections
+                    }
                 }
             }
         }
+        else{
+            System.out.println("Having trouble connecting to the other client. Try logging out and back in."); // Nothing to broadcast
+        }
+
     }
 
     public void broadcastToMe(Session session, ServerMessage message) throws IOException {

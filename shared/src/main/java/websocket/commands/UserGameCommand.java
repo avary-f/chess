@@ -27,6 +27,7 @@ public class UserGameCommand {
         MAKE_MOVE,
         LEAVE,
         RESIGN,
+        HIGHLIGHT,
         REDRAW
     }
 

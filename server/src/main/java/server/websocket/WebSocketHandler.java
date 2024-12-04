@@ -19,11 +19,9 @@ import server.ServerResponse;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
-import websocket.messages.Error;
-import websocket.messages.LoadGame;
-import websocket.messages.Notification;
+import websocket.messages.*;
 import websocket.commands.*;
-import websocket.messages.ServerMessage;
+import websocket.messages.Error;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,6 +48,7 @@ public class WebSocketHandler {
             case MAKE_MOVE -> makeMove(cmd.getAuthToken(), cmd.getGameID(), message, session);
             case RESIGN -> resign(cmd.getAuthToken(), cmd.getGameID(), session);
             case REDRAW -> redraw(cmd.getAuthToken(), cmd.getGameID(), session);
+            case HIGHLIGHT -> highlight(cmd.getAuthToken(), cmd.getGameID(), message, session);
         }
     }//once you open a connection in websocket, this is the main place that messages go
 
@@ -72,6 +71,14 @@ public class WebSocketHandler {
         } catch (Exception ex){
             throwServerError(session, ex);
         }
+    }
+
+    private void highlight(String authToken, Integer gameID, String msg, Session session) throws Exception {
+        checkAuth(authToken);
+        Highlight cmdMove = new Gson().fromJson(msg, Highlight.class);
+        String highlightSquare = cmdMove.getHighlightSquare();
+        ServerMessage loadGameHighlight = new LoadGameHighlight(serviceGame.getGame(gameID), null, highlightSquare);
+        connections.broadcastToMe(session, loadGameHighlight);
     }
 
     private void redraw(String authToken, Integer gameID, Session session) throws Exception{

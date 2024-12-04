@@ -10,6 +10,13 @@ public class LoadGame extends ServerMessage{
         this.message = message;
     }
 
+    public LoadGame(ServerMessageType serverMessageType, GameData game, String message) {
+        super(serverMessageType);
+        this.game = game;
+        this.message = message;
+    }
+
+
     public GameData game() {
         return game;
     }

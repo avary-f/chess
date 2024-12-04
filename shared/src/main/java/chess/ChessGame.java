@@ -109,20 +109,28 @@ public class ChessGame{
         }
         ChessPiece removedPiece = board.removePiece(move.getEndPosition()); //make temp move
         ChessPiece piece = board.removePiece(move.getStartPosition());
-        if(move.promotionPiece() != null){
+        boolean isPromotionPiece;
+        if(move.promotionPiece() != null){ //not sure if this is supposed to be 7
             board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.promotionPiece()));
+            isPromotionPiece = true;
         }
         else{
             board.addPiece(move.getEndPosition(), piece);
+            isPromotionPiece = false;
         }
-        boolean inCheck = isInCheck(piece.getTeamColor());  //return false if move puts its own king in check
-        undoMove(move, removedPiece);
+        boolean inCheck = isInCheck(piece.getTeamColor());
+        undoMove(move, removedPiece, isPromotionPiece);
         return !inCheck;
     }
 
-    public void undoMove(ChessMove move, ChessPiece removedPiece){
+    public void undoMove(ChessMove move, ChessPiece removedPiece, boolean isPromotionPiece){
         ChessPiece piece = board.removePiece(move.getEndPosition());
-        board.addPiece(move.getStartPosition(), piece);
+        if(isPromotionPiece){
+            board.addPiece(move.getStartPosition(), new ChessPiece(piece.getTeamColor(), ChessPiece.PieceType.PAWN));
+        }
+        else{
+            board.addPiece(move.getStartPosition(), piece);
+        }
         board.addPiece(move.getEndPosition(), removedPiece);
     }
 
@@ -172,16 +180,20 @@ public class ChessGame{
         }
         else {
             ChessPiece piece = board.removePiece(move.getStartPosition());
+            //problem is somewhere here
             if(move.promotionPiece() == null){
+                //problem is here?
                 board.addPiece(move.getEndPosition(), piece);
             }
             else{
                 board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.promotionPiece()));
             }
+            // problem happened here
             if(isInCheckmate(getTeamTurn()) | isInStalemate(getTeamTurn())){ //check if that move made it the end of the game
                 setEndOfGame();
             }
             setTeamTurn(getOtherTeamColor(turnColor)); //Make it the other team's turn after the piece is moved, not sure if I need this yet
+            //problem is somewhere here
         }
     }
 

@@ -7,4 +7,5 @@ public interface ServerMessageHandler {
     void notify(Notification message);
     void notify(Error message);
     void notify(LoadGame message);
+    void notify(LoadGameHighlight message);
 }

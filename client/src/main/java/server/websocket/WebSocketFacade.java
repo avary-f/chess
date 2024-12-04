@@ -5,10 +5,8 @@ import com.google.gson.Gson;
 import model.GameData;
 import server.ResponseException;
 import websocket.commands.*;
+import websocket.messages.*;
 import websocket.messages.Error;
-import websocket.messages.LoadGame;
-import websocket.messages.Notification;
-import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -37,8 +35,8 @@ public class WebSocketFacade extends Endpoint { //need to extend Endpoint for we
                     switch (messages.getServerMessageType()){
                         case NOTIFICATION -> messageHandler.notify(new Gson().fromJson(message, Notification.class));
                         case ERROR -> messageHandler.notify(new Gson().fromJson(message, Error.class));
-                        case LOAD_GAME -> messageHandler.notify(new Gson().fromJson(message, LoadGame.class));
-                    }
+                        case LOAD_GAME_HIGHLIGHT -> messageHandler.notify(new Gson().fromJson(message, LoadGameHighlight.class));
+                        case LOAD_GAME -> messageHandler.notify(new Gson().fromJson(message, LoadGame.class));                    }
                 } //this works with the on message in the websockethandler
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -71,6 +69,10 @@ public class WebSocketFacade extends Endpoint { //need to extend Endpoint for we
 
     public void redraw(String auth, GameData game) {
         sendWsCmd(new Redraw(auth, game.gameID()));
+    }
+
+    public void highlight(String auth, GameData game, String highlightSquare) {
+        sendWsCmd(new Highlight(auth, game.gameID(), highlightSquare));
     }
 
     private void sendWsCmd(Object wsCmd){
