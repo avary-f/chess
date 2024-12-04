@@ -93,9 +93,6 @@ public class BoardReader { //prints out the board
         if(game.game.getBoard().getPiece(position) == null){
             throw new ResponseException(400, "Invalid chess position");
         }
-        else if(!game.game.getBoard().getPiece(position).getTeamColor().equals(playerColor)){ //if it's the other teams piece
-            throw new ResponseException(400, "Invalid chess position: You cannot highlight opponent pieces");
-        }
         highlightChessBoard(validMoves, position);
     }
 

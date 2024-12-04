@@ -32,13 +32,11 @@ import java.util.List;
 @WebSocket
 public class WebSocketHandler {
 
-    private UserService serviceUser;
-    private GameService serviceGame;
-    private AuthService serviceAuth;
+    private final GameService serviceGame;
+    private final AuthService serviceAuth;
     private final ConnectionManager connections = new ConnectionManager();
 
     public WebSocketHandler(UserService serviceUser, GameService serviceGame){
-        this.serviceUser = serviceUser;
         this.serviceAuth = serviceUser.getServiceAuth();
         this.serviceGame = serviceGame;
     }
@@ -68,7 +66,9 @@ public class WebSocketHandler {
             String username = serviceAuth.getUsername(auth);
             var message = String.format("Game over: %s resigned from the game", username);
             ServerMessage notification = new Notification(message);
-            connections.broadcast(null, notification, gameID);
+            connections.broadcast(auth.authToken(), notification, gameID);
+            var newMessage = "Game over: you resigned from the game";
+            connections.broadcastToMe(session, new Notification(newMessage));
         } catch (Exception ex){
             throwServerError(session, ex);
         }

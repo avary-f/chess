@@ -8,7 +8,11 @@ import model.GameData;
 import server.ResponseException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
+
+import static ui.EscapeSequences.BLUE;
 
 public class ClientGameplay extends ChessClient{
 
@@ -36,9 +40,34 @@ public class ClientGameplay extends ChessClient{
 
     private String resign() {
         getGame().game.setEndOfGame();
-        ws.resign(getAuth(), getGame());
-        moveOutOfGamePlay();
-        return "Game over, you have resigned. Type 'help' to continue.";
+        printPrompt();
+        System.out.print("Are you sure you want to resign? (y/n)");
+        System.out.println();
+        printPrompt();
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        try {
+            if(evalResign(line)){
+                ws.resign(getAuth(), getGame());
+            }
+            else{
+                printPrompt();
+                System.out.println("Resign request cancelled. Continue playing!");
+            }
+        } catch (Throwable e) {
+            var msg = e.toString();
+            System.out.print(msg);
+        }
+        return "";
+    }
+
+    public boolean evalResign(String input) {
+        var tokens = input.toLowerCase().split(" ");
+        if(tokens.length == 1){
+            String response = tokens[0];
+            return response.equals("y") || response.equals("yes");
+        }
+        return false;
     }
 
     private void checkValidInput(String[] input){
