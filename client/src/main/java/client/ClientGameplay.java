@@ -71,8 +71,7 @@ public class ClientGameplay extends ChessClient{
     }
 
     private void checkValidInput(String[] input){
-        for(int i = 0; i < 2; i++){
-            var s = input[i];
+        for(var s: input){
             if((s.length() != 2) || !getBoardReader().getColumns().contains(s.substring(0, 1))
                     || !getBoardReader().getRows().contains(s.substring(1, 2))){ //has to be valid input
                 throw new ResponseException(400, "Invalid chess position");
@@ -81,8 +80,14 @@ public class ClientGameplay extends ChessClient{
     }
 
     private String makeMove(String[] params) throws ResponseException {
-        if(params.length == 2 || params.length == 3) { //the 3rd param is the promotion piece
+        if(params.length == 2){
             checkValidInput(params);
+        }
+        else if(params.length == 3){
+            checkValidInput(params);
+            checkValidInputPromotion(params[2]);
+        }
+        if(params.length == 2 || params.length == 3) { //the 3rd param is the promotion piece
             if(getGame().game.isGameEnded()){
                 throw new ResponseException(422, "Error: Game has ended");
             }
@@ -97,6 +102,12 @@ public class ClientGameplay extends ChessClient{
             return "";
         } else{
             throw new ResponseException(400, "Expected: <Current_ColRow> <Desired_ColRow> [PromotionPiece] (ex: e2 e3 queen)");
+        }
+    }
+
+    private void checkValidInputPromotion(String s){
+        if(!(s.equals("queen") || s.equals("rook") || s.equals("bishop") || s.equals("knight"))){ //has to be valid input
+            throw new ResponseException(400, "Expected promotion piece: queen | rook | bishop | knight ");
         }
     }
 

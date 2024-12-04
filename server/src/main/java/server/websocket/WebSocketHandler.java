@@ -127,7 +127,7 @@ public class WebSocketHandler {
             ServerMessage error = new Error(message);
             connections.broadcastToMe(session, error);
         } catch (BadRequestException ex){
-            var message = "Error: Cannot make a move for the other team";
+            var message = "Error: Invalid Move";
             ServerMessage error = new Error(message);
             connections.broadcastToMe(session, error);
         } catch (Exception ex){

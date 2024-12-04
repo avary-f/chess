@@ -118,7 +118,7 @@ public class GameService {
         game = dataAccessGame.get(game);
         UserData user = new UserData(serviceAuth.getUsername(req.auth()), null, null);
         user = dataAccessUser.get(user);
-        if(!game.game.getBoard().getPiece(move.getStartPosition()).getTeamColor().equals(getPlayerColor(game, user))){
+        if(game.game.getBoard().getPiece(move.getStartPosition()) == null || !game.game.getBoard().getPiece(move.getStartPosition()).getTeamColor().equals(getPlayerColor(game, user))){
             throw new BadRequestException();
         }//check that I am asking to move my own piece
         game.game.makeMove(move); //throws invalid MoveException

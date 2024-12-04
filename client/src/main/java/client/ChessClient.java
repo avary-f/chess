@@ -122,7 +122,7 @@ public abstract class ChessClient implements ServerMessageHandler{
         try{
             boardReader.drawHighlightChessBoard(message.getHighlightSquare());
         } catch (Exception ex){
-            throw new RuntimeException(ex.getMessage());
+            System.out.println(BLUE + "Invalid chess position");
         }
         printPrompt();
     }
