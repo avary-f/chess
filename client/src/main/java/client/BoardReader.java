@@ -18,13 +18,15 @@ public class BoardReader { //prints out the board
     private final static int BOARD_SIZE_IN_SQUARES = 8;
     private final ArrayList<String> columns = new ArrayList<>(List.of("a", "b", "c", "d", "e", "f", "g", "h")); //white orientation by default
     private final ArrayList<String> rows = new ArrayList<>(List.of("1", "2", "3", "4", "5", "6", "7", "8")); //white orientation by default
+    private final ArrayList<String> columnsReversed = columns;
+    private final ArrayList<String> rowsReversed = rows;
 
     public BoardReader(GameData game, String playerColor) {
-        if(playerColor.equals("BLACK")){
+        if(playerColor.equals("WHITE")){
+            this.playerColor = ChessGame.TeamColor.WHITE;
+        } else{
             this.playerColor = ChessGame.TeamColor.BLACK;
             reverseOrinetation();
-        } else{
-            this.playerColor = ChessGame.TeamColor.WHITE;
         }
         this.game = game;
     }
@@ -38,8 +40,8 @@ public class BoardReader { //prints out the board
     }
 
     private void reverseOrinetation(){
-        Collections.reverse(columns); //modifies columns directly
-        Collections.reverse(rows); //modifies rows directly
+        Collections.reverse(columnsReversed);
+        Collections.reverse(rowsReversed);
     }
 
     private ChessPosition reversePosition(ChessPosition position){
@@ -59,7 +61,7 @@ public class BoardReader { //prints out the board
         out.print(" ");
         out.print(EMPTY.repeat(2)); //empty spaces for alignment
         for (int col = 0; col < BOARD_SIZE_IN_SQUARES; col++) {
-            printCharText(columns.get(col));
+            printCharText(columnsReversed.get(col)); //CHANGED HERE
             if (col < BOARD_SIZE_IN_SQUARES - 1) { //help line up the columns
                 out.print("   ");
             }
@@ -112,7 +114,7 @@ public class BoardReader { //prints out the board
         drawHeaders();
         for (int row = BOARD_SIZE_IN_SQUARES; row > 0 ; row--) {
             out.print(EMPTY);
-            printCharText(rows.get(row - 1));
+            printCharText(rowsReversed.get(row - 1));
             out.print(EMPTY);
             for (int col = 1; col <= BOARD_SIZE_IN_SQUARES; col++) {
                 if ((row + col) % 2 == 0) {

@@ -72,13 +72,12 @@ public class ClientPostlogin extends ChessClient{
         if(params.length == 1){
             int index = validateIDInput(params[0]);
             GameData game = getGameFromGameIndexMap(index);
-            BoardReader boardToObserve = new BoardReader(game, "WHITE"); //default to watching white as observer
-            boardToObserve.drawChessBoard();
             setGame(game);
             setTeamColor("WHITE");
             setState(State.GAMEPLAY);
             ws.connect(getAuth(), game);
-            return "You joined " + game.gameName() + " as an observer.\n" ;
+//            return "You joined " + game.gameName() + " as an observer.\n";
+            return "";
         }
         else{
             throw new ResponseException(400, "Expected: <ID> ");
@@ -97,8 +96,8 @@ public class ClientPostlogin extends ChessClient{
                     setTeamColor(playerColor);
                     setState(State.GAMEPLAY);
                     ws.connect(getAuth(), game);
-//                    return "You joined " + game.gameName() + " as " + playerColor +"\n";
-                    return "";
+                    return "You joined " + game.gameName() + " as " + playerColor +"\n";
+//                    return "";
                 } catch (RuntimeException ex) {
                     throw new ResponseException(403, "Player already taken.");
                 }

@@ -3,6 +3,7 @@ package server.websocket;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 //import dataaccess.DataAccess;
 import model.AuthData;
@@ -66,7 +67,7 @@ public class WebSocketHandler {
             String username = serviceAuth.getUsername(auth);
             var message = String.format("Game over: %s resigned from the game", username);
             ServerMessage notification = new Notification(message);
-            connections.broadcast(null, notification, gameID);
+            connections.broadcast(auth.authToken(), notification, gameID);
         } catch (Exception ex){
             throwServerError(session, ex);
         }
@@ -80,29 +81,41 @@ public class WebSocketHandler {
                 ServerMessage error = new Error(message);
                 connections.broadcastToMe(session, error);
             }
-            AuthData auth = checkAuth(authToken);
-            MakeMove cmdMove = new Gson().fromJson(msg, MakeMove.class);
-            ChessMove move = cmdMove.getMove();
-            String username = serviceAuth.getUsername(new AuthData(auth.authToken(), null));
-            GameData updatedGame = serviceGame.makeMove(new MoveRequest(auth.authToken(), gameID, move));
-            var message = String.format("%s moved " + convertColumns(move.getStartPosition()) + " to " +
-                    convertColumns(move.getEndPosition()), username.toUpperCase());
-            ServerMessage notification = new Notification(message);
-            connections.broadcast(auth.authToken(), notification, gameID);
-            ServerMessage loadGame = new LoadGame(updatedGame, null);
-            connections.broadcast(null, loadGame, gameID);//will send this to everyone
-            ChessGame.TeamColor otherTeamColor = getOtherTeamColor(gameID, username);
-            if(checkForCheck(updatedGame, otherTeamColor)){
-                sendInCheckNotification(updatedGame, otherTeamColor);
+            else {
+                AuthData auth = checkAuth(authToken);
+                MakeMove cmdMove = new Gson().fromJson(msg, MakeMove.class);
+                ChessMove move = cmdMove.getMove();
+                String username = serviceAuth.getUsername(new AuthData(auth.authToken(), null));
+                GameData updatedGame = serviceGame.makeMove(new MoveRequest(auth.authToken(), gameID, move));
+                var message = String.format("%s moved " + convertColumns(move.getStartPosition()) + " to " +
+                        convertColumns(move.getEndPosition()), username.toUpperCase());
+                ServerMessage notification = new Notification(message);
+                connections.broadcast(auth.authToken(), notification, gameID);
+                ServerMessage loadGame = new LoadGame(updatedGame, null);
+                connections.broadcast(null, loadGame, gameID);//will send this to everyone
+                ChessGame.TeamColor otherTeamColor = getOtherTeamColor(gameID, username);
+                if (checkForCheckmate(updatedGame, otherTeamColor)) {
+                    sendGameOverCheckmateNotification(auth, gameID);
+                }
+                else if (checkForCheck(updatedGame, otherTeamColor)) {
+                    sendInCheckNotification(updatedGame, otherTeamColor);
+                }
+                else if (checkForStalemate(updatedGame, otherTeamColor)) {
+                    sendGameOverStalemateNotification(auth, gameID);
+                }
             }
-            if(checkForCheckmate(updatedGame, otherTeamColor)){
-                sendGameOverCheckmateNotification(auth, gameID);
-            }
-            if(checkForStalemate(updatedGame, otherTeamColor)){
-                sendGameOverStalemateNotification(auth, gameID);
-            }
-        } catch (Exception ex){
-            throwServerError(session, ex);
+        } catch (InvalidMoveException ex){
+            var message = ex.getMessage();
+            ServerMessage error = new Error(message);
+            connections.broadcastToMe(session, error);
+        } catch (IOException ex) {
+            var message = "Connection closed due to inactivity. Please retype your command";
+            ServerMessage error = new Error(message);
+            connections.broadcastToMe(session, error);
+        } catch (BadRequestException ex){
+            var message = "Error: Cannot make a move for the other team";
+            ServerMessage error = new Error(message);
+            connections.broadcastToMe(session, error);
         }
     }
 
@@ -113,8 +126,7 @@ public class WebSocketHandler {
 
     private boolean checkForStalemate(GameData updatedGame, ChessGame.TeamColor otherTeamColor) throws BadRequestException {
         ChessGame game = serviceGame.getGame(updatedGame.gameID()).game;
-        boolean stale = game.isInStalemate(otherTeamColor);
-        return stale;
+        return game.isInStalemate(otherTeamColor);
     }
 
     private void sendGameOverCheckmateNotification(AuthData auth, Integer gameID) throws Exception {
@@ -184,10 +196,10 @@ public class WebSocketHandler {
     }
 
     private String getMyColor(Integer gameID, String username) throws BadRequestException { //what if they are both the black and white player
-        if(serviceGame.getGame(gameID).whiteUsername().equals(username)){
+        if(serviceGame.getGame(gameID).whiteUsername() != null && serviceGame.getGame(gameID).whiteUsername().equals(username)){
             return "white";
         }
-        else if(serviceGame.getGame(gameID).blackUsername().equals(username)){
+        else if(serviceGame.getGame(gameID).blackUsername() != null && serviceGame.getGame(gameID).blackUsername().equals(username)){
             return "black";
         }
         else{

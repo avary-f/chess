@@ -11,8 +11,6 @@ import server.websocket.WebSocketFacade;
 import websocket.messages.Error;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
-import websocket.messages.ServerMessage;
-
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.GREEN;
 
@@ -20,7 +18,6 @@ public abstract class ChessClient implements ServerMessageHandler{
     private String clientName = null;
     public final ServerFacade server;
     public WebSocketFacade ws;
-    private final String serverUrl;
     private State state;
     private String auth;
     private GameData game;
@@ -30,10 +27,10 @@ public abstract class ChessClient implements ServerMessageHandler{
     public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
         ws = new WebSocketFacade(serverUrl, this);
-        this.serverUrl = serverUrl;
     }
 
     public void printPrompt() {
+        System.out.print(RESET_BG_COLOR);
         if(state.equals(State.LOGGEDOUT)){ //if they are signed out
             System.out.print("\n" + RESET + "[LOGGED_OUT] >>> " + GREEN);
         }
@@ -108,6 +105,7 @@ public abstract class ChessClient implements ServerMessageHandler{
     public void notify(LoadGame message) {
         System.out.print(RESET_BG_COLOR);
         setGame(message.game());
+        System.out.println();
         boardReader = new BoardReader(getGame(), getTeamColor());
         boardReader.drawChessBoard();
         printPrompt();

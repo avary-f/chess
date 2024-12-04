@@ -34,6 +34,8 @@ public class ConnectionManager {
         }
     }
 
+    //make a remove function and remove unopen sessions outside of the function
+
     public void broadcast(String excludeAuth, ServerMessage message, Integer gameID) throws IOException {
         CopyOnWriteArrayList<Connection> list = connections.get(gameID);
         for(Connection c: list){

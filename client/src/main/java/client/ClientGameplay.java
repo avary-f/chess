@@ -63,9 +63,9 @@ public class ClientGameplay extends ChessClient{
             String moveFrom = params[0];
             String moveTo = params[1];
             ChessMove move = new ChessMove(convertColumns(moveFrom), convertColumns(moveTo), promotion);
-            if(!getGame().game.getTeamTurn().equals(convertColors(getTeamColor()))){
-                throw new ResponseException(422, "Error: Waiting on the other player's move...");
-            }
+//            if(!getGame().game.getTeamTurn().equals(convertColors(getTeamColor()))){
+//                throw new ResponseException(422, "Error: Waiting on the other player's move...");
+//            }
             ws.makeMove(getAuth(), getGame(), move);
             return "";
         } else{
@@ -98,6 +98,7 @@ public class ClientGameplay extends ChessClient{
     }
 
     private String redraw() {
+        updateBoardReader(new BoardReader(getGame(), getTeamColor()));
         getBoardReader().drawChessBoard();
         return "";
     }
