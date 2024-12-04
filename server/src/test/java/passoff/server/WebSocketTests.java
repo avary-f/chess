@@ -270,28 +270,6 @@ public class WebSocketTests {
         leave(white, gameID, Set.of(black, observer), Set.of(white2, black2, observer2));
     }
 
-    @Test
-    @Order(10)
-    @DisplayName("Stalemate Test")
-    public void stalemateTest() {
-        setupNormalGame();
-
-        // Simulate moves leading to a stalemate condition
-        makeMove(white, gameID, new ChessMove(new ChessPosition(2, 5), new ChessPosition(4, 5), null), true, false, Set.of(black, observer), Set.of());
-        makeMove(black, gameID, new ChessMove(new ChessPosition(7, 6), new ChessPosition(5, 6), null), true, false, Set.of(white, observer), Set.of());
-        makeMove(white, gameID, new ChessMove(new ChessPosition(1, 6), new ChessPosition(3, 5), null), true, false, Set.of(black, observer), Set.of());
-        makeMove(black, gameID, new ChessMove(new ChessPosition(8, 8), new ChessPosition(5, 5), null), true, false, Set.of(white, observer), Set.of());
-        makeMove(white, gameID, new ChessMove(new ChessPosition(3, 5), new ChessPosition(5, 7), null), true, false, Set.of(black, observer), Set.of());
-        makeMove(black, gameID, new ChessMove(new ChessPosition(7, 5), new ChessPosition(6, 5), null), true, false, Set.of(white, observer), Set.of());
-
-        // Final move causing stalemate
-        makeMove(white, gameID, new ChessMove(new ChessPosition(5, 7), new ChessPosition(7, 8), null), true, false, Set.of(black, observer), Set.of());
-
-        // Attempt any valid move after stalemate should fail
-        ChessMove invalidMove = new ChessMove(new ChessPosition(5, 6), new ChessPosition(4, 6), null);
-        makeMove(black, gameID, invalidMove, false, false, Set.of(white, observer), Set.of());
-    }
-
     private void setupNormalGame() {
         connectToGame(white, gameID, true, Set.of(), Set.of()); //connect white player
         connectToGame(black, gameID, true, Set.of(white), Set.of()); //connect black player

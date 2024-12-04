@@ -51,6 +51,7 @@ public class WebSocketHandler {
             case LEAVE -> leave(cmd.getAuthToken(), cmd.getGameID());
             case MAKE_MOVE -> makeMove(cmd.getAuthToken(), cmd.getGameID(), message, session);
             case RESIGN -> resign(cmd.getAuthToken(), cmd.getGameID(), session);
+            case REDRAW -> redraw(cmd.getAuthToken(), cmd.getGameID(), session);
         }
     }//once you open a connection in websocket, this is the main place that messages go
 
@@ -67,14 +68,21 @@ public class WebSocketHandler {
             String username = serviceAuth.getUsername(auth);
             var message = String.format("Game over: %s resigned from the game", username);
             ServerMessage notification = new Notification(message);
-            connections.broadcast(auth.authToken(), notification, gameID);
+            connections.broadcast(null, notification, gameID);
         } catch (Exception ex){
             throwServerError(session, ex);
         }
     }
 
+    private void redraw(String authToken, Integer gameID, Session session) throws Exception{
+        checkAuth(authToken);
+        ServerMessage loadGame = new LoadGame(serviceGame.getGame(gameID), null);
+        connections.broadcastToMe(session, loadGame);
+    }
+
     private void makeMove(String authToken, Integer gameID, String msg, Session session) throws Exception {
         try{
+            AuthData auth = checkAuth(authToken);
             GameData game = serviceGame.getGame(gameID);
             if(game.game.isGameEnded()){
                 var message = "Error: Game ended, no more moves can be made";
@@ -82,7 +90,6 @@ public class WebSocketHandler {
                 connections.broadcastToMe(session, error);
             }
             else {
-                AuthData auth = checkAuth(authToken);
                 MakeMove cmdMove = new Gson().fromJson(msg, MakeMove.class);
                 ChessMove move = cmdMove.getMove();
                 String username = serviceAuth.getUsername(new AuthData(auth.authToken(), null));
@@ -116,6 +123,8 @@ public class WebSocketHandler {
             var message = "Error: Cannot make a move for the other team";
             ServerMessage error = new Error(message);
             connections.broadcastToMe(session, error);
+        } catch (Exception ex){
+            throwServerError(session, ex);
         }
     }
 

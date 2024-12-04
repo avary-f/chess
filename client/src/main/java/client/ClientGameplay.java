@@ -98,8 +98,7 @@ public class ClientGameplay extends ChessClient{
     }
 
     private String redraw() {
-        updateBoardReader(new BoardReader(getGame(), getTeamColor()));
-        getBoardReader().drawChessBoard();
+        ws.redraw(getAuth(), getGame());
         return "";
     }
 

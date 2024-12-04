@@ -69,6 +69,10 @@ public class WebSocketFacade extends Endpoint { //need to extend Endpoint for we
         sendWsCmd(new Resign(auth, game.gameID()));
     }
 
+    public void redraw(String auth, GameData game) {
+        sendWsCmd(new Redraw(auth, game.gameID()));
+    }
+
     private void sendWsCmd(Object wsCmd){
         try{
             this.session.getBasicRemote().sendText(new Gson().toJson(wsCmd));
