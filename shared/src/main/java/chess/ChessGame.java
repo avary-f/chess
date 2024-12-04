@@ -180,20 +180,17 @@ public class ChessGame{
         }
         else {
             ChessPiece piece = board.removePiece(move.getStartPosition());
-            //problem is somewhere here
             if(move.promotionPiece() == null){
-                //problem is here?
                 board.addPiece(move.getEndPosition(), piece);
             }
             else{
                 board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.promotionPiece()));
             }
-            // problem happened here
-            if(isInCheckmate(getTeamTurn()) | isInStalemate(getTeamTurn())){ //check if that move made it the end of the game
-                setEndOfGame();
-            }
             setTeamTurn(getOtherTeamColor(turnColor)); //Make it the other team's turn after the piece is moved, not sure if I need this yet
-            //problem is somewhere here
+            if(isInCheckmate(getOtherTeamColor(turnColor)) || isInStalemate(getOtherTeamColor(turnColor))){ //check if that move made it the end of the game
+                setEndOfGame();
+                setTeamTurn(turnColor);
+            }
         }
     }
 
