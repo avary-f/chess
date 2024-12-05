@@ -1,7 +1,4 @@
 package client;
-
-import com.google.gson.Gson;
-import server.BadRequestException;
 import server.websocket.ServerMessageHandler;
 import model.GameData;
 import server.ResponseException;
