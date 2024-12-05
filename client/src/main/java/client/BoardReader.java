@@ -87,19 +87,13 @@ public class BoardReader { //prints out the board
         highlightChessBoard(Collections.emptyList(), null);
     }
 
-    public void drawHighlightChessBoard(String input){
+    public void drawHighlightChessBoard(String input) {
         ChessPosition position = getPiecePosition(input);
         Collection<ChessMove> validMoves = game.game.validMoves(position);
-        if(game.game.getBoard().getPiece(position) == null){
+        if (game.game.getBoard().getPiece(position) == null) {
             throw new ResponseException(400, "Invalid chess position");
         }
         highlightChessBoard(validMoves, position);
-    }
-
-    public void drawMoveChessBoard(ChessMove move){
-        Collection<ChessMove> moveToMake = new ArrayList<>();
-        moveToMake.add(move);
-        highlightChessBoard(moveToMake, move.getStartPosition());
     }
 
     public void highlightChessBoard(Collection<ChessMove> validMoves, ChessPosition position) {
@@ -158,35 +152,18 @@ public class BoardReader { //prints out the board
     }
 
     private ChessPosition getPiecePosition(String position) {
-        return new ChessPosition(getRow(position.substring(1, 2)), getCol(position.substring(0, 1)));
+        return new ChessPosition(getIndex(rows, position.substring(1, 2)), getIndex(columns, position.substring(0, 1)));
     }
 
-    private int getCol(String c) {
-        // Validate input
-        if (!columns.contains(c)) {
+    private int getIndex(ArrayList<String> list, String c) {
+        if (!list.contains(c)) {
             return -1; // Invalid column
         }
-
-        int colIndex = columns.indexOf(c); // Get zero-based index
+        int index = list.indexOf(c);
         if (playerColor.equals(ChessGame.TeamColor.WHITE)) {
-            return colIndex + 1; // Return 1-based index for white
+            return index + 1;
         } else {
-            return 8 - colIndex; // Flip for black and return 1-based index
-        }
-    }
-
-
-    private int getRow(String c) {
-        // Validate input
-        if (!rows.contains(c)) {
-            return -1; // Invalid column
-        }
-
-        int rowIndex = rows.indexOf(c); // Get zero-based index
-        if (playerColor.equals(ChessGame.TeamColor.WHITE)) {
-            return rowIndex + 1; // Return 1-based index for white
-        } else {
-            return 8 - rowIndex; // Flip for black and return 1-based index
+            return 8 - index;
         }
     }
 

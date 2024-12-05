@@ -1,6 +1,4 @@
 package client;
-
-import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
@@ -8,11 +6,8 @@ import model.GameData;
 import server.ResponseException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-
-import static ui.EscapeSequences.BLUE;
 
 public class ClientGameplay extends ChessClient{
 

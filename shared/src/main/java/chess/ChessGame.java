@@ -186,7 +186,8 @@ public class ChessGame{
             else{
                 board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.promotionPiece()));
             }
-            setTeamTurn(getOtherTeamColor(turnColor)); //Make it the other team's turn after the piece is moved, not sure if I need this yet
+            setTeamTurn(getOtherTeamColor(turnColor));
+            //Make it the other team's turn after the piece is moved, not sure if I need this yet
             if(isInCheckmate(getOtherTeamColor(turnColor)) || isInStalemate(getOtherTeamColor(turnColor))){ //check if that move made it the end of the game
                 setEndOfGame();
                 setTeamTurn(turnColor);

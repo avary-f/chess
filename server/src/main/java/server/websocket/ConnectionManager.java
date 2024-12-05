@@ -42,22 +42,21 @@ public class ConnectionManager {
 
     public void broadcast(String excludeAuth, ServerMessage message, Integer gameID) throws IOException {
         CopyOnWriteArrayList<Connection> list = connections.get(gameID);
-        if(list != null) {
-            for (Connection c : list) {
-                if (c.session.isOpen()) {
-                    if (!c.auth.equals(excludeAuth)) { //don't send the notification to yourself
-                        c.send(message);
-                    }
-                } else {
-                    list.remove(c);
-                    if (list.isEmpty()) {
-                        connections.remove(gameID); //if there are no connections
-                    }
+        if(list == null) {
+            System.out.println("Having trouble connecting to the other client. Try logging out and back in."); // Nothing to broadcast
+            return;
+        }
+        for (Connection c : list) {
+            if (c.session.isOpen()) {
+                if (!c.auth.equals(excludeAuth)) { //don't send the notification to yourself
+                    c.send(message);
+                }
+            } else {
+                list.remove(c);
+                if (list.isEmpty()) {
+                    connections.remove(gameID); //if there are no connections
                 }
             }
-        }
-        else{
-            System.out.println("Having trouble connecting to the other client. Try logging out and back in."); // Nothing to broadcast
         }
 
     }
