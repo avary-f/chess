@@ -43,7 +43,7 @@ public class ConnectionManager {
     public void broadcast(String excludeAuth, ServerMessage message, Integer gameID) throws IOException {
         CopyOnWriteArrayList<Connection> list = connections.get(gameID);
         if(list == null) {
-            System.out.println("Having trouble connecting to the other client. Try logging out and back in."); // Nothing to broadcast
+            System.out.println("Having trouble connecting to the other client. Please try logging out and back in."); // Nothing to broadcast
             return;
         }
         for (Connection c : list) {
