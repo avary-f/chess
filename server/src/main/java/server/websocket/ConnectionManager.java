@@ -22,18 +22,18 @@ public class ConnectionManager {
     public void remove(String auth) {
         for(Integer gameID: connections.keySet()) {
             CopyOnWriteArrayList<Connection> list = connections.get(gameID);
-            if (list != null) {
-                for (Connection c : list) {
-                    if (c.auth.equals(auth)) {
-                        list.remove(c); //remove that specific connection to the game
-                        if (list.isEmpty()) { //if no one is joined to the game
-                            connections.remove(gameID);
-                        }
-                        return; //if you found the thing you need to remove, end the function
-                    }
-                }
-            } else {
+            if (list == null) {
                 System.out.println("Having trouble connecting to the other client. Try logging out and back in."); // Nothing to broadcast
+                return;
+            }
+            for (Connection c : list) {
+                if (c.auth.equals(auth)) {
+                    list.remove(c); //remove that specific connection to the game
+                    if (list.isEmpty()) { //if no one is joined to the game
+                        connections.remove(gameID);
+                    }
+                    return; //if you found the thing you need to remove, end the function
+                }
             }
         }
     }
