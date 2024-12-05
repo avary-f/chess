@@ -79,7 +79,8 @@ public class ClientGameplay extends ChessClient{
             checkValidInput(params);
         }
         else if(params.length == 3){
-            checkValidInput(params);
+            String[] newParams = {params[0], params[1]};
+            checkValidInput(newParams);
             checkValidInputPromotion(params[2]);
         }
         if(params.length == 2 || params.length == 3) { //the 3rd param is the promotion piece
