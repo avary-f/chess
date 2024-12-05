@@ -123,7 +123,7 @@ public class WebSocketHandler {
             ServerMessage error = new Error(message);
             connections.broadcastToMe(session, error);
         } catch (IOException ex) {
-            var message = "Connection closed due to inactivity. Please retype your command";
+            var message = "Connection closed due to inactivity. Please retype your command.";
             ServerMessage error = new Error(message);
             connections.broadcastToMe(session, error);
         } catch (BadRequestException ex){
